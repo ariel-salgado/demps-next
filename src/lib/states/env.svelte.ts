@@ -27,24 +27,6 @@ export class Environment {
 		return Array.from(this._features.values());
 	}
 
-	serialize() {
-		return JSON.stringify(
-			this._features,
-			(_, value) => {
-				return Object.fromEntries(value);
-			},
-			2
-		);
-	}
-
-	deserialize(json: string) {
-		return JSON.parse(json, (_, value) => {
-			if (value && typeof value === 'object') {
-				return new Map(Object.entries(value));
-			}
-		});
-	}
-
 	addFeature(feature: Feature, id?: string) {
 		const featureId = id || String(feature.id);
 
