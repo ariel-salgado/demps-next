@@ -29,5 +29,11 @@ export default [
 	},
 	{
 		ignores: ['build/', '.svelte-kit/', 'package/', '.vscode/']
+	},
+	{
+		rules: {
+			"svelte/valid-compile": "off",
+			"@typescript-eslint/no-explicit-any": "off",
+		}
 	}
 ];
