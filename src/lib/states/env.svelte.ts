@@ -1,19 +1,12 @@
-import type {
-	Feature,
-	Geometry,
-	GeoJsonProperties,
-	FeatureCollection,
-	GeometryCollection
-} from 'geojson';
+import type { G } from '$lib/types';
+import type { Feature, GeoJsonProperties, FeatureCollection } from 'geojson';
 
 import { Map } from 'svelte/reactivity';
 
-type G = Exclude<Geometry, GeometryCollection>;
+export class Environment {
+	private _features: Map<string, Feature<G>>;
 
-export class Environment<T extends G> {
-	private _features: Map<string, Feature<T>>;
-
-	constructor(geojson?: FeatureCollection<T>) {
+	constructor(geojson?: FeatureCollection<G>) {
 		const value = geojson ? geojson.features : [];
 
 		this._features = new Map(value.map((feature) => [String(feature.id), feature]));
@@ -52,7 +45,7 @@ export class Environment<T extends G> {
 		});
 	}
 
-	addFeature(feature: Feature<T>, id?: string) {
+	addFeature(feature: Feature, id?: string) {
 		const featureId = id || String(feature.id);
 
 		if (this._features.has(featureId)) {
@@ -61,10 +54,10 @@ export class Environment<T extends G> {
 
 		feature.id = featureId;
 
-		this._features.set(featureId, feature);
+		this._features.set(featureId, feature as Feature<G>);
 	}
 
-	updateFeatureCoords(id: string, coords: T['coordinates']) {
+	updateFeatureCoords(id: string, coords: G['coordinates']) {
 		if (!this._features.has(id)) {
 			throw new Error(`Feature with id ${id} not found`);
 		}
