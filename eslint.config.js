@@ -32,8 +32,8 @@ export default [
 	},
 	{
 		rules: {
-			"svelte/valid-compile": "off",
-			"@typescript-eslint/no-explicit-any": "off",
+			'svelte/valid-compile': 'off',
+			'@typescript-eslint/no-explicit-any': 'off'
 		}
 	}
 ];
