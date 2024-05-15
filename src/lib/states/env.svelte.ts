@@ -16,7 +16,7 @@ export class Environment {
 		return this._features.get(id);
 	}
 
-	get value() {
+	get value(): FeatureCollection {
 		return {
 			type: 'FeatureCollection',
 			features: Array.from(this._features.values())
