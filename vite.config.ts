@@ -8,7 +8,7 @@ export default defineConfig({
 	plugins: [sveltekit(), tailwindcss()],
 	test: {
 		globals: true,
-		include: ['src/**/*.{test,spec}.{js,ts}'],
+		include: ['test/**/*.{test,spec}.{js,ts}'],
 		alias: {
 			$lib: resolve('./src/lib')
 		}
