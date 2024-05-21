@@ -14,7 +14,8 @@
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
-		"prepare": "husky"
+		"prepare": "husky",
+		"preinstall": "npx only-allow pnpm"
 	},
 	"devDependencies": {
 		"@codemirror/autocomplete": "^6.16.0",
@@ -27,7 +28,7 @@
 		"@codemirror/view": "^6.26.3",
 		"@playwright/test": "^1.44.0",
 		"@sveltejs/adapter-node": "^5.0.1",
-		"@sveltejs/kit": "^2.5.9",
+		"@sveltejs/kit": "^2.5.10",
 		"@sveltejs/vite-plugin-svelte": "4.0.0-next.1",
 		"@tailwindcss/vite": "4.0.0-alpha.15",
 		"@turf/random": "7.0.0-alpha.116",
@@ -45,11 +46,11 @@
 		"html-minifier-terser": "^7.2.0",
 		"husky": "^9.0.11",
 		"leaflet": "^1.9.4",
-		"lint-staged": "^15.2.2",
+		"lint-staged": "^15.2.4",
 		"prettier": "^3.2.5",
 		"prettier-plugin-svelte": "^3.2.3",
 		"prettier-plugin-tailwindcss": "^0.5.14",
-		"svelte": "5.0.0-next.136",
+		"svelte": "5.0.0-next.137",
 		"svelte-check": "^3.7.1",
 		"tailwind-merge": "^2.3.0",
 		"tailwindcss": "4.0.0-alpha.15",
@@ -60,5 +61,10 @@
 		"vitest": "^1.6.0"
 	},
 	"type": "module",
-	"packageManager": "pnpm@9.1.1+sha256.9551e803dcb7a1839fdf5416153a844060c7bce013218ce823410532504ac10b"
+	"packageManager": "pnpm@9.1.2",
+	"engines": {
+		"npm": "please-use-pnpm",
+		"yarn": "please-use-pnpm",
+		"pnpm": ">=9.0.0"
+	}
 }
