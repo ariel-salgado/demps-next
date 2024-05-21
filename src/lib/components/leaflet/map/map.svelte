@@ -49,7 +49,7 @@
 	});
 
 	// @ts-expect-error - Svelte action can't be async, but works anyway
-	const initMap: MapAction = async (mapContainer, environment: Parameters) => {
+	const initMap: MapAction = async (mapContainer, environment) => {
 		if (!window.L) {
 			await import('leaflet');
 			await import('leaflet/dist/leaflet.css');
@@ -92,7 +92,6 @@
 					toggleOverlay();
 				}
 			},
-
 			destroy() {
 				map?.remove();
 				map = undefined;
