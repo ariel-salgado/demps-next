@@ -12,7 +12,7 @@ const options: Options = {
 	html5: true,
 	ignoreCustomComments: [/^#/],
 	minifyCSS: true,
-	minifyJS: false,
+	minifyJS: true,
 	removeAttributeQuotes: true,
 	removeComments: false,
 	removeOptionalTags: true,
