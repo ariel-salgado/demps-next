@@ -8,13 +8,13 @@
 
 	let { left, right }: Props = $props();
 
-	let leftSide: HTMLDivElement | undefined = $state();
-	let container: HTMLDivElement | undefined = $state();
-
 	let xPosition = $state(0);
 	let leftWidth = $state(0);
 
 	let isDragging = $state(false);
+
+	let leftSide: HTMLDivElement | undefined = $state();
+	let container: HTMLDivElement | undefined = $state();
 
 	$effect(() => {
 		if (isDragging) {
@@ -43,12 +43,26 @@
 	}
 </script>
 
-<!-- TODO: Add better styles -->
 <!-- TODO: Expose width classes as props -->
 
-<svelte:body class={`${isDragging && 'cursor-col-resize'}`} />
+{#snippet resizer()}
+	<div
+		role="button"
+		tabindex="-1"
+		onmousedowncapture={mouseDownHandler}
+		class={`rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" width="7" height="18">
+			<path d="M2 0h3v3H2zm0 5h3v3H2zm0 5h3v3H2zm0 5h3v3H2z" class="fill-slate-400" />
+		</svg>
+	</div>
+{/snippet}
 
-<div class="isolate flex size-full" bind:this={container}>
+<div
+	class={`isolate flex size-full ${isDragging ? 'cursor-col-resize' : ''}`}
+	bind:this={container}
+>
+	<!-- Left screen -->
 	<div
 		class={`z-0 w-2/3 min-w-80 ${isDragging && 'pointer-events-none select-none'}`}
 		bind:this={leftSide}
@@ -56,15 +70,14 @@
 		{@render left()}
 	</div>
 
-	<div class="relative z-10 flex h-full w-1 flex-col justify-center bg-neutral-300">
-		<div
-			class={`absolute -left-1 h-20 w-3 cursor-ew-resize rounded-md bg-neutral-600 ${isDragging && 'cursor-col-resize'}`}
-			onmousedowncapture={mouseDownHandler}
-			role="button"
-			tabindex="0"
-		></div>
+	<!-- Resizer -->
+	<div class="z-10 flex h-full w-2 flex-col justify-around bg-slate-600">
+		{@render resizer()}
+		{@render resizer()}
+		{@render resizer()}
 	</div>
 
+	<!-- Right screen -->
 	<div class={`z-0 min-w-80 flex-1 ${isDragging && 'pointer-events-none select-none'}`}>
 		{@render right()}
 	</div>
