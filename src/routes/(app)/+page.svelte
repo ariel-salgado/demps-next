@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { env } from '$lib/states';
-	import { Map } from '$lib/components/leaflet';
 	import { SplitView } from '$lib/components/ui';
 	import { Editor } from '$lib/components/codemirror';
+	import { Map, Draw } from '$lib/components/leaflet';
 
 	const zoom = 15;
 	const center: [number, number] = [-33.015348, -71.550002];
@@ -16,7 +16,9 @@
 <section class="size-full">
 	<SplitView>
 		{#snippet left()}
-			<Map {center} {zoom} environment={env} />
+			<Map {center} {zoom} environment={env}>
+				<Draw />
+			</Map>
 		{/snippet}
 		{#snippet right()}
 			<Editor environment={env} />
