@@ -11,8 +11,12 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
+export function randomID(): string {
+	return crypto.randomUUID().split('-').at(-1) as string;
+}
+
 export function generatePolygon(): Feature<G> {
-	const id = crypto.randomUUID().split('-').at(-1) as string;
+	const id = randomID();
 	const feature = (rewind(randomPolygon()) as FeatureCollection<G>).features.at(0)!;
 
 	return { id, ...feature };
