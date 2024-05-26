@@ -40,6 +40,9 @@
 		get map() {
 			return map;
 		},
+		get environment() {
+			return environment;
+		},
 		get featureGroup() {
 			return featureGroup;
 		},
@@ -89,6 +92,7 @@
 		return {
 			update(environment: Parameters) {
 				if (environment) {
+					loadFeatures(environment.features);
 					toggleOverlay();
 				}
 			},
