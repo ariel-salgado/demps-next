@@ -1,3 +1,3 @@
 import { Environment } from './env.svelte';
 
-export const env = new Environment();
+export const environment = new Environment();
