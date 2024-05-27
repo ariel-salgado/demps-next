@@ -1,12 +1,13 @@
 <script lang="ts">
+	import type { Feature } from 'geojson';
+	import type { Circle, Layer, Polygon } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet/map';
 
+	import { randomID } from '$lib/utils';
 	import { getContext, onMount } from 'svelte';
 	import { contextKey } from '$lib/components/leaflet/map';
 
-	const { map, featureGroup } = getContext<MapContext>(contextKey);
-
-	console.log(map);
+	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(contextKey);
 
 	onMount(async () => {
 		if (!map.pm) {
@@ -39,5 +40,68 @@
 		window.document.querySelectorAll('a.leaflet-buttons-control-button').forEach((button) => {
 			button.setAttribute('aria-label', button.parentElement!.getAttribute('title')!);
 		});
+	});
+
+	function layerToGeometry<T extends Polygon | Circle>(layer: Layer) {
+		let feature: T | undefined;
+
+		if (layer instanceof window.L.Polygon) {
+			const coordinates = layer.getLatLngs();
+			feature = new window.L.Polygon(coordinates) as T;
+		} else if (layer instanceof window.L.Circle) {
+			const coordinates = layer.getLatLng();
+			const radius = Number(layer.getRadius().toFixed(6));
+			feature = new window.L.Circle(coordinates, radius) as T;
+		} else {
+			return;
+		}
+
+		return feature;
+	}
+
+	function geometryToGeoJSON<T extends Polygon | Circle>(feature: T) {
+		let featureGeoJSON: Feature | undefined;
+
+		if (feature instanceof window.L.Circle) {
+			// @ts-expect-error - id is an added property
+			const properties = environment.get(feature.id)?.properties;
+
+			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature as Circle, 18).toGeoJSON(6);
+			featureGeoJSON.properties = {
+				...properties,
+				radius: Number((feature as Circle).getRadius().toFixed(6)),
+				center: [
+					Number((feature as Circle).getLatLng().lat.toFixed(6)),
+					Number((feature as Circle).getLatLng().lng.toFixed(6))
+				]
+			};
+		} else if (feature instanceof window.L.Polygon) {
+			featureGeoJSON = feature.toGeoJSON(6);
+		} else {
+			return;
+		}
+
+		// @ts-expect-error - id is an added property
+		featureGeoJSON = { id: feature.id, ...featureGeoJSON };
+
+		return featureGeoJSON;
+	}
+
+	map.on('pm:create', ({ layer }) => {
+		featureGroup.removeLayer(layer);
+
+		const feature = layerToGeometry(layer);
+
+		if (!feature) return;
+
+		const id = randomID();
+
+		Object.defineProperty(feature, 'id', { value: id, writable: false });
+
+		featureGroup.addLayer(feature);
+		overlayLayer.addOverlay(feature, id);
+
+		const featureGeoJSON = geometryToGeoJSON(feature);
+		environment.addFeature(featureGeoJSON!, id);
 	});
 </script>
