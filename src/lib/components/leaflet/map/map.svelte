@@ -6,8 +6,8 @@
 	import type { G } from '$lib/types';
 	import type { Feature } from 'geojson';
 	import type { Action } from 'svelte/action';
+	import type { Environment } from '$lib/states';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import type { Environment } from '$lib/states/env.svelte';
 	import type { Control, FeatureGroup, Map, MapOptions } from 'leaflet';
 
 	import { cn } from '$lib/utils';
@@ -84,7 +84,7 @@
 			map?.addLayer(featureGroup!);
 
 			if (environment) {
-				loadFeatures(environment.features);
+				loadFeatures(environment.getFeatures());
 				fitBounds();
 			}
 		});
@@ -92,7 +92,7 @@
 		return {
 			update(environment: Parameters) {
 				if (environment) {
-					loadFeatures(environment.features);
+					loadFeatures(environment.getFeatures());
 					toggleOverlay();
 				}
 			},

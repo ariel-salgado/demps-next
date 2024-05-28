@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	import type { Action } from 'svelte/action';
-	import type { Environment } from '$lib/states/env.svelte';
+	import type { Environment } from '$lib/states';
 
 	import { setContext } from 'svelte';
 

@@ -1,3 +1,5 @@
-import { Environment } from './env.svelte';
+import { createEnvironment } from './environment.svelte';
 
-export const environment = new Environment();
+export type Environment = ReturnType<typeof createEnvironment>;
+
+export const environment = createEnvironment();

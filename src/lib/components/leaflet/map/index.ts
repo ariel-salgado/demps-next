@@ -1,4 +1,4 @@
-import type { Environment } from '$lib/states/env.svelte';
+import type { Environment } from '$lib/states';
 import type { Map, FeatureGroup, Control } from 'leaflet';
 
 export { default as Map } from './map.svelte';
