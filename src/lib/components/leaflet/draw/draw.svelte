@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { G } from '$lib/types';
 	import type { Feature } from 'geojson';
 	import type { Circle, Layer, Polygon } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet/map';
@@ -15,8 +16,7 @@
 			await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
 		}
 
-		// @ts-expect-error - reInitLayer accepts the map object
-		window.L.PM.reInitLayer(map);
+		window.L.PM.reInitLayer(map as unknown as Layer);
 		window.L.PM.reInitLayer(featureGroup);
 
 		map.pm.setLang('es');
@@ -59,12 +59,13 @@
 		return feature;
 	}
 
-	function geometryToGeoJSON<T extends Polygon | Circle>(feature: T) {
+	function geometryToGeoJSON<T extends (Layer | Polygon | Circle) & Partial<{ id: string }>>(
+		feature: T
+	) {
 		let featureGeoJSON: Feature | undefined;
 
 		if (feature instanceof window.L.Circle) {
-			// @ts-expect-error - id is an added property
-			const properties = environment.get(feature.id)?.properties;
+			const properties = environment.getFeature(feature.id!)?.properties;
 
 			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature as Circle, 18).toGeoJSON(6);
 			featureGeoJSON.properties = {
@@ -81,7 +82,6 @@
 			return;
 		}
 
-		// @ts-expect-error - id is an added property
 		featureGeoJSON = { id: feature.id, ...featureGeoJSON };
 
 		return featureGeoJSON;
@@ -89,13 +89,11 @@
 
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
-
 		const feature = layerToGeometry(layer);
 
 		if (!feature) return;
 
 		const id = randomID();
-
 		Object.defineProperty(feature, 'id', { value: id, writable: false });
 
 		featureGroup.addLayer(feature);
@@ -103,5 +101,10 @@
 
 		const featureGeoJSON = geometryToGeoJSON(feature);
 		environment.addFeature(featureGeoJSON!, id);
+	});
+
+	featureGroup.on('pm:edit', ({ layer }) => {
+		let featureGeoJSON = geometryToGeoJSON(layer) as Feature<G>;
+		environment.updateFeature(featureGeoJSON.id as string, featureGeoJSON);
 	});
 </script>
