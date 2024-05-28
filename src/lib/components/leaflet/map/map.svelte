@@ -3,8 +3,6 @@
 </script>
 
 <script lang="ts">
-	import type { G } from '$lib/types';
-	import type { Feature } from 'geojson';
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
 	import type { HTMLAttributes } from 'svelte/elements';
@@ -83,19 +81,16 @@
 			map?.invalidateSize();
 			map?.addLayer(featureGroup!);
 
-			if (environment) {
-				loadFeatures(environment.getFeatures());
-				fitBounds();
-			}
+			$effect.root(() => {
+				$effect(() => {
+					if (environment) {
+						// Do something when the environment changes
+					}
+				});
+			});
 		});
 
 		return {
-			update(environment: Parameters) {
-				if (environment) {
-					loadFeatures(environment.getFeatures());
-					toggleOverlay();
-				}
-			},
 			destroy() {
 				map?.remove();
 				map = undefined;
@@ -104,7 +99,7 @@
 		};
 	};
 
-	function loadFeatures(features: Feature<G>[]) {
+	/* function loadFeatures(features: Feature<G>[]) {
 		window.L.geoJSON(features, {
 			style: () => {
 				return {};
@@ -148,7 +143,7 @@
 		}
 
 		map?.addControl(overlayLayer!);
-	}
+	} */
 </script>
 
 <svelte:head>
