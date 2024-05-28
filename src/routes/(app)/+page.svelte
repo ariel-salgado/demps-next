@@ -6,8 +6,6 @@
 
 	const zoom = 15;
 	const center: [number, number] = [-33.015348, -71.550002];
-
-	$inspect(environment.features);
 </script>
 
 <svelte:head>
