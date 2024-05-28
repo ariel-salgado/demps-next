@@ -43,7 +43,7 @@
 	}
 </script>
 
-<!-- TODO: Expose width classes as props -->
+<!-- TODO: Add button to close right side panel -->
 
 {#snippet resizer()}
 	<div
