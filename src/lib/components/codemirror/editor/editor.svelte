@@ -40,7 +40,6 @@
 		});
 
 		return {
-			update() {},
 			destroy() {
 				editorContainer.remove();
 			}
