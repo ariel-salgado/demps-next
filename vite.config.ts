@@ -7,6 +7,6 @@ export default defineConfig({
 	plugins: [sveltekit(), tailwindcss()],
 	test: {
 		globals: true,
-		include: ['test/**/*.{test,spec}.{js,ts}']
+		include: ['src/**/*.{test,spec}.{js,ts}']
 	}
 });
