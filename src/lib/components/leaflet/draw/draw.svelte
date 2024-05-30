@@ -4,7 +4,7 @@
 	import type { Circle, Layer, Polygon } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet/map';
 
-	import { randomID } from '$lib/utils';
+	import { randomID } from '$lib/utils/utils';
 	import { getContext, onMount } from 'svelte';
 	import { contextKey } from '$lib/components/leaflet/map';
 
@@ -104,7 +104,7 @@
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
-		let featureGeoJSON = geometryToGeoJSON(layer) as Feature<G>;
-		environment.updateFeature(featureGeoJSON.id as string, featureGeoJSON);
+		let feature = geometryToGeoJSON(layer) as Feature<G>;
+		environment.updateFeatureCoords(feature.id as string, feature.geometry.coordinates);
 	});
 </script>

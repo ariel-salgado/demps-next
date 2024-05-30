@@ -8,7 +8,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { Control, FeatureGroup, Map, MapOptions } from 'leaflet';
 
-	import { cn } from '$lib/utils';
+	import { cn } from '$lib/utils/utils';
 	import { setContext } from 'svelte';
 
 	type Parameters = Environment | undefined;

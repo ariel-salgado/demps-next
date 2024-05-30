@@ -2,6 +2,7 @@
 	import { extensions } from './extensions';
 	import { EditorView } from '@codemirror/view';
 	import { EditorState } from '@codemirror/state';
+	import { isValidGeoJSON, strEqualsObj } from '$lib/utils';
 
 	export const contextKey = Symbol();
 </script>
@@ -9,6 +10,7 @@
 <script lang="ts">
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
+	import type { FeatureCollection } from 'geojson';
 
 	import { setContext } from 'svelte';
 
@@ -30,6 +32,18 @@
 		}
 	});
 
+	function updateEditor(value: FeatureCollection) {
+		if (!strEqualsObj(editor!.state.doc.toString(), value) && isValidGeoJSON(value)) {
+			editor?.dispatch({
+				changes: {
+					from: 0,
+					to: editor.state.doc.length,
+					insert: JSON.stringify(value, null, 2)
+				}
+			});
+		}
+	}
+
 	const initEditor: EditorAction = (editorContainer, environment) => {
 		editor = new EditorView({
 			parent: editorContainer,
@@ -37,6 +51,12 @@
 				doc: JSON.stringify(environment.value, null, 2),
 				extensions: [extensions]
 			})
+		});
+
+		$effect.root(() => {
+			$effect(() => {
+				updateEditor(environment.value);
+			});
 		});
 
 		return {
