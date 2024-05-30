@@ -4,7 +4,7 @@
 	import { Editor } from '$lib/components/codemirror';
 	import { Map, Draw } from '$lib/components/leaflet';
 
-	const zoom = 15;
+	const zoom: number = 15;
 	const center: [number, number] = [-33.015348, -71.550002];
 </script>
 
