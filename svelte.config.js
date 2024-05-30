@@ -1,10 +1,11 @@
-import adapter from '@sveltejs/adapter-node';
+import adapter from '@sveltejs/adapter-static';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
 		adapter: adapter({
-			precompress: true
+			precompress: true,
+			strict: true
 		})
 	}
 };
