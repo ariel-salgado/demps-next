@@ -49,6 +49,7 @@
 	<div
 		role="button"
 		tabindex="-1"
+		aria-label="Resize"
 		onmousedowncapture={mouseDownHandler}
 		class={`rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
 	>
