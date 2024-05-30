@@ -27,8 +27,22 @@ export function createEnvironment(geojson?: FeatureCollection<G>) {
 		_features.set(featureId, feature as Feature<G>);
 	}
 
-	function updateFeature(id: string, feature: Feature<G>) {
+	function updateFeatureCoords(id: string, coordinates: Feature<G>['geometry']['coordinates']) {
 		if (!_features.has(id)) throw new Error(`Feature with id ${id} not found`);
+
+		// Little tweak to avoid reactivity issues
+		const feature = Object.assign({}, _features.get(id));
+		feature.geometry.coordinates = coordinates;
+
+		_features.set(id, feature);
+	}
+
+	function updateFeatureProperties(id: string, properties: Feature<G>['properties']) {
+		if (!_features.has(id)) throw new Error(`Feature with id ${id} not found`);
+
+		// Little tweak to avoid reactivity issues
+		const feature = Object.assign({}, _features.get(id));
+		feature.properties = properties;
 
 		_features.set(id, feature);
 	}
@@ -49,7 +63,8 @@ export function createEnvironment(geojson?: FeatureCollection<G>) {
 		getFeature,
 		getFeatures,
 		addFeature,
-		updateFeature,
+		updateFeatureCoords,
+		updateFeatureProperties,
 		removeFeature
 	};
 }
