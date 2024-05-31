@@ -4,10 +4,10 @@ import type { Feature, FeatureCollection } from 'geojson';
 import { Map } from 'svelte/reactivity';
 
 export function createEnvironment(geojson?: FeatureCollection<G>) {
-	const value = geojson ? geojson.features : [];
+	const _value = geojson ? geojson.features : [];
 
 	const _features: Map<string, Feature<G>> = new Map(
-		value.map((feature) => [String(feature.id), feature])
+		_value.map((feature) => [String(feature.id), feature])
 	);
 
 	function getFeature(id: string) {
@@ -25,6 +25,12 @@ export function createEnvironment(geojson?: FeatureCollection<G>) {
 
 		feature.id = featureId;
 		_features.set(featureId, feature as Feature<G>);
+	}
+
+	function updateFeature(id: string, feature: Feature<G>) {
+		if (!_features.has(id)) throw new Error(`Feature with id ${id} not found`);
+
+		_features.set(id, feature);
 	}
 
 	function updateFeatureCoords(id: string, coordinates: Feature<G>['geometry']['coordinates']) {
@@ -57,12 +63,13 @@ export function createEnvironment(geojson?: FeatureCollection<G>) {
 		get value(): FeatureCollection {
 			return {
 				type: 'FeatureCollection',
-				features: Array.from(_features.values())
+				features: getFeatures()
 			};
 		},
 		getFeature,
 		getFeatures,
 		addFeature,
+		updateFeature,
 		updateFeatureCoords,
 		updateFeatureProperties,
 		removeFeature
