@@ -65,17 +65,21 @@
 		let featureGeoJSON: Feature | undefined;
 
 		if (feature instanceof window.L.Circle) {
-			const properties = environment.getFeature(feature.id!)?.properties;
-
 			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature as Circle, 18).toGeoJSON(6);
-			featureGeoJSON.properties = {
-				...properties,
-				radius: Number((feature as Circle).getRadius().toFixed(6)),
-				center: [
-					Number((feature as Circle).getLatLng().lat.toFixed(6)),
-					Number((feature as Circle).getLatLng().lng.toFixed(6))
-				]
-			};
+
+			Object.defineProperties(featureGeoJSON.properties, {
+				radius: {
+					value: Number((feature as Circle).getRadius().toFixed(6)),
+					writable: true
+				},
+				center: {
+					value: [
+						Number((feature as Circle).getLatLng().lat.toFixed(6)),
+						Number((feature as Circle).getLatLng().lng.toFixed(6))
+					],
+					writable: true
+				}
+			});
 		} else if (feature instanceof window.L.Polygon) {
 			featureGeoJSON = feature.toGeoJSON(6);
 		} else {
@@ -100,11 +104,25 @@
 		overlayLayer.addOverlay(feature, id);
 
 		const featureGeoJSON = geometryToGeoJSON(feature);
+
 		environment.addFeature(featureGeoJSON!, id);
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
 		let feature = geometryToGeoJSON(layer) as Feature<G>;
-		environment.updateFeatureCoords(feature.id as string, feature.geometry.coordinates);
+
+		if (layer instanceof window.L.Circle) {
+			environment.updateFeature(feature.id as string, feature);
+		} else if (layer instanceof window.L.Polygon) {
+			environment.updateFeatureCoords(feature.id as string, feature.geometry.coordinates);
+		}
+	});
+
+	map.on('pm:remove', ({ layer }) => {
+		featureGroup.removeLayer(layer);
+		overlayLayer.removeLayer(layer);
+
+		// @ts-expect-error - id is an added property
+		environment.removeFeature(layer.id);
 	});
 </script>
