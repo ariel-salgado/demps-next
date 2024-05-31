@@ -10,6 +10,7 @@
 
 	let xPosition = $state(0);
 	let leftWidth = $state(0);
+	let innerHeight = $state(0);
 
 	let isDragging = $state(false);
 
@@ -43,14 +44,16 @@
 	}
 </script>
 
-<!-- TODO: Add button to close right side panel -->
+<!-- ?: Add button to close right side panel -->
+
+<svelte:window bind:innerHeight />
 
 {#snippet resizer()}
 	<div
 		role="button"
 		tabindex="-1"
 		aria-label="Resize"
-		onmousedowncapture={mouseDownHandler}
+		onmousedown={mouseDownHandler}
 		class={`rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" width="7" height="18">
@@ -61,11 +64,12 @@
 
 <div
 	class={`isolate flex size-full ${isDragging ? 'cursor-col-resize' : ''}`}
+	style="max-height: {innerHeight! - container!.getBoundingClientRect().top - 1}px"
 	bind:this={container}
 >
 	<!-- Left screen -->
 	<div
-		class={`z-0 w-2/3 min-w-80 ${isDragging && 'pointer-events-none select-none'}`}
+		class={`z-0 w-2/3 min-w-96 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
 		bind:this={leftSide}
 	>
 		{@render left()}
@@ -79,7 +83,9 @@
 	</div>
 
 	<!-- Right screen -->
-	<div class={`z-0 min-w-80 flex-1 ${isDragging && 'pointer-events-none select-none'}`}>
+	<div
+		class={`z-0 min-w-96 flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
+	>
 		{@render right()}
 	</div>
 </div>
