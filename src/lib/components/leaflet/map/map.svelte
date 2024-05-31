@@ -3,6 +3,8 @@
 </script>
 
 <script lang="ts">
+	import type { G } from '$lib/types';
+	import type { Feature } from 'geojson';
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
 	import type { HTMLAttributes } from 'svelte/elements';
@@ -84,9 +86,11 @@
 			$effect.root(() => {
 				$effect(() => {
 					if (environment) {
-						// Do something when the environment changes
+						loadFeatures(environment.getFeatures());
 					}
 				});
+
+				return () => clearLayers();
 			});
 		});
 
@@ -99,51 +103,36 @@
 		};
 	};
 
-	/* function loadFeatures(features: Feature<G>[]) {
+	function clearLayers() {
+		featureGroup?.eachLayer((layer) => {
+			overlayLayer?.removeLayer(layer);
+		});
+		featureGroup?.clearLayers();
+	}
+
+	// TODO: For some reason, radius and center are not being added in the editor
+	function loadFeatures(features: Feature<G>[]) {
+		clearLayers();
+
 		window.L.geoJSON(features, {
 			style: () => {
 				return {};
 			},
 			onEachFeature(feature, layer) {
-				if (feature.properties.radius && feature.properties.center) {
-					const radius = feature.properties.radius;
-					const center = new window.L.LatLng(
-						feature.properties.center[0],
-						feature.properties.center[1]
-					);
+				const { radius, center, nameID } = feature.properties;
 
-					layer = new window.L.Circle(center, radius).setStyle(layer.options);
+				if (radius && center.length > 0) {
+					const _center = new window.L.LatLng(center[0], center[1]);
+					layer = new window.L.Circle(_center, radius).setStyle(layer.options);
 				}
 
 				Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
 
 				featureGroup?.addLayer(layer);
-				overlayLayer?.addOverlay(layer, feature.properties.nameID || feature.id);
+				overlayLayer?.addOverlay(layer, nameID || feature.id);
 			}
 		});
 	}
-
-	function fitBounds(animate?: boolean) {
-		if (featureGroup?.getLayers().length === 0) return;
-
-		const featureBounds = featureGroup?.getBounds();
-
-		if (!featureBounds?.isValid()) return;
-
-		map?.fitBounds(featureBounds!, {
-			animate: animate,
-			maxZoom: 15
-		});
-	}
-
-	function toggleOverlay() {
-		if (featureGroup?.getLayers().length === 0) {
-			map?.removeControl(overlayLayer!);
-			return;
-		}
-
-		map?.addControl(overlayLayer!);
-	} */
 </script>
 
 <svelte:head>
