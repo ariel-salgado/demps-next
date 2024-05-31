@@ -33,11 +33,11 @@ export function strEqualsObj(str: string, obj: object) {
 
 export function isValidGeoJSON(json: string | object) {
 	try {
-		if (typeof json === 'object') {
+		if (json instanceof Object) {
 			check(JSON.stringify(json));
-			return true;
+		} else {
+			check(json);
 		}
-		check(json);
 		return true;
 	} catch {
 		return false;
