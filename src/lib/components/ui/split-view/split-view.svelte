@@ -64,7 +64,7 @@
 
 <div
 	class={`isolate flex size-full ${isDragging ? 'cursor-col-resize' : ''}`}
-	style="max-height: {innerHeight! - container!.getBoundingClientRect().top - 1}px"
+	style="max-height: {innerHeight! - (container?.getBoundingClientRect().top || 0) - 1}px"
 	bind:this={container}
 >
 	<!-- Left screen -->
