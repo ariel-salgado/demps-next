@@ -33,11 +33,13 @@
 	});
 
 	function updateEditor(value: FeatureCollection) {
-		if (!strEqualsObj(editor!.state.doc.toString(), value) && isValidGeoJSON(value)) {
+		const { doc } = editor!.state;
+
+		if (!strEqualsObj(doc.toString(), value) && isValidGeoJSON(value)) {
 			editor?.dispatch({
 				changes: {
 					from: 0,
-					to: editor.state.doc.length,
+					to: doc.length,
 					insert: JSON.stringify(value, null, 2)
 				}
 			});
