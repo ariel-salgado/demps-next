@@ -67,19 +67,11 @@
 		if (feature instanceof window.L.Circle) {
 			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature as Circle, 18).toGeoJSON(6);
 
-			Object.defineProperties(featureGeoJSON.properties, {
-				radius: {
-					value: Number((feature as Circle).getRadius().toFixed(6)),
-					writable: true
-				},
-				center: {
-					value: [
-						Number((feature as Circle).getLatLng().lat.toFixed(6)),
-						Number((feature as Circle).getLatLng().lng.toFixed(6))
-					],
-					writable: true
-				}
-			});
+			featureGeoJSON.properties!.radius = Number((feature as Circle).getRadius().toFixed(6));
+			featureGeoJSON.properties!.center = [
+				Number((feature as Circle).getLatLng().lat.toFixed(6)),
+				Number((feature as Circle).getLatLng().lng.toFixed(6))
+			];
 		} else if (feature instanceof window.L.Polygon) {
 			featureGeoJSON = feature.toGeoJSON(6);
 		} else {

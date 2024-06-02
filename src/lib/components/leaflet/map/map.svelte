@@ -110,7 +110,6 @@
 		featureGroup?.clearLayers();
 	}
 
-	// TODO: For some reason, radius and center are not being added in the editor
 	function loadFeatures(features: Feature<G>[]) {
 		clearLayers();
 
