@@ -73,7 +73,7 @@
 		map.pm.setGlobalOptions({
 			resizableCircle: true,
 			layerGroup: featureGroup,
-			limitMarkersToCount: 20
+			limitMarkersToCount: 10
 		});
 
 		map.pm.addControls({
