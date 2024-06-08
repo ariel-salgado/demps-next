@@ -76,7 +76,8 @@ const theme: Extension = EditorView.theme({
 	'.cm-tooltip': {
 		overflow: 'hidden',
 		background: 'white',
-		borderRadius: '0.5rem'
+		borderRadius: '0.5rem',
+		zIndex: '999'
 	},
 	'& .cm-diagnostic-error': {
 		backgroundColor: '#ffeaea'

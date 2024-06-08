@@ -63,29 +63,27 @@
 {/snippet}
 
 <div
-	class={`isolate flex size-full ${isDragging ? 'cursor-col-resize' : ''}`}
+	class={`flex size-full ${isDragging ? 'cursor-col-resize' : ''}`}
 	style="max-height: {innerHeight! - (container?.getBoundingClientRect().top || 0) - 1}px"
 	bind:this={container}
 >
 	<!-- Left screen -->
 	<div
-		class={`z-0 w-2/3 min-w-96 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
+		class={`w-2/3 min-w-96 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
 		bind:this={leftSide}
 	>
 		{@render left()}
 	</div>
 
 	<!-- Resizer -->
-	<div class="z-10 flex h-full w-2 flex-col justify-around bg-slate-600">
+	<div class="flex h-full w-2 flex-col justify-around bg-slate-600">
 		{@render resizer()}
 		{@render resizer()}
 		{@render resizer()}
 	</div>
 
 	<!-- Right screen -->
-	<div
-		class={`z-0 min-w-96 flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
-	>
+	<div class={`min-w-96 flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}>
 		{@render right()}
 	</div>
 </div>
