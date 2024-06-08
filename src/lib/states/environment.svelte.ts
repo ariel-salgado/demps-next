@@ -4,7 +4,10 @@ import type { Feature, FeatureCollection } from 'geojson';
 import { Map } from 'svelte/reactivity';
 import { loadLocalStorage, saveLocalStorage } from '$lib/utils';
 
+// ?: Maybe better implementation on load pending strategy
+
 export function createEnvironment(features?: Feature<G>[]) {
+	let _loadPending: boolean = $state(true);
 	let _features: Map<string, Feature<G>>;
 
 	$effect.root(() => {
@@ -13,6 +16,7 @@ export function createEnvironment(features?: Feature<G>[]) {
 
 		_features = new Map(init.map((feature) => [String(feature.id), feature]));
 
+		// TODO: Prevent calling saveLocalStorage on init
 		$effect(() => {
 			saveLocalStorage('environment', getFeatures());
 		});
@@ -79,6 +83,16 @@ export function createEnvironment(features?: Feature<G>[]) {
 				type: 'FeatureCollection',
 				features: getFeatures()
 			};
+		},
+		get loadPending(): boolean {
+			return _loadPending;
+		},
+		set value(value: FeatureCollection) {
+			_features.clear();
+			value.features.forEach((feature) => addFeature(feature));
+		},
+		set loadPending(value: boolean) {
+			_loadPending = value;
 		},
 		getFeature,
 		getFeatures,
