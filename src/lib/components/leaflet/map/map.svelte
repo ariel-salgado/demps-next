@@ -55,7 +55,7 @@
 		overlayLayer = new window.L.Control.Layers();
 
 		const rasterLayer = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			keepBuffer: 32,
+			keepBuffer: 16,
 			updateWhenIdle: true,
 			updateWhenZooming: false,
 			attribution:
@@ -75,11 +75,25 @@
 		map.whenReady(() => {
 			map?.invalidateSize();
 
-			if (environment) {
-				map?.addLayer(featureGroup!);
-				map?.addControl(overlayLayer!);
-				loadFeatures(environment.getFeatures());
-			}
+			$effect.root(() => {
+				if (environment) {
+					map?.addLayer(featureGroup!);
+					map?.addControl(overlayLayer!);
+				}
+
+				$effect(() => {
+					if (environment?.loadPending) {
+						clearLayers();
+						loadFeatures(environment.getFeatures());
+						environment.loadPending = false;
+					}
+				});
+
+				return () => {
+					map?.removeLayer(featureGroup!);
+					map?.removeControl(overlayLayer!);
+				};
+			});
 		});
 
 		return {
@@ -110,6 +124,15 @@
 				overlayLayer?.addOverlay(layer, nameID || feature.id);
 			}
 		});
+	}
+
+	function clearLayers() {
+		if (featureGroup?.getLayers().length === 0) return;
+
+		featureGroup?.eachLayer((layer) => {
+			overlayLayer?.removeLayer(layer);
+		});
+		featureGroup?.clearLayers();
 	}
 </script>
 
