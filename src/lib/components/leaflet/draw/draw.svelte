@@ -83,6 +83,23 @@
 		return featureGeoJSON;
 	}
 
+	function geoJSONToGeometry<T extends Polygon | Circle>(feature: Feature<G>) {
+		let layer: T;
+
+		//@ts-expect-error - radius and center are added properties
+		const { radius, center } = feature.properties;
+
+		if (radius && center.length > 0) {
+			const coordinates = new window.L.LatLng(center[0], center[1]);
+			layer = new window.L.Circle(coordinates, radius) as T;
+		} else {
+			const coordinates = window.L.GeoJSON.coordsToLatLngs(feature.geometry.coordinates.flat());
+			layer = new window.L.Polygon(coordinates) as T;
+		}
+
+		return layer;
+	}
+
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
 		const feature = layerToGeometry(layer);
@@ -101,13 +118,28 @@
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
+		let editedFeature: Feature<G> | undefined;
 		let feature = geometryToGeoJSON(layer) as Feature<G>;
 
 		if (layer instanceof window.L.Circle) {
-			environment.updateFeature(feature.id as string, feature);
+			editedFeature = environment.updateFeature(feature.id as string, feature);
 		} else if (layer instanceof window.L.Polygon) {
-			environment.updateFeatureCoords(feature.id as string, feature.geometry.coordinates);
+			editedFeature = environment.updateFeatureCoords(
+				feature.id as string,
+				feature.geometry.coordinates
+			);
+		} else {
+			return;
 		}
+
+		featureGroup.removeLayer(layer);
+		overlayLayer.removeLayer(layer);
+
+		const editedLayer = geoJSONToGeometry(editedFeature);
+		Object.defineProperty(editedLayer, 'id', { value: feature.id, writable: false });
+
+		featureGroup.addLayer(editedLayer);
+		overlayLayer.addOverlay(editedLayer, feature.id as string);
 	});
 
 	map.on('pm:remove', ({ layer }) => {

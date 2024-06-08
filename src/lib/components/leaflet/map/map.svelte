@@ -10,8 +10,8 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { Control, FeatureGroup, Map, MapOptions } from 'leaflet';
 
-	import { cn } from '$lib/utils/utils';
 	import { setContext } from 'svelte';
+	import { cn } from '$lib/utils/utils';
 
 	type Parameters = Environment | undefined;
 
@@ -23,14 +23,7 @@
 		environment?: Environment;
 	}
 
-	let {
-		children,
-		zoom,
-		center,
-		environment = $bindable(),
-		class: className,
-		...rest
-	}: Props = $props();
+	let { children, zoom, center, environment, class: className, ...rest }: Props = $props();
 
 	let map: Map | undefined = $state();
 	let featureGroup: FeatureGroup | undefined = $state();
@@ -81,17 +74,12 @@
 
 		map.whenReady(() => {
 			map?.invalidateSize();
-			map?.addLayer(featureGroup!);
 
-			$effect.root(() => {
-				$effect(() => {
-					if (environment) {
-						loadFeatures(environment.getFeatures());
-					}
-				});
-
-				return () => clearLayers();
-			});
+			if (environment) {
+				map?.addLayer(featureGroup!);
+				map?.addControl(overlayLayer!);
+				loadFeatures(environment.getFeatures());
+			}
 		});
 
 		return {
@@ -103,16 +91,7 @@
 		};
 	};
 
-	function clearLayers() {
-		featureGroup?.eachLayer((layer) => {
-			overlayLayer?.removeLayer(layer);
-		});
-		featureGroup?.clearLayers();
-	}
-
 	function loadFeatures(features: Feature<G>[]) {
-		clearLayers();
-
 		window.L.geoJSON(features, {
 			style: () => {
 				return {};
@@ -121,8 +100,8 @@
 				const { radius, center, nameID } = feature.properties;
 
 				if (radius && center.length > 0) {
-					const _center = new window.L.LatLng(center[0], center[1]);
-					layer = new window.L.Circle(_center, radius).setStyle(layer.options);
+					const coords = new window.L.LatLng(center[0], center[1]);
+					layer = new window.L.Circle(coords, radius).setStyle(layer.options);
 				}
 
 				Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
