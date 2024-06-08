@@ -22,7 +22,7 @@
 		environment: Environment;
 	}
 
-	let { environment = $bindable() }: Props = $props();
+	const { environment }: Props = $props();
 
 	let editor: EditorView | undefined = $state();
 
@@ -55,15 +55,15 @@
 			})
 		});
 
-		$effect.root(() => {
-			$effect(() => {
-				updateEditor(environment.value);
-			});
+		$effect(() => {
+			updateEditor(environment.value);
 		});
 
 		return {
 			destroy() {
 				editorContainer.remove();
+				editor?.destroy();
+				editor = undefined;
 			}
 		};
 	};

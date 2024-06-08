@@ -23,7 +23,7 @@
 		environment?: Environment;
 	}
 
-	let { children, zoom, center, environment, class: className, ...rest }: Props = $props();
+	const { children, zoom, center, environment, class: className, ...rest }: Props = $props();
 
 	let map: Map | undefined = $state();
 	let featureGroup: FeatureGroup | undefined = $state();

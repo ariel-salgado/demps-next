@@ -1,33 +1,27 @@
 <script context="module" lang="ts">
-	function layerToGeometry<T extends Polygon | Circle>(layer: Layer) {
-		let feature: T | undefined;
-
+	function layerToGeometry(layer: Layer) {
 		if (layer instanceof window.L.Polygon) {
 			const coordinates = layer.getLatLngs();
-			feature = new window.L.Polygon(coordinates) as T;
+			return new window.L.Polygon(coordinates);
 		} else if (layer instanceof window.L.Circle) {
 			const coordinates = layer.getLatLng();
 			const radius = Number(layer.getRadius().toFixed(6));
-			feature = new window.L.Circle(coordinates, radius) as T;
+			return new window.L.Circle(coordinates, radius);
 		} else {
 			return;
 		}
-
-		return feature;
 	}
 
-	function geometryToGeoJSON<T extends (Layer | Polygon | Circle) & Partial<{ id: string }>>(
-		feature: T
-	) {
-		let featureGeoJSON: Feature | undefined;
+	function geometryToGeoJSON<T extends Layer | Polygon | Circle>(feature: T) {
+		let featureGeoJSON: Feature<G> | undefined;
 
 		if (feature instanceof window.L.Circle) {
-			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature as Circle, 18).toGeoJSON(6);
+			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature, 18).toGeoJSON(6);
 
-			featureGeoJSON.properties!.radius = Number((feature as Circle).getRadius().toFixed(6));
+			featureGeoJSON.properties!.radius = Number(feature.getRadius().toFixed(6));
 			featureGeoJSON.properties!.center = [
-				Number((feature as Circle).getLatLng().lat.toFixed(6)),
-				Number((feature as Circle).getLatLng().lng.toFixed(6))
+				Number(feature.getLatLng().lat.toFixed(6)),
+				Number(feature.getLatLng().lng.toFixed(6))
 			];
 		} else if (feature instanceof window.L.Polygon) {
 			featureGeoJSON = feature.toGeoJSON(6);
@@ -35,26 +29,21 @@
 			return;
 		}
 
-		featureGeoJSON = { id: feature.id, ...featureGeoJSON };
-
-		return featureGeoJSON;
+		//@ts-expect-error - id is an added property
+		return { id: feature.id, ...featureGeoJSON };
 	}
 
-	function geoJSONToGeometry<T extends Polygon | Circle>(feature: Feature<G>) {
-		let layer: T;
-
+	function geoJSONToGeometry(feature: Feature<G>) {
 		//@ts-expect-error - radius and center are added properties
 		const { radius, center } = feature.properties;
 
 		if (radius && center.length > 0) {
 			const coordinates = new window.L.LatLng(center[0], center[1]);
-			layer = new window.L.Circle(coordinates, radius) as T;
+			return new window.L.Circle(coordinates, radius);
 		} else {
 			const coordinates = window.L.GeoJSON.coordsToLatLngs(feature.geometry.coordinates.flat());
-			layer = new window.L.Polygon(coordinates) as T;
+			return new window.L.Polygon(coordinates);
 		}
-
-		return layer;
 	}
 </script>
 
@@ -104,6 +93,7 @@
 
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
+
 		const feature = layerToGeometry(layer);
 
 		if (!feature) return;
@@ -120,16 +110,15 @@
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
+		const feature = geometryToGeoJSON(layer) as Feature<G>;
+		const { id, geometry } = feature;
+
 		let editedFeature: Feature<G> | undefined;
-		let feature = geometryToGeoJSON(layer) as Feature<G>;
 
 		if (layer instanceof window.L.Circle) {
-			editedFeature = environment.updateFeature(feature.id as string, feature);
+			editedFeature = environment.updateFeature(id as string, feature);
 		} else if (layer instanceof window.L.Polygon) {
-			editedFeature = environment.updateFeatureCoords(
-				feature.id as string,
-				feature.geometry.coordinates
-			);
+			editedFeature = environment.updateFeatureCoords(id as string, geometry.coordinates);
 		} else {
 			return;
 		}
@@ -138,10 +127,10 @@
 		overlayLayer.removeLayer(layer);
 
 		const editedLayer = geoJSONToGeometry(editedFeature);
-		Object.defineProperty(editedLayer, 'id', { value: feature.id, writable: false });
+		Object.defineProperty(editedLayer, 'id', { value: id, writable: false });
 
 		featureGroup.addLayer(editedLayer);
-		overlayLayer.addOverlay(editedLayer, feature.id as string);
+		overlayLayer.addOverlay(editedLayer, id as string);
 	});
 
 	map.on('pm:remove', ({ layer }) => {

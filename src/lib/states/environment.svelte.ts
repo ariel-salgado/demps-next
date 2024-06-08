@@ -3,8 +3,8 @@ import type { Feature, FeatureCollection } from 'geojson';
 
 import { Map } from 'svelte/reactivity';
 
-export function createEnvironment(geojson?: FeatureCollection<G>) {
-	const _value = geojson ? geojson.features : [];
+export function createEnvironment(features?: Feature<G>[]) {
+	const _value = features || [];
 
 	const _features: Map<string, Feature<G>> = new Map(
 		_value.map((feature) => [String(feature.id), feature])
