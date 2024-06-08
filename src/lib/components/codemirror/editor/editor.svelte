@@ -8,6 +8,7 @@
 </script>
 
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
 	import type { FeatureCollection } from 'geojson';
@@ -19,16 +20,20 @@
 	type EditorAction = Action<HTMLElement, Parameters>;
 
 	interface Props {
+		children?: Snippet;
 		environment: Environment;
 	}
 
-	const { environment }: Props = $props();
+	const { children, environment }: Props = $props();
 
 	let editor: EditorView | undefined = $state();
 
 	setContext(contextKey, {
 		get editor() {
 			return editor;
+		},
+		get environment() {
+			return environment;
 		}
 	});
 
@@ -69,4 +74,10 @@
 	};
 </script>
 
-<div class="contents" use:initEditor={environment}></div>
+<div class="contents" use:initEditor={environment}>
+	{#if children}
+		<div class="sticky top-6 z-10 float-right mr-12 size-0">
+			{@render children()}
+		</div>
+	{/if}
+</div>
