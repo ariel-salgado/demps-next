@@ -1,1 +1,1 @@
-export { SplitView } from './split-view';
+export { default as SplitView } from './split-view/split-view.svelte';

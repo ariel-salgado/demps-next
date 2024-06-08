@@ -1,2 +1,4 @@
-export { Map } from './map';
-export { Draw } from './draw';
+export type { MapContext } from './map';
+
+export { default as Map, contextKey } from './map/map.svelte';
+export { default as Draw } from './draw/draw.svelte';
