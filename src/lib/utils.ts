@@ -2,10 +2,14 @@ import type { G } from '$lib/types';
 import type { ClassValue } from 'clsx';
 import type { Feature, FeatureCollection } from 'geojson';
 
+// Others
 import { clsx } from 'clsx';
-import { rewind } from '@turf/rewind';
 import { twMerge } from 'tailwind-merge';
 import { browser } from '$app/environment';
+
+// GeoJSON related
+import { rewind } from '@turf/rewind';
+import { truncate } from '@turf/truncate';
 import { randomPolygon } from '@turf/random';
 import { check } from '@placemarkio/check-geojson';
 
@@ -50,6 +54,26 @@ export function isValidGeoJSON(json: string | object) {
 		}
 		return true;
 	} catch {
-		return false;
+		throw new Error('Invalid GeoJSON');
 	}
+}
+
+export function preprocessGeoJSON(geojson: FeatureCollection | string) {
+	if (typeof geojson === 'string') {
+		geojson = JSON.parse(geojson) as FeatureCollection;
+	}
+
+	if (!isValidGeoJSON(geojson)) return;
+
+	const features: Feature<G>[] = [];
+
+	for (const feature of geojson.features) {
+		const id = feature.id ? String(feature.id) : randomID();
+		const truncated = truncate(feature, { precision: 6, coordinates: 2, mutate: true });
+		const rewinded = rewind(truncated, { mutate: true }) as Feature<G>;
+
+		features.push({ id, ...rewinded });
+	}
+
+	return { type: 'FeatureCollection', features } as FeatureCollection<G>;
 }
