@@ -1,47 +1,4 @@
-<script lang="ts">
-	import type { G } from '$lib/types';
-	import type { Feature } from 'geojson';
-	import type { Circle, Layer, Polygon } from 'leaflet';
-	import type { MapContext } from '$lib/components/leaflet/map';
-
-	import { randomID } from '$lib/utils/utils';
-	import { getContext, onMount } from 'svelte';
-	import { contextKey } from '$lib/components/leaflet/map';
-
-	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(contextKey);
-
-	onMount(async () => {
-		if (!map.pm) {
-			await import('@geoman-io/leaflet-geoman-free');
-			await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
-		}
-
-		window.L.PM.reInitLayer(map as unknown as Layer);
-		window.L.PM.reInitLayer(featureGroup);
-
-		map.pm.setLang('es');
-
-		map.pm.setGlobalOptions({
-			resizableCircle: true,
-			layerGroup: featureGroup,
-			limitMarkersToCount: 20
-		});
-
-		map.pm.addControls({
-			position: 'topleft',
-			drawText: false,
-			drawMarker: false,
-			cutPolygon: false,
-			drawPolyline: false,
-			drawCircleMarker: false
-		});
-
-		// Add aria-label to the draw buttons
-		window.document.querySelectorAll('a.leaflet-buttons-control-button').forEach((button) => {
-			button.setAttribute('aria-label', button.parentElement!.getAttribute('title')!);
-		});
-	});
-
+<script context="module" lang="ts">
 	function layerToGeometry<T extends Polygon | Circle>(layer: Layer) {
 		let feature: T | undefined;
 
@@ -99,6 +56,51 @@
 
 		return layer;
 	}
+</script>
+
+<script lang="ts">
+	import type { G } from '$lib/types';
+	import type { Feature } from 'geojson';
+	import type { Circle, Layer, Polygon } from 'leaflet';
+	import type { MapContext } from '$lib/components/leaflet';
+
+	import { randomID } from '$lib/utils';
+	import { getContext, onMount } from 'svelte';
+	import { contextKey } from '$lib/components/leaflet';
+
+	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(contextKey);
+
+	onMount(async () => {
+		if (!map.pm) {
+			await import('@geoman-io/leaflet-geoman-free');
+			await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
+		}
+
+		window.L.PM.reInitLayer(map as unknown as Layer);
+		window.L.PM.reInitLayer(featureGroup);
+
+		map.pm.setLang('es');
+
+		map.pm.setGlobalOptions({
+			resizableCircle: true,
+			layerGroup: featureGroup,
+			limitMarkersToCount: 20
+		});
+
+		map.pm.addControls({
+			position: 'topleft',
+			drawText: false,
+			drawMarker: false,
+			cutPolygon: false,
+			drawPolyline: false,
+			drawCircleMarker: false
+		});
+
+		// Add aria-label to the draw buttons
+		window.document.querySelectorAll('a.leaflet-buttons-control-button').forEach((button) => {
+			button.setAttribute('aria-label', button.parentElement!.getAttribute('title')!);
+		});
+	});
 
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
