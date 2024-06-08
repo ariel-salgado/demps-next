@@ -2,13 +2,23 @@ import type { G } from '$lib/types';
 import type { Feature, FeatureCollection } from 'geojson';
 
 import { Map } from 'svelte/reactivity';
+import { loadLocalStorage, saveLocalStorage } from '$lib/utils';
 
 export function createEnvironment(features?: Feature<G>[]) {
-	const _value = features || [];
+	let _features: Map<string, Feature<G>>;
 
-	const _features: Map<string, Feature<G>> = new Map(
-		_value.map((feature) => [String(feature.id), feature])
-	);
+	$effect.root(() => {
+		const stored = loadLocalStorage('environment');
+		const init = (stored ? JSON.parse(stored) : features || []) as Feature<G>[];
+
+		_features = new Map(init.map((feature) => [String(feature.id), feature]));
+
+		$effect(() => {
+			saveLocalStorage('environment', getFeatures());
+		});
+
+		return () => _features.clear();
+	});
 
 	function getFeature(id: string) {
 		return _features.get(id);

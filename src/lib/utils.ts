@@ -5,8 +5,18 @@ import type { Feature, FeatureCollection } from 'geojson';
 import { clsx } from 'clsx';
 import { rewind } from '@turf/rewind';
 import { twMerge } from 'tailwind-merge';
+import { browser } from '$app/environment';
 import { randomPolygon } from '@turf/random';
 import { check } from '@placemarkio/check-geojson';
+
+export function saveLocalStorage(key: string, value: any) {
+	if (!browser) return;
+	localStorage.setItem(key, JSON.stringify(value));
+}
+
+export function loadLocalStorage(key: string) {
+	return browser ? localStorage.getItem(key) : null;
+}
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
