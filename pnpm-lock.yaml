@@ -101,6 +101,9 @@ importers:
       lint-staged:
         specifier: ^15.2.5
         version: 15.2.5
+      lucide-svelte:
+        specifier: ^0.390.0
+        version: 0.390.0(svelte@5.0.0-next.151)
       prettier:
         specifier: ^3.3.1
         version: 3.3.1
@@ -1543,6 +1546,11 @@ packages:
 
   lower-case@2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
+
+  lucide-svelte@0.390.0:
+    resolution: {integrity: sha512-zaHTuk1KB2PqYrF/UY87g8DkforXEj7sYOo2Ml3LokNzx35dRJMHZHsuEXXTj9gqB76Da0o6Tud15bmtNBX1/Q==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   magic-string@0.30.10:
     resolution: {integrity: sha512-iIRwTIf0QKV3UAnYK4PU8uiEc4SRh5jX0mwpIwETPpHdhVM4f53RSwS/vXvN1JhGX+Cs7B8qIq3d6AH49O5fAQ==}
@@ -3738,6 +3746,10 @@ snapshots:
   lower-case@2.0.2:
     dependencies:
       tslib: 2.6.3
+
+  lucide-svelte@0.390.0(svelte@5.0.0-next.151):
+    dependencies:
+      svelte: 5.0.0-next.151
 
   magic-string@0.30.10:
     dependencies:
