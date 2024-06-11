@@ -75,25 +75,16 @@
 		map.whenReady(() => {
 			map?.invalidateSize();
 
-			$effect.root(() => {
-				if (environment) {
-					map?.addLayer(featureGroup!);
-					map?.addControl(overlayLayer!);
-				}
+			if (environment) {
+				map?.addLayer(featureGroup!);
+				map?.addControl(overlayLayer!);
+				loadFeatures(environment?.getFeatures());
+			}
 
-				$effect(() => {
-					if (environment?.loadPending) {
-						clearLayers();
-						loadFeatures(environment.getFeatures());
-						environment.loadPending = false;
-					}
-				});
-
-				return () => {
-					map?.removeLayer(featureGroup!);
-					map?.removeControl(overlayLayer!);
-				};
-			});
+			return () => {
+				map?.removeLayer(featureGroup!);
+				map?.removeControl(overlayLayer!);
+			};
 		});
 
 		return {
@@ -126,14 +117,14 @@
 		});
 	}
 
-	function clearLayers() {
+	/* 	function clearLayers() {
 		if (featureGroup?.getLayers().length === 0) return;
 
 		featureGroup?.eachLayer((layer) => {
 			overlayLayer?.removeLayer(layer);
 		});
 		featureGroup?.clearLayers();
-	}
+	} */
 </script>
 
 <svelte:head>

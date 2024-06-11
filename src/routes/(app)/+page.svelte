@@ -7,7 +7,12 @@
 	const zoom: number = 15;
 	const center: [number, number] = [-33.015348, -71.550002];
 
+	let reload: symbol = $state(Symbol());
 	let files: FileList | null = $state(null);
+
+	function onUpload() {
+		reload = Symbol();
+	}
 </script>
 
 <svelte:head>
@@ -18,13 +23,15 @@
 <section class="size-full">
 	<SplitView>
 		{#snippet left()}
-			<Map {center} {zoom} {environment}>
-				<Draw />
-			</Map>
+			{#key reload}
+				<Map {center} {zoom} {environment}>
+					<Draw />
+				</Map>
+			{/key}
 		{/snippet}
 		{#snippet right()}
 			<Editor {environment}>
-				<Upload accept=".geojson" {files} />
+				<Upload accept=".geojson" {files} {onUpload} />
 			</Editor>
 		{/snippet}
 	</SplitView>
