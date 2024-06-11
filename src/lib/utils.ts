@@ -18,8 +18,9 @@ export function saveLocalStorage(key: string, value: any) {
 	localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function loadLocalStorage(key: string) {
-	return browser ? localStorage.getItem(key) : null;
+export function loadLocalStorage<T>(key: string) {
+	const stored = browser ? localStorage.getItem(key) : null;
+	return stored ? (JSON.parse(stored) as T) : null;
 }
 
 export function cn(...inputs: ClassValue[]) {
