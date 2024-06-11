@@ -13,13 +13,7 @@ export function createEnvironment(features?: Feature<G>[]) {
 
 		_features = new Map(init.map((feature) => [String(feature.id), feature]));
 
-		let isLoaded = $state(false);
 		$effect(() => {
-			if (!isLoaded) {
-				isLoaded = true;
-				return;
-			}
-
 			saveLocalStorage('environment', getFeatures());
 		});
 
