@@ -11,13 +11,14 @@
 	interface Props extends HTMLButtonAttributes {
 		accept: string;
 		files: FileList | null;
+		onUpload?: () => void;
 	}
 
-	let { accept, files = $bindable(), ...rest }: Props = $props();
+	let { accept, files = $bindable(), onUpload = $bindable(), ...rest }: Props = $props();
 
 	const { environment } = getContext<EditorContext>(contextKey);
 
-	function handleUpload() {
+	function handleUpload(e: Event) {
 		if (!!files && files.length > 0) {
 			const reader = new FileReader();
 
@@ -32,8 +33,13 @@
 							throw new Error('Archivo GeoJSON inválido.');
 						}
 
-						environment.value = geojson;
-						environment.loadPending = true;
+						environment.clear();
+						environment.addFeatures(geojson);
+
+						if (onUpload) {
+							onUpload();
+							(e.target as HTMLInputElement).value = '';
+						}
 					}
 				} catch {
 					alert('Archivo GeoJSON inválido.');
@@ -53,5 +59,5 @@
 		<Upload />
 	</label>
 
-	<input class="hidden" type="file" id="fileUpload" {accept} bind:files onchange={handleUpload} />
+	<input id="fileUpload" type="file" class="hidden" {accept} bind:files onchange={handleUpload} />
 </Button>
