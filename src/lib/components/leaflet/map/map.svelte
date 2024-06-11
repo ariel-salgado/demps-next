@@ -80,11 +80,6 @@
 				map?.addControl(overlayLayer!);
 				loadFeatures(environment?.getFeatures());
 			}
-
-			return () => {
-				map?.removeLayer(featureGroup!);
-				map?.removeControl(overlayLayer!);
-			};
 		});
 
 		return {
@@ -116,15 +111,6 @@
 			}
 		});
 	}
-
-	/* 	function clearLayers() {
-		if (featureGroup?.getLayers().length === 0) return;
-
-		featureGroup?.eachLayer((layer) => {
-			overlayLayer?.removeLayer(layer);
-		});
-		featureGroup?.clearLayers();
-	} */
 </script>
 
 <svelte:head>
