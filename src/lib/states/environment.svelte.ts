@@ -8,10 +8,11 @@ export function createEnvironment(features?: Feature<G>[]) {
 	let _features: Map<string, Feature<G>>;
 
 	$effect.root(() => {
-		const stored = loadLocalStorage('environment');
-		const init = (stored ? JSON.parse(stored) : features || []) as Feature<G>[];
+		const stored = loadLocalStorage<Feature<G>[]>('environment');
+		const init = stored ? stored : features || [];
 
-		_features = new Map(init.map((feature) => [String(feature.id), feature]));
+		_features = new Map();
+		addFeatures(init);
 
 		$effect(() => {
 			saveLocalStorage('environment', getFeatures());
