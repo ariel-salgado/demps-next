@@ -4,10 +4,7 @@ import type { Feature, FeatureCollection } from 'geojson';
 import { Map } from 'svelte/reactivity';
 import { loadLocalStorage, saveLocalStorage } from '$lib/utils';
 
-// ?: Maybe better implementation on load pending strategy
-
 export function createEnvironment(features?: Feature<G>[]) {
-	let _loadPending: boolean = $state(true);
 	let _features: Map<string, Feature<G>>;
 
 	$effect.root(() => {
@@ -16,13 +13,22 @@ export function createEnvironment(features?: Feature<G>[]) {
 
 		_features = new Map(init.map((feature) => [String(feature.id), feature]));
 
-		// TODO: Prevent calling saveLocalStorage on init
+		let isLoaded = $state(false);
 		$effect(() => {
+			if (!isLoaded) {
+				isLoaded = true;
+				return;
+			}
+
 			saveLocalStorage('environment', getFeatures());
 		});
 
-		return () => _features.clear();
+		return () => clear();
 	});
+
+	function clear() {
+		_features.clear();
+	}
 
 	function getFeature(id: string) {
 		return _features.get(id);
@@ -40,6 +46,16 @@ export function createEnvironment(features?: Feature<G>[]) {
 		feature.id = featureId;
 		_features.set(featureId, feature as Feature<G>);
 		return feature;
+	}
+
+	function addFeatures(features: FeatureCollection | Feature<G>[]) {
+		if (typeof features === 'object' && Object.hasOwn(features, 'type')) {
+			features = (features as FeatureCollection).features as Feature<G>[];
+		}
+
+		for (const feature of features as Feature<G>[]) {
+			addFeature(feature);
+		}
 	}
 
 	function updateFeature(id: string, feature: Feature<G>) {
@@ -84,19 +100,11 @@ export function createEnvironment(features?: Feature<G>[]) {
 				features: getFeatures()
 			};
 		},
-		get loadPending(): boolean {
-			return _loadPending;
-		},
-		set value(value: FeatureCollection) {
-			_features.clear();
-			value.features.forEach((feature) => addFeature(feature));
-		},
-		set loadPending(value: boolean) {
-			_loadPending = value;
-		},
+		clear,
 		getFeature,
 		getFeatures,
 		addFeature,
+		addFeatures,
 		updateFeature,
 		updateFeatureCoords,
 		updateFeatureProperties,
