@@ -11,7 +11,7 @@ import { browser } from '$app/environment';
 import { rewind } from '@turf/rewind';
 import { truncate } from '@turf/truncate';
 import { randomPolygon } from '@turf/random';
-import { check } from '@placemarkio/check-geojson';
+import { HintError, check } from '@placemarkio/check-geojson';
 
 export function saveLocalStorage(key: string, value: any) {
 	if (!browser) return;
@@ -54,8 +54,13 @@ export function isValidGeoJSON(json: string | object) {
 			check(json);
 		}
 		return true;
-	} catch {
-		throw new Error('Invalid GeoJSON');
+	} catch (e) {
+		if (e instanceof HintError || e instanceof Error) {
+			console.error(e.message);
+			return false;
+		}
+
+		throw e;
 	}
 }
 
@@ -77,4 +82,16 @@ export function preprocessGeoJSON(geojson: FeatureCollection | string) {
 	}
 
 	return { type: 'FeatureCollection', features } as FeatureCollection<G>;
+}
+
+export function debounce<T extends (...args: Parameters<T>) => void>(
+	this: ThisParameterType<T>,
+	fn: T,
+	delay: number
+) {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	return (...args: Parameters<T>) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => fn.apply(this, args), delay);
+	};
 }
