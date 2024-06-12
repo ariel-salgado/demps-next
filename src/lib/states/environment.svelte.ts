@@ -95,6 +95,10 @@ export function createEnvironment(features?: Feature<G>[]) {
 				features: getFeatures()
 			};
 		},
+		set value(geojson: FeatureCollection) {
+			clear();
+			addFeatures(geojson);
+		},
 		clear,
 		getFeature,
 		getFeatures,

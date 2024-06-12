@@ -2,12 +2,13 @@
 	import { extensions } from './extensions';
 	import { EditorView } from '@codemirror/view';
 	import { EditorState } from '@codemirror/state';
-	import { isValidGeoJSON, strEqualsObj } from '$lib/utils';
+	import { debounce, isValidGeoJSON, strEqualsObj } from '$lib/utils';
 
 	export const contextKey = Symbol();
 </script>
 
 <script lang="ts">
+	import type { G } from '$lib/types';
 	import type { Snippet } from 'svelte';
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
@@ -22,9 +23,10 @@
 	interface Props {
 		children?: Snippet;
 		environment: Environment;
+		onChanges?: () => void;
 	}
 
-	const { children, environment }: Props = $props();
+	const { children, environment, onChanges }: Props = $props();
 
 	let editor: EditorView | undefined = $state();
 
@@ -37,10 +39,24 @@
 		}
 	});
 
+	const updateEnvironment = debounce((value: string) => {
+		const geojson = JSON.parse(value) as FeatureCollection<G>;
+
+		if (isValidGeoJSON(geojson) && !strEqualsObj(value, environment.value)) {
+			environment.value = geojson;
+
+			if (onChanges) onChanges();
+		}
+	}, 1000);
+
+	const handleChanges = EditorView.updateListener.of(({ state, docChanged }) => {
+		if (docChanged) updateEnvironment(state.doc.toString());
+	});
+
 	function updateEditor(value: FeatureCollection) {
 		const { doc } = editor!.state;
 
-		if (!strEqualsObj(doc.toString(), value) && isValidGeoJSON(value)) {
+		if (isValidGeoJSON(value) && !strEqualsObj(doc.toString(), value)) {
 			editor?.dispatch({
 				changes: {
 					from: 0,
@@ -55,8 +71,7 @@
 		editor = new EditorView({
 			parent: editorContainer,
 			state: EditorState.create({
-				doc: JSON.stringify(environment.value, null, 2),
-				extensions: [extensions]
+				extensions: [extensions, handleChanges]
 			})
 		});
 

@@ -21,13 +21,29 @@
 		zoom?: number;
 		center?: [number, number];
 		environment?: Environment;
+		reloadOn?: boolean;
 	}
 
-	const { children, zoom, center, environment, class: className, ...rest }: Props = $props();
+	let {
+		children,
+		zoom,
+		center,
+		environment,
+		reloadOn = $bindable(),
+		class: className,
+		...rest
+	}: Props = $props();
 
 	let map: Map | undefined = $state();
 	let featureGroup: FeatureGroup | undefined = $state();
 	let overlayLayer: Control.Layers | undefined = $state();
+
+	$effect(() => {
+		if (reloadOn) {
+			reloadLayers();
+			reloadOn = false;
+		}
+	});
 
 	setContext(contextKey, {
 		get map() {
@@ -110,6 +126,18 @@
 				overlayLayer?.addOverlay(layer, nameID || feature.id);
 			}
 		});
+	}
+
+	function clearLayers() {
+		featureGroup?.eachLayer((layer) => {
+			overlayLayer?.removeLayer(layer);
+		});
+		featureGroup?.clearLayers();
+	}
+
+	function reloadLayers() {
+		clearLayers();
+		loadFeatures(environment!.getFeatures());
 	}
 </script>
 
