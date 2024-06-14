@@ -55,7 +55,7 @@
 	}
 </script>
 
-<Button class="p-0" size="icon" {...rest}>
+<Button class="p-0" size="icon" aria-label="Upload GeoJSON file" {...rest}>
 	<label class="flex size-full cursor-pointer items-center justify-center p-1.5" for="fileUpload">
 		<Upload />
 	</label>

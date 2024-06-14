@@ -64,6 +64,7 @@
 				<button
 					id="layer-toggle"
 					class="flex items-center justify-center cursor-pointer z-[2] size-[30px] leading-[30px] p-[5px] relative border-0 border-solid border-[#E5E7EB] bg-white focus-within:bg-[#F4F4F4] hover:bg-[#F4F4F4]"
+					aria-label="Toggle Layers"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
