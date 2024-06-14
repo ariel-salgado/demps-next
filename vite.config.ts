@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
 	plugins: [sveltekit(), tailwindcss()],
+	server: {
+		host: '0.0.0.0'
+	},
 	test: {
 		globals: true,
 		include: ['src/**/*.{test,spec}.{js,ts}']
