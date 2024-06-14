@@ -2,10 +2,7 @@
 	import { environment } from '$lib/states';
 	import { SplitView } from '$lib/components/ui';
 	import { Map, Draw } from '$lib/components/leaflet';
-	import { Editor, Upload } from '$lib/components/codemirror';
-
-	// TODO: Make the reload strategy better
-	// TODO: Make the minimal changes when updating the map and the editor
+	import { Editor, Clipboard, Upload } from '$lib/components/codemirror';
 
 	const zoom: number = 15;
 	const center: [number, number] = [-33.015348, -71.550002];
@@ -13,7 +10,7 @@
 	let reload: boolean = $state(false);
 	let files: FileList | null = $state(null);
 
-	function onUpload() {
+	function triggerReload() {
 		reload = true;
 	}
 </script>
@@ -26,13 +23,14 @@
 <section class="size-full">
 	<SplitView>
 		{#snippet left()}
-			<Map {center} {zoom} {environment} bind:reloadOn={reload}>
+			<Map {center} {zoom} {environment} bind:reload>
 				<Draw />
 			</Map>
 		{/snippet}
 		{#snippet right()}
-			<Editor {environment} onChanges={onUpload}>
-				<Upload accept=".geojson" {files} {onUpload} />
+			<Editor {environment} onChanges={triggerReload}>
+				<Clipboard />
+				<Upload accept=".geojson" {files} onUpload={triggerReload} />
 			</Editor>
 		{/snippet}
 	</SplitView>
