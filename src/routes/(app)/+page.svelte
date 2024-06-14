@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { environment } from '$lib/states';
 	import { SplitView } from '$lib/components/ui';
-	import { Map, Draw } from '$lib/components/leaflet';
+	import { Map, ToggleLayers, Draw } from '$lib/components/leaflet';
 	import { Editor, Clipboard, Upload } from '$lib/components/codemirror';
 
 	const zoom: number = 15;
@@ -24,6 +24,7 @@
 	<SplitView>
 		{#snippet left()}
 			<Map {center} {zoom} {environment} bind:reload>
+				<ToggleLayers />
 				<Draw />
 			</Map>
 		{/snippet}
