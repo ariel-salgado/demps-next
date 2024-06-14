@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	import { EllipsisVertical } from 'lucide-svelte';
+
 	interface Props {
 		left: Snippet;
 		right: Snippet;
@@ -56,9 +58,7 @@
 		onmousedown={mouseDownHandler}
 		class={`self-center rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
 	>
-		<svg xmlns="http://www.w3.org/2000/svg" width="7" height="18">
-			<path d="M2 0h3v3H2zm0 5h3v3H2zm0 5h3v3H2zm0 5h3v3H2z" class="fill-slate-400" />
-		</svg>
+		<EllipsisVertical class="stroke-slate-300" />
 	</div>
 {/snippet}
 
@@ -76,7 +76,7 @@
 	</div>
 
 	<!-- Resizer -->
-	<div class="flex h-full w-[9px] flex-col justify-around bg-slate-600">
+	<div class="flex h-full w-2 flex-col justify-around bg-slate-600">
 		{@render resizer()}
 		{@render resizer()}
 		{@render resizer()}
