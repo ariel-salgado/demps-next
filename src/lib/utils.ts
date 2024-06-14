@@ -14,8 +14,9 @@ import { randomPolygon } from '@turf/random';
 import { HintError, check } from '@placemarkio/check-geojson';
 
 export function saveLocalStorage(key: string, value: any) {
-	if (!browser) return;
-	localStorage.setItem(key, JSON.stringify(value));
+	if (browser) {
+		localStorage.setItem(key, JSON.stringify(value));
+	}
 }
 
 export function loadLocalStorage<T>(key: string) {
@@ -48,18 +49,17 @@ export function strEqualsObj(str: string, obj: object) {
 
 export function isValidGeoJSON(json: string | object) {
 	try {
-		if (json instanceof Object) {
-			check(JSON.stringify(json));
-		} else {
-			check(json);
+		if (typeof json === 'object') {
+			json = JSON.stringify(json);
 		}
+
+		check(json);
 		return true;
 	} catch (e) {
 		if (e instanceof HintError || e instanceof Error) {
 			console.error(e.message);
 			return false;
 		}
-
 		throw e;
 	}
 }
@@ -69,7 +69,9 @@ export function preprocessGeoJSON(geojson: FeatureCollection | string) {
 		geojson = JSON.parse(geojson) as FeatureCollection;
 	}
 
-	if (!isValidGeoJSON(geojson)) return;
+	if (!isValidGeoJSON(geojson)) {
+		return;
+	}
 
 	const features: Feature<G>[] = [];
 
