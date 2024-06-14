@@ -21,7 +21,7 @@
 		zoom?: number;
 		center?: [number, number];
 		environment?: Environment;
-		reloadOn?: boolean;
+		reload?: boolean;
 	}
 
 	let {
@@ -29,7 +29,7 @@
 		zoom,
 		center,
 		environment,
-		reloadOn = $bindable(),
+		reload = $bindable(),
 		class: className,
 		...rest
 	}: Props = $props();
@@ -39,9 +39,9 @@
 	let overlayLayer: Control.Layers | undefined = $state();
 
 	$effect(() => {
-		if (reloadOn) {
+		if (reload) {
 			reloadLayers();
-			reloadOn = false;
+			reload = false;
 		}
 	});
 
@@ -102,7 +102,6 @@
 			destroy() {
 				map?.remove();
 				map = undefined;
-				mapContainer.remove();
 			}
 		};
 	};
