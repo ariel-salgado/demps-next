@@ -7,9 +7,8 @@
 			const coordinates = layer.getLatLng();
 			const radius = Number(layer.getRadius().toFixed(6));
 			return new window.L.Circle(coordinates, radius);
-		} else {
-			return;
 		}
+		return;
 	}
 
 	function geometryToGeoJSON<T extends Layer | Polygon | Circle>(feature: T) {
@@ -116,7 +115,7 @@
 		let editedFeature: Feature<G> | undefined;
 
 		if (layer instanceof window.L.Circle) {
-			editedFeature = environment.updateFeature(id as string, feature);
+			editedFeature = environment.updateFeature(feature);
 		} else if (layer instanceof window.L.Polygon) {
 			editedFeature = environment.updateFeatureCoords(id as string, geometry.coordinates);
 		} else {
