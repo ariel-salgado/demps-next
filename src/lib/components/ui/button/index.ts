@@ -10,4 +10,5 @@ export const sizes = {
 
 export type Sizes = keyof typeof sizes;
 
-export const defaultStyle = 'cursor-pointer rounded-md bg-white';
+export const defaultStyle =
+	'cursor-pointer rounded-md bg-white hover:bg-neutral-100 transition-colors';
