@@ -3,7 +3,7 @@
 
 	import { onNavigate } from '$app/navigation';
 
-	let { children } = $props();
+	const { children } = $props();
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
