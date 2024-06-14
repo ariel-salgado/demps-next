@@ -56,7 +56,7 @@
 </script>
 
 <Button class="p-0" size="icon" {...rest}>
-	<label class="flex size-full items-center justify-center p-1.5" for="fileUpload">
+	<label class="flex size-full cursor-pointer items-center justify-center p-1.5" for="fileUpload">
 		<Upload />
 	</label>
 
