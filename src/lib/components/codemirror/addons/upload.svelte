@@ -14,7 +14,7 @@
 		onUpload?: () => void;
 	}
 
-	let { accept, files = $bindable(), onUpload = $bindable(), ...rest }: Props = $props();
+	let { accept, files = $bindable(), onUpload, ...rest }: Props = $props();
 
 	const { environment } = getContext<EditorContext>(contextKey);
 
@@ -36,9 +36,10 @@
 						environment.clear();
 						environment.addFeatures(geojson);
 
+						(e.target as HTMLInputElement).value = '';
+
 						if (onUpload) {
 							onUpload();
-							(e.target as HTMLInputElement).value = '';
 						}
 					}
 				} catch {
