@@ -19,7 +19,7 @@
 </script>
 
 {#if rest.as === 'a'}
-	<a {...rest}>
+	<a class={cn(defaultStyle, sizes[size], className)} {...rest}>
 		{@render children()}
 	</a>
 {:else}
