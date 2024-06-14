@@ -21,7 +21,11 @@ export function saveLocalStorage(key: string, value: any) {
 
 export function loadLocalStorage<T>(key: string) {
 	const stored = browser ? localStorage.getItem(key) : null;
-	return stored ? (JSON.parse(stored) as T) : null;
+	try {
+		return stored ? (JSON.parse(stored) as T) : null;
+	} catch {
+		return null;
+	}
 }
 
 export function cn(...inputs: ClassValue[]) {
@@ -65,25 +69,29 @@ export function isValidGeoJSON(json: string | object) {
 }
 
 export function preprocessGeoJSON(geojson: FeatureCollection | string) {
-	if (typeof geojson === 'string') {
-		geojson = JSON.parse(geojson) as FeatureCollection;
+	try {
+		if (typeof geojson === 'string') {
+			geojson = JSON.parse(geojson) as FeatureCollection;
+		}
+
+		if (!isValidGeoJSON(geojson)) {
+			return;
+		}
+
+		const features: Feature<G>[] = [];
+
+		for (const feature of geojson.features) {
+			const id = feature.id ? String(feature.id) : randomID();
+			const truncated = truncate(feature, { precision: 6, coordinates: 2, mutate: true });
+			const rewinded = rewind(truncated, { mutate: true }) as Feature<G>;
+
+			features.push({ id, ...rewinded });
+		}
+
+		return { type: 'FeatureCollection', features } as FeatureCollection<G>;
+	} catch {
+		throw new Error('Invalid GeoJSON');
 	}
-
-	if (!isValidGeoJSON(geojson)) {
-		return;
-	}
-
-	const features: Feature<G>[] = [];
-
-	for (const feature of geojson.features) {
-		const id = feature.id ? String(feature.id) : randomID();
-		const truncated = truncate(feature, { precision: 6, coordinates: 2, mutate: true });
-		const rewinded = rewind(truncated, { mutate: true }) as Feature<G>;
-
-		features.push({ id, ...rewinded });
-	}
-
-	return { type: 'FeatureCollection', features } as FeatureCollection<G>;
 }
 
 export function debounce<T extends (...args: Parameters<T>) => void>(

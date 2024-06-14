@@ -40,19 +40,28 @@
 	});
 
 	const updateEnvironment = debounce((value: string) => {
-		const geojson = JSON.parse(value) as FeatureCollection<G>;
+		try {
+			const geojson = JSON.parse(value) as FeatureCollection<G>;
 
-		if (isValidGeoJSON(geojson) && !strEqualsObj(value, environment.value)) {
-			environment.value = geojson;
+			if (isValidGeoJSON(geojson) && !strEqualsObj(value, environment.value)) {
+				environment.value = geojson;
 
-			if (onChanges) onChanges();
+				if (onChanges) {
+					onChanges();
+				}
+			}
+		} catch {
+			throw new Error('Invalid GeoJSON');
 		}
 	}, 1000);
 
 	const handleChanges = EditorView.updateListener.of(({ state, docChanged }) => {
-		if (docChanged) updateEnvironment(state.doc.toString());
+		if (docChanged) {
+			updateEnvironment(state.doc.toString());
+		}
 	});
 
+	// ?: Make the minimal changes when updating the editor
 	function updateEditor(value: FeatureCollection) {
 		const { doc } = editor!.state;
 
@@ -90,8 +99,8 @@
 </script>
 
 <div class="contents" use:initEditor={environment}>
-	{#if children}
-		<div class="sticky top-6 z-10 float-right mr-12 size-0">
+	{#if editor && children}
+		<div class="sticky top-6 z-50 float-right mr-12 size-0 space-y-2.5">
 			{@render children()}
 		</div>
 	{/if}
