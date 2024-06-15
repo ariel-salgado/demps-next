@@ -7,6 +7,9 @@ const config = {
 			precompress: true,
 			strict: true
 		})
+	},
+	compilerOptions: {
+		modernAst: true
 	}
 };
 
