@@ -50,6 +50,7 @@
 		"husky": "^9.0.11",
 		"leaflet": "^1.9.4",
 		"leaflet-geosearch": "^4.0.0",
+		"leaflet-maskcanvas": "^1.0.0",
 		"lint-staged": "^15.2.7",
 		"lucide-svelte": "^0.395.0",
 		"prettier": "^3.3.2",
