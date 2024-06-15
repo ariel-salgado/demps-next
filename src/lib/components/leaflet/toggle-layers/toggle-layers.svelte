@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { MapContext } from '$lib/components/leaflet';
 
+	import { on } from 'svelte/events';
 	import { contextKey } from '$lib/components/leaflet';
-	import { getContext, onDestroy, onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 
 	let { overlayLayer } = getContext<MapContext>(contextKey);
 
@@ -88,10 +89,10 @@
 	const layerToggleBtn = document.getElementById('layer-toggle');
 
 	onMount(() => {
-		layerToggleBtn?.addEventListener('click', toggleLayers);
-	});
+		const cleanup = on(layerToggleBtn!, 'click', toggleLayers);
 
-	onDestroy(() => {
-		layerToggleBtn?.removeEventListener('click', toggleLayers);
+		return () => {
+			cleanup();
+		};
 	});
 </script>
