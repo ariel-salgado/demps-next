@@ -108,8 +108,25 @@
 
 	function loadFeatures(features: Feature<G>[]) {
 		window.L.geoJSON(features, {
-			style: () => {
-				return {};
+			style: (feature) => {
+				if ('properties' in feature! === false) return {};
+
+				const {
+					fill: fillColor,
+					stroke: color,
+					'stroke-width': weight,
+					'fill-opacity': fillOpacity,
+					'stroke-opacity': opacity
+				} = feature.properties;
+
+				return {
+					smoothFactor: 1.5,
+					...(fillColor && { fillColor }),
+					...(color && { color }),
+					...(!Number.isNaN(Number(weight)) && { weight: Number(weight) }),
+					...(!Number.isNaN(Number(fillOpacity)) && { fillOpacity: Number(fillOpacity) }),
+					...(!Number.isNaN(Number(opacity)) && { opacity: Number(opacity) })
+				};
 			},
 			onEachFeature(feature, layer) {
 				const { radius, center, nameID } = feature.properties;
