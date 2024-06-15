@@ -95,6 +95,7 @@
 				map?.addLayer(featureGroup!);
 				map?.addControl(overlayLayer!);
 				loadFeatures(environment?.getFeatures());
+				fitBounds();
 			}
 		});
 
@@ -154,6 +155,17 @@
 	function reloadLayers() {
 		clearLayers();
 		loadFeatures(environment!.getFeatures());
+		fitBounds();
+	}
+
+	function fitBounds() {
+		if (!featureGroup) return;
+
+		const bounds = featureGroup.getBounds();
+
+		if (bounds.isValid()) {
+			map?.fitBounds(bounds);
+		}
 	}
 </script>
 
