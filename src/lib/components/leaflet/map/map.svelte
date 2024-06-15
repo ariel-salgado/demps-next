@@ -165,7 +165,10 @@
 		const bounds = featureGroup.getBounds();
 
 		if (bounds.isValid()) {
-			map?.fitBounds(bounds);
+			map?.fitBounds(bounds, {
+				animate: true,
+				padding: [50, 50]
+			});
 		}
 	}
 </script>
