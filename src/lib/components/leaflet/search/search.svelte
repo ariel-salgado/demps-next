@@ -21,9 +21,13 @@
 
 		map.addControl(search);
 
-		document.querySelector('.leaflet-geosearch-button form input')?.setAttribute('name', 'search');
-		document
-			.querySelector('.leaflet-control-container')
-			?.lastElementChild?.classList.add('!absolute', 'top-0', 'left-14', '!max-w-[300px]');
+		const searchContainer = document.querySelector('.leaflet-control-container')
+			?.lastElementChild as HTMLElement;
+		const seachInput = searchContainer.children[0].firstChild as HTMLInputElement;
+		const clearSearch = searchContainer.children[0].children[1] as HTMLButtonElement;
+
+		searchContainer?.classList.add('!absolute', 'top-0', 'left-14', '!max-w-[300px]');
+		seachInput.classList.add('placeholder:text-neutral-950');
+		clearSearch.classList.add('text-lg', '!font-normal');
 	});
 </script>
