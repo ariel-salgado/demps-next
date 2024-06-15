@@ -12,6 +12,7 @@
 
 	import { cn } from '$lib/utils';
 	import { setContext } from 'svelte';
+	import { LoaderCircle } from 'lucide-svelte';
 
 	type Parameters = Environment | undefined;
 
@@ -178,8 +179,16 @@
 	<link rel="dns-prefetch" href="https://c.tile.openstreetmap.org" fetchpriority="high" />
 </svelte:head>
 
-<div class={cn('size-full outline-none', className)} {...rest} use:initMap={environment}>
-	{#if map && children}
-		{@render children()}
+<div
+	class={cn('grid size-full place-content-center items-center outline-none', className)}
+	{...rest}
+	use:initMap={environment}
+>
+	{#if map}
+		{#if children}
+			{@render children()}
+		{/if}
+	{:else}
+		<LoaderCircle class="size-12 animate-spin" />
 	{/if}
 </div>
