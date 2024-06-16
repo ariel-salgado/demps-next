@@ -56,7 +56,7 @@
 		tabindex="-1"
 		aria-label="Resize"
 		onmousedown={mouseDownHandler}
-		class={`self-center rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
+		class={`z-[999] self-center rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
 	>
 		<EllipsisVertical class="stroke-slate-300" />
 	</div>
@@ -69,7 +69,7 @@
 >
 	<!-- Left screen -->
 	<div
-		class={`w-2/3 min-w-96 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
+		class={`w-2/3 min-w-[500px] overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
 		bind:this={leftSide}
 	>
 		{@render left()}
@@ -83,7 +83,9 @@
 	</div>
 
 	<!-- Right screen -->
-	<div class={`min-w-96 flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}>
+	<div
+		class={`min-w-[500px] flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
+	>
 		{@render right()}
 	</div>
 </div>
