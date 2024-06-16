@@ -100,7 +100,7 @@
 
 <div class="contents" use:initEditor={environment}>
 	{#if editor && children}
-		<div class="sticky top-6 z-50 float-right mr-12 size-0 space-y-2.5">
+		<div class="sticky top-7 z-50 float-right mr-14 size-0 space-y-3">
 			{@render children()}
 		</div>
 	{/if}

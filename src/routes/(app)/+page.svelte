@@ -2,7 +2,7 @@
 	import { environment } from '$lib/states';
 	import { SplitView } from '$lib/components/ui';
 	import { Map, ToggleLayers, Draw, Search } from '$lib/components/leaflet';
-	import { Editor, CopyToClipboard, Upload, Download } from '$lib/components/codemirror';
+	import { Editor, CopyToClipboard, Upload, Download, Clear } from '$lib/components/codemirror';
 
 	const zoom: number = 15;
 	const center: [number, number] = [-33.015348, -71.550002];
@@ -33,6 +33,7 @@
 			<Editor {environment} onChanges={triggerReload}>
 				<Download />
 				<CopyToClipboard />
+				<Clear onClear={triggerReload} />
 				<Upload accept=".geojson" {files} onUpload={triggerReload} />
 			</Editor>
 		{/snippet}
