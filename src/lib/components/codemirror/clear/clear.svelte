@@ -16,10 +16,12 @@
 	const { environment } = getContext<EditorContext>(contextKey);
 
 	function clearData() {
-		environment.clear();
+		if (confirm('Are you sure you want to clear the data?')) {
+			environment.clear();
 
-		if (onClear) {
-			onClear();
+			if (onClear) {
+				onClear();
+			}
 		}
 	}
 </script>
