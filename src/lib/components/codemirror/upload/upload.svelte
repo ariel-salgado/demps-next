@@ -3,6 +3,7 @@
 	import type { EditorContext } from '$lib/components/codemirror';
 
 	import { getContext } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import { Upload } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { contextKey } from '$lib/components/codemirror';
@@ -30,11 +31,14 @@
 						const geojson = preprocessGeoJSON(data);
 
 						if (!geojson) {
+							toast.error('Archivo GeoJSON inválido.');
 							throw new Error('Archivo GeoJSON inválido.');
 						}
 
 						environment.clear();
 						environment.addFeatures(geojson);
+
+						toast.success('Archivo GeoJSON cargado correctamente.');
 
 						(e.target as HTMLInputElement).value = '';
 
@@ -43,7 +47,8 @@
 						}
 					}
 				} catch {
-					alert('Archivo GeoJSON inválido.');
+					toast.error('Archivo GeoJSON inválido.');
+					throw new Error('Archivo GeoJSON inválido.');
 				}
 			};
 
@@ -55,7 +60,7 @@
 	}
 </script>
 
-<Button class="p-0" size="icon" aria-label="Upload GeoJSON file" {...rest}>
+<Button class="p-0" size="icon" aria-label="Cargar archivo GeoJSON" {...rest}>
 	<label class="flex size-full cursor-pointer items-center justify-center p-1.5" for="fileUpload">
 		<Upload />
 	</label>

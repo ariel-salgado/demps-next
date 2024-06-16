@@ -3,6 +3,7 @@
 	import type { EditorContext } from '$lib/components/codemirror';
 
 	import { getContext } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui';
 	import { contextKey } from '$lib/components/codemirror';
 	import { ClipboardCopy, ClipboardCheck } from 'lucide-svelte';
@@ -21,15 +22,18 @@
 		if (editor) {
 			navigator.clipboard.writeText(editor.state.doc.toString()).then(() => {
 				copied = true;
+				toast.success('Copiado al portapapeles.');
 				setTimeout(() => {
 					copied = false;
 				}, timeout);
 			});
+		} else {
+			toast.error('Error al copiar al portapapeles.');
 		}
 	}
 </script>
 
-<Button size="icon" onclick={copyToClipboard} aria-label="Copy to clipboard" {...rest}>
+<Button size="icon" onclick={copyToClipboard} aria-label="Copiar al portapapeles" {...rest}>
 	{#if !copied}
 		<ClipboardCopy />
 	{:else}

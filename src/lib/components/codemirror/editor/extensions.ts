@@ -120,6 +120,6 @@ export const extensions: Extension = (() => [
 		...lintKeymap
 	]),
 	EditorView.contentAttributes.of({
-		'aria-label': 'GeoJSON editor'
+		'aria-label': 'Editor'
 	})
 ])();

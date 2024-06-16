@@ -51,7 +51,7 @@
 				}
 			}
 		} catch {
-			throw new Error('Invalid GeoJSON');
+			// The editor shows the error message
 		}
 	}, 1000);
 
@@ -90,7 +90,6 @@
 
 		return {
 			destroy() {
-				editorContainer.remove();
 				editor?.destroy();
 				editor = undefined;
 			}
