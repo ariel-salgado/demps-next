@@ -33,7 +33,13 @@
 	}
 </script>
 
-<Button size="icon" onclick={copyToClipboard} aria-label="Copiar al portapapeles" {...rest}>
+<Button
+	size="icon"
+	onclick={copyToClipboard}
+	title="Copiar"
+	aria-label="Copiar al portapapeles"
+	{...rest}
+>
 	{#if !copied}
 		<ClipboardCopy />
 	{:else}

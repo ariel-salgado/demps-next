@@ -29,6 +29,6 @@
 	}
 </script>
 
-<Button size="icon" onclick={clearData} aria-label="Borrar datos" {...rest}>
+<Button size="icon" onclick={clearData} aria-label="Borrar datos" title="Borrar datos" {...rest}>
 	<RotateCcw />
 </Button>
