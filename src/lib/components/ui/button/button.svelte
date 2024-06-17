@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Sizes } from './props';
 	import type { Snippet } from 'svelte';
+	import type { Variants, Sizes } from './props';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
 	import { cn } from '$lib/utils';
-	import { sizes, baseStyle } from './props';
+	import { baseStyle, variants, sizes } from './props';
 
 	type ButtonOrLinkProps =
 		| (HTMLButtonAttributes & { as?: 'button' })
@@ -12,18 +12,25 @@
 
 	type Props = {
 		children: Snippet;
+		variant?: Variants;
 		size?: Sizes;
 	} & ButtonOrLinkProps;
 
-	let { children, size = 'default', class: className, ...rest }: Props = $props();
+	let {
+		children,
+		variant = 'primary',
+		size = 'default',
+		class: className,
+		...rest
+	}: Props = $props();
 </script>
 
 {#if rest.as === 'a'}
-	<a class={cn(baseStyle, sizes[size], className)} {...rest}>
+	<a class={cn(baseStyle, variants[variant], sizes[size], className)} {...rest}>
 		{@render children()}
 	</a>
 {:else}
-	<button type="button" class={cn(baseStyle, sizes[size], className)} {...rest}>
+	<button type="button" class={cn(baseStyle, variants[variant], sizes[size], className)} {...rest}>
 		{@render children()}
 	</button>
 {/if}

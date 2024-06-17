@@ -34,6 +34,7 @@
 </script>
 
 <Button
+	variant="outline"
 	size="icon"
 	onclick={copyToClipboard}
 	title="Copiar"

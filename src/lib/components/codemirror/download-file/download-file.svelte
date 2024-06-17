@@ -39,6 +39,7 @@
 
 <Button
 	as="a"
+	variant="outline"
 	size="icon"
 	href={URLdata}
 	download={`${download}.geojson`}
