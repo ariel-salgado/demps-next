@@ -13,7 +13,6 @@
 	let xPosition = $state(0);
 	let leftWidth = $state(0);
 	let innerHeight = $state(0);
-
 	let isDragging = $state(false);
 
 	let leftSide: HTMLDivElement | undefined = $state();
@@ -46,8 +45,6 @@
 	}
 </script>
 
-<!-- ?: Add button to close right side panel -->
-
 <svelte:window bind:innerHeight />
 
 {#snippet resizer()}
@@ -64,7 +61,7 @@
 
 <div
 	class={`flex size-full ${isDragging ? 'cursor-col-resize' : ''}`}
-	style="max-height: {innerHeight! - (container?.getBoundingClientRect().top || 0) - 1}px"
+	style="max-height: {innerHeight! - (container?.getBoundingClientRect().top || 0)}px"
 	bind:this={container}
 >
 	<!-- Left screen -->
@@ -76,6 +73,7 @@
 	</div>
 
 	<!-- Resizer -->
+	<!-- ?: Add button to close right side panel -->
 	<div class="flex h-full w-2 flex-col justify-around bg-slate-600">
 		{@render resizer()}
 		{@render resizer()}
