@@ -2,7 +2,7 @@
 	import type { MapContext } from '$lib/components/leaflet';
 
 	import { getContext, onMount } from 'svelte';
-	import { contextKey } from '$lib/components/leaflet';
+	import { mapContextKey } from '$lib/components/leaflet';
 
 	interface Props {
 		coordinates: [number, number][];
@@ -10,7 +10,7 @@
 
 	let { coordinates = $bindable() }: Props = $props();
 
-	const { map } = getContext<MapContext>(contextKey);
+	const { map } = getContext<MapContext>(mapContextKey);
 
 	onMount(async () => {
 		// @ts-expect-error - maskCanvas is not recognized

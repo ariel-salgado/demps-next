@@ -1,7 +1,20 @@
-export type { MapContext } from './map';
+import type { MapContext } from './map';
 
-export { default as Draw } from './draw/draw.svelte';
-export { default as Canvas } from './canvas/canvas.svelte';
-export { default as Search } from './search/search.svelte';
-export { default as Map, contextKey } from './map/map.svelte';
-export { default as ToggleLayers } from './toggle-layers/toggle-layers.svelte';
+import { Geoman } from './geoman';
+import { Geosearch } from './geosearch';
+import { Map, contextKey } from './map';
+import { MaskCanvas } from './mask-canvas';
+import { ToggleLayers } from './toggle-layers';
+
+export type { MapContext };
+
+export {
+	Map,
+	Geoman,
+	Geosearch,
+	contextKey,
+	MaskCanvas,
+	ToggleLayers,
+	//
+	contextKey as mapContextKey
+};

@@ -1,2 +1,5 @@
-export { default as Button } from './button/button.svelte';
-export { default as SplitView } from './split-view/split-view.svelte';
+import { Header } from './header';
+import { Button } from './button';
+import { SplitView } from './split-view';
+
+export { Header, Button, SplitView };

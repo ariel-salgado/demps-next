@@ -6,7 +6,7 @@
 	import { toast } from 'svelte-sonner';
 	import { RotateCcw } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
-	import { contextKey } from '$lib/components/codemirror';
+	import { editorContextKey } from '$lib/components/codemirror';
 
 	interface Props extends HTMLButtonAttributes {
 		onClear?: () => void;
@@ -14,7 +14,7 @@
 
 	const { onClear, ...rest }: Props = $props();
 
-	const { environment } = getContext<EditorContext>(contextKey);
+	const { environment } = getContext<EditorContext>(editorContextKey);
 
 	function clearData() {
 		if (confirm('Está seguro que desea borrar los datos?')) {

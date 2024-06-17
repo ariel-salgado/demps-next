@@ -6,7 +6,7 @@
 	import { toast } from 'svelte-sonner';
 	import { Upload } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
-	import { contextKey } from '$lib/components/codemirror';
+	import { editorContextKey } from '$lib/components/codemirror';
 	import { isValidGeoJSON, preprocessGeoJSON } from '$lib/utils';
 
 	interface Props extends HTMLButtonAttributes {
@@ -17,7 +17,7 @@
 
 	let { accept, files = $bindable(), onUpload, ...rest }: Props = $props();
 
-	const { environment } = getContext<EditorContext>(contextKey);
+	const { environment } = getContext<EditorContext>(editorContextKey);
 
 	function handleUpload(e: Event) {
 		if (!!files && files.length > 0) {

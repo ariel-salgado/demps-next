@@ -1,7 +1,13 @@
 import type { Environment } from '$lib/states';
 import type { EditorView } from '@codemirror/view';
 
-export type EditorContext = {
+import Editor, { contextKey } from './editor.svelte';
+
+type EditorContext = {
 	editor: EditorView;
 	environment: Environment;
 };
+
+export type { EditorContext };
+
+export { Editor, contextKey };

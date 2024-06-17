@@ -2,9 +2,9 @@
 	import type { MapContext } from '$lib/components/leaflet';
 
 	import { getContext, onMount } from 'svelte';
-	import { contextKey } from '$lib/components/leaflet';
+	import { mapContextKey } from '$lib/components/leaflet';
 
-	const { map } = getContext<MapContext>(contextKey);
+	const { map } = getContext<MapContext>(mapContextKey);
 
 	onMount(async () => {
 		const { GeoSearchControl, OpenStreetMapProvider } = await import('leaflet-geosearch');

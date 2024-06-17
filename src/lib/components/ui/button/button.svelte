@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Sizes } from '.';
+	import type { Sizes } from './props';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
 	import { cn } from '$lib/utils';
-	import { sizes, defaultStyle } from '.';
+	import { sizes, baseStyle } from './props';
 
 	type ButtonOrLinkProps =
 		| (HTMLButtonAttributes & { as?: 'button' })
@@ -19,11 +19,11 @@
 </script>
 
 {#if rest.as === 'a'}
-	<a class={cn(defaultStyle, sizes[size], className)} {...rest}>
+	<a class={cn(baseStyle, sizes[size], className)} {...rest}>
 		{@render children()}
 	</a>
 {:else}
-	<button type="button" class={cn(defaultStyle, sizes[size], className)} {...rest}>
+	<button type="button" class={cn(baseStyle, sizes[size], className)} {...rest}>
 		{@render children()}
 	</button>
 {/if}

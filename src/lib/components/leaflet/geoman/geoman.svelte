@@ -54,9 +54,9 @@
 
 	import { randomID } from '$lib/utils';
 	import { getContext, onMount } from 'svelte';
-	import { contextKey } from '$lib/components/leaflet';
+	import { mapContextKey } from '$lib/components/leaflet';
 
-	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(contextKey);
+	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(mapContextKey);
 
 	onMount(async () => {
 		if (!map.pm) {
