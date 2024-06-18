@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      chokidar:
+        specifier: ^3.6.0
+        version: 3.6.0
     devDependencies:
       '@codemirror/autocomplete':
         specifier: ^6.16.2
