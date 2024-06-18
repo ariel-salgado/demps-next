@@ -48,7 +48,7 @@
 
 	const initToggle: Action<HTMLElement> = (node) => {
 		const toolbar = document.querySelector('div[class="leaflet-top leaflet-left"');
-		toolbar?.appendChild(node);
+		toolbar?.firstChild?.after(node);
 
 		return {
 			destroy() {
