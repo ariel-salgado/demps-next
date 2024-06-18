@@ -27,6 +27,8 @@
 	</nav>
 
 	<div class="flex">
-		<Button>Simular</Button>
+		<Button as="a" href="/simulacion" aria-label="Iniciar simulación">
+			<span>Simulación</span>
+		</Button>
 	</div>
 </header>
