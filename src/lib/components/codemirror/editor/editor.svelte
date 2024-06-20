@@ -1,9 +1,4 @@
 <script context="module" lang="ts">
-	import { extensions } from './extensions';
-	import { EditorView } from '@codemirror/view';
-	import { EditorState } from '@codemirror/state';
-	import { debounce, isValidGeoJSON, strEqualsObj } from '$lib/utils';
-
 	export const contextKey = Symbol();
 </script>
 
@@ -15,10 +10,10 @@
 	import type { FeatureCollection } from 'geojson';
 
 	import { setContext } from 'svelte';
-
-	type Parameters = Environment;
-
-	type EditorAction = Action<HTMLElement, Parameters>;
+	import { extensions } from './extensions';
+	import { EditorView } from '@codemirror/view';
+	import { EditorState } from '@codemirror/state';
+	import { debounce, isValidGeoJSON, strEqualsObj } from '$lib/utils';
 
 	interface Props {
 		children?: Snippet;
@@ -40,43 +35,39 @@
 	});
 
 	const updateEnvironment = debounce((value: string) => {
+		if (!isValidGeoJSON(value) || strEqualsObj(value, environment.value)) return;
+
 		try {
-			const geojson = JSON.parse(value) as FeatureCollection<G>;
+			environment.value = JSON.parse(value) as FeatureCollection<G>;
 
-			if (isValidGeoJSON(geojson) && !strEqualsObj(value, environment.value)) {
-				environment.value = geojson;
-
-				if (onChanges) {
-					onChanges();
-				}
-			}
+			if (onChanges) onChanges();
 		} catch {
 			// The editor shows the error message
 		}
 	}, 1000);
 
 	const handleChanges = EditorView.updateListener.of(({ state, docChanged }) => {
-		if (docChanged) {
-			updateEnvironment(state.doc.toString());
-		}
+		if (!docChanged) return;
+
+		updateEnvironment(state.doc.toString());
 	});
 
-	// ?: Make the minimal changes when updating the editor
+	// ?: Just update the affected code
 	function updateEditor(value: FeatureCollection) {
 		const { doc } = editor!.state;
 
-		if (isValidGeoJSON(value) && !strEqualsObj(doc.toString(), value)) {
-			editor?.dispatch({
-				changes: {
-					from: 0,
-					to: doc.length,
-					insert: JSON.stringify(value, null, 2)
-				}
-			});
-		}
+		if (!isValidGeoJSON(value) || strEqualsObj(doc.toString(), value)) return;
+
+		editor?.dispatch({
+			changes: {
+				from: 0,
+				to: doc.length,
+				insert: JSON.stringify(value, null, 2)
+			}
+		});
 	}
 
-	const initEditor: EditorAction = (editorContainer, environment) => {
+	const initEditor: Action<HTMLElement, Environment> = (editorContainer, environment) => {
 		editor = new EditorView({
 			parent: editorContainer,
 			state: EditorState.create({

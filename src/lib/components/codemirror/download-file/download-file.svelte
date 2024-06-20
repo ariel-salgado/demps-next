@@ -22,14 +22,15 @@
 		try {
 			const data = JSON.parse(editor.state.doc.toString());
 
-			if (data.features.length > 0) {
-				const convertedData =
-					'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2));
-				URLdata = 'data:' + convertedData;
-				toast.success('Datos exportados correctamente');
-			} else {
+			if (data.features.length === 0) {
 				toast.error('No hay datos para exportar');
+				return;
 			}
+
+			const convertedData =
+				'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2));
+			URLdata = 'data:' + convertedData;
+			toast.success('Datos exportados correctamente');
 		} catch {
 			toast.error('Error al exportar los datos');
 			throw new Error('Error al exportar los datos');

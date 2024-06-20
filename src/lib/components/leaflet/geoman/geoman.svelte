@@ -1,4 +1,47 @@
-<script context="module" lang="ts">
+<script lang="ts">
+	import type { G } from '$lib/types';
+	import type { Feature } from 'geojson';
+	import type { Circle, Layer, Polygon } from 'leaflet';
+	import type { MapContext } from '$lib/components/leaflet';
+
+	import { randomID } from '$lib/utils';
+	import { getContext, onMount } from 'svelte';
+	import { mapContextKey } from '$lib/components/leaflet';
+
+	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(mapContextKey);
+
+	onMount(async () => {
+		if (!map.pm) {
+			await import('@geoman-io/leaflet-geoman-free');
+			await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
+		}
+
+		window.L.PM.reInitLayer(map as unknown as Layer);
+		window.L.PM.reInitLayer(featureGroup);
+
+		map.pm.setLang('es');
+
+		map.pm.setGlobalOptions({
+			resizableCircle: true,
+			layerGroup: featureGroup,
+			limitMarkersToCount: 10
+		});
+
+		map.pm.addControls({
+			position: 'topleft',
+			drawText: false,
+			drawMarker: false,
+			cutPolygon: false,
+			drawPolyline: false,
+			drawCircleMarker: false
+		});
+
+		// Add aria-label to the draw buttons
+		window.document.querySelectorAll('a.leaflet-buttons-control-button').forEach((button) => {
+			button.setAttribute('aria-label', button.parentElement!.getAttribute('title')!);
+		});
+	});
+
 	function layerToGeometry(layer: Layer) {
 		if (layer instanceof window.L.Polygon) {
 			const coordinates = layer.getLatLngs();
@@ -44,51 +87,6 @@
 			return new window.L.Polygon(coordinates);
 		}
 	}
-</script>
-
-<script lang="ts">
-	import type { G } from '$lib/types';
-	import type { Feature } from 'geojson';
-	import type { Circle, Layer, Polygon } from 'leaflet';
-	import type { MapContext } from '$lib/components/leaflet';
-
-	import { randomID } from '$lib/utils';
-	import { getContext, onMount } from 'svelte';
-	import { mapContextKey } from '$lib/components/leaflet';
-
-	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(mapContextKey);
-
-	onMount(async () => {
-		if (!map.pm) {
-			await import('@geoman-io/leaflet-geoman-free');
-			await import('@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css');
-		}
-
-		window.L.PM.reInitLayer(map as unknown as Layer);
-		window.L.PM.reInitLayer(featureGroup);
-
-		map.pm.setLang('es');
-
-		map.pm.setGlobalOptions({
-			resizableCircle: true,
-			layerGroup: featureGroup,
-			limitMarkersToCount: 10
-		});
-
-		map.pm.addControls({
-			position: 'topleft',
-			drawText: false,
-			drawMarker: false,
-			cutPolygon: false,
-			drawPolyline: false,
-			drawCircleMarker: false
-		});
-
-		// Add aria-label to the draw buttons
-		window.document.querySelectorAll('a.leaflet-buttons-control-button').forEach((button) => {
-			button.setAttribute('aria-label', button.parentElement!.getAttribute('title')!);
-		});
-	});
 
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
@@ -109,6 +107,8 @@
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
+		if (!(layer instanceof window.L.Circle) || !(layer instanceof window.L.Polygon)) return;
+
 		const feature = geometryToGeoJSON(layer) as Feature<G>;
 		const { id, geometry } = feature;
 
@@ -116,10 +116,8 @@
 
 		if (layer instanceof window.L.Circle) {
 			editedFeature = environment.updateFeature(feature);
-		} else if (layer instanceof window.L.Polygon) {
-			editedFeature = environment.updateFeatureCoords(id as string, geometry.coordinates);
 		} else {
-			return;
+			editedFeature = environment.updateFeatureCoords(id as string, geometry.coordinates);
 		}
 
 		featureGroup.removeLayer(layer);

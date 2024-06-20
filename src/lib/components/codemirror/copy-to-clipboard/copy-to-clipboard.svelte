@@ -19,17 +19,18 @@
 	let copied: boolean = $state(false);
 
 	function copyToClipboard() {
-		if (editor) {
-			navigator.clipboard.writeText(editor.state.doc.toString()).then(() => {
-				copied = true;
-				toast.success('Copiado al portapapeles.');
-				setTimeout(() => {
-					copied = false;
-				}, timeout);
-			});
-		} else {
+		if (!editor) {
 			toast.error('Error al copiar al portapapeles.');
+			return;
 		}
+
+		navigator.clipboard.writeText(editor.state.doc.toString()).then(() => {
+			copied = true;
+			toast.success('Copiado al portapapeles.');
+			setTimeout(() => {
+				copied = false;
+			}, timeout);
+		});
 	}
 </script>
 

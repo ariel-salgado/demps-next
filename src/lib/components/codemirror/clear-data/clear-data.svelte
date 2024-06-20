@@ -17,15 +17,14 @@
 	const { environment } = getContext<EditorContext>(editorContextKey);
 
 	function clearData() {
-		if (confirm('Está seguro que desea borrar los datos?')) {
-			environment.clear();
+		if (!confirm('Está seguro que desea borrar los datos?')) return;
 
-			toast.success('Datos borrados correctamente.');
+		environment.clear();
+		toast.success('Datos borrados correctamente.');
 
-			if (onClear) {
-				onClear();
-			}
-		}
+		if (!onClear) return;
+
+		onClear();
 	}
 </script>
 

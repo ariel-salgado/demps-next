@@ -20,43 +20,40 @@
 	const { environment } = getContext<EditorContext>(editorContextKey);
 
 	function handleUpload(e: Event) {
-		if (!!files && files.length > 0) {
-			const reader = new FileReader();
+		if (!files || files.length === 0) return;
 
-			reader.onload = () => {
-				const data = reader.result as string;
+		const reader = new FileReader();
 
-				try {
-					if (isValidGeoJSON(data)) {
-						const geojson = preprocessGeoJSON(data);
+		reader.onload = () => {
+			const data = reader.result as string;
+			if (!isValidGeoJSON(data)) return;
 
-						if (!geojson) {
-							toast.error('Archivo GeoJSON inválido.');
-							throw new Error('Archivo GeoJSON inválido.');
-						}
+			try {
+				const geojson = preprocessGeoJSON(data);
 
-						environment.clear();
-						environment.addFeatures(geojson);
-
-						toast.success('Archivo GeoJSON cargado correctamente.');
-
-						(e.target as HTMLInputElement).value = '';
-
-						if (onUpload) {
-							onUpload();
-						}
-					}
-				} catch {
+				if (!geojson) {
 					toast.error('Archivo GeoJSON inválido.');
 					throw new Error('Archivo GeoJSON inválido.');
 				}
-			};
 
-			const file = files[0] as File;
-			const blob = new Blob([file], { type: file.type });
+				environment.clear();
+				environment.addFeatures(geojson);
 
-			reader.readAsText(blob);
-		}
+				toast.success('Archivo GeoJSON cargado correctamente.');
+
+				(e.target as HTMLInputElement).value = '';
+
+				if (onUpload) onUpload();
+			} catch {
+				toast.error('Archivo GeoJSON inválido.');
+				throw new Error('Archivo GeoJSON inválido.');
+			}
+		};
+
+		const file = files[0] as File;
+		const blob = new Blob([file], { type: file.type });
+
+		reader.readAsText(blob);
 	}
 </script>
 

@@ -16,7 +16,7 @@
 		size?: Sizes;
 	} & ButtonOrLinkProps;
 
-	let {
+	const {
 		children,
 		variant = 'primary',
 		size = 'default',
