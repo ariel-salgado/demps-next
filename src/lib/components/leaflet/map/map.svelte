@@ -27,8 +27,8 @@
 
 	let {
 		children,
-		zoom,
-		center,
+		zoom = 15,
+		center = [-33.015348, -71.550002],
 		environment,
 		reload = $bindable(),
 		class: className,

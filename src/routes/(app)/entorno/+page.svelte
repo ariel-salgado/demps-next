@@ -10,9 +10,6 @@
 		CopyToClipboard
 	} from '$lib/components/codemirror';
 
-	const zoom: number = 15;
-	const center: [number, number] = [-33.015348, -71.550002];
-
 	let reload: boolean = $state(false);
 	let files: FileList | null = $state(null);
 
@@ -29,7 +26,7 @@
 <section class="size-full">
 	<SplitView>
 		{#snippet left()}
-			<Map {center} {zoom} {environment} bind:reload>
+			<Map {environment} bind:reload>
 				<Geoman />
 				<Geosearch />
 				<ToggleLayers />
