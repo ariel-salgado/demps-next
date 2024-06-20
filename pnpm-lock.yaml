@@ -135,6 +135,9 @@ importers:
       svelte-sonner:
         specifier: ^0.3.24
         version: 0.3.24(svelte@5.0.0-next.160)
+      sveltekit-sse:
+        specifier: ^0.13.2
+        version: 0.13.2(@microsoft/fetch-event-source@2.0.1)(@sveltejs/kit@2.5.17(@sveltejs/vite-plugin-svelte@4.0.0-next.3(svelte@5.0.0-next.160)(vite@5.3.1(lightningcss@1.25.1)(terser@5.31.1)))(svelte@5.0.0-next.160)(vite@5.3.1(lightningcss@1.25.1)(terser@5.31.1)))(svelte@5.0.0-next.160)
       tailwind-merge:
         specifier: ^2.3.0
         version: 2.3.0
@@ -416,6 +419,9 @@ packages:
 
   '@lezer/lr@1.4.1':
     resolution: {integrity: sha512-CHsKq8DMKBf9b3yXPDIU4DbH+ZJd/sJdYOW2llbW/HudP5u0VS6Bfq1hLYfgU7uAYGFIyGGQIsSOXGPEErZiJw==}
+
+  '@microsoft/fetch-event-source@2.0.1':
+    resolution: {integrity: sha512-W6CLUJ2eBMw3Rec70qrsEW0jOm/3twwJv21mrmj2yORiaVmVYGS4sSS5yUwvQc1ZlDLYGPnClVWmUUMagKNsfA==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2249,6 +2255,13 @@ packages:
     resolution: {integrity: sha512-wh3VsVmyioB+9tlJDmrFv0CHDR/jIMwpCO/n6oIQAdOHKNykR1PogNSaSALz2thCZ+t/5Q60wGa+cfhixnj1fA==}
     engines: {node: '>=18'}
 
+  sveltekit-sse@0.13.2:
+    resolution: {integrity: sha512-blEwtcDJxoLdt3lloiaJyWs9W0iYf7yL2B7FHBz6gKdUXHqaIGVwsVeGSDzlOpvKh/+F1GUXaF7i/EZXthrPaA==}
+    peerDependencies:
+      '@microsoft/fetch-event-source': ^2.0.1
+      '@sveltejs/kit': ^2.0.0
+      svelte: ^4.0.0 || ^5.0.0-next.0
+
   tailwind-merge@2.3.0:
     resolution: {integrity: sha512-vkYrLpIP+lgR0tQCG6AP7zZXCTLc1Lnv/CCRT3BqJ9CZ3ui2++GPaGb1x/ILsINIMSYqqvrpqjUFsMNLlW99EA==}
 
@@ -2684,6 +2697,8 @@ snapshots:
   '@lezer/lr@1.4.1':
     dependencies:
       '@lezer/common': 1.2.1
+
+  '@microsoft/fetch-event-source@2.0.1': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -4557,6 +4572,12 @@ snapshots:
       locate-character: 3.0.0
       magic-string: 0.30.10
       zimmerframe: 1.1.2
+
+  sveltekit-sse@0.13.2(@microsoft/fetch-event-source@2.0.1)(@sveltejs/kit@2.5.17(@sveltejs/vite-plugin-svelte@4.0.0-next.3(svelte@5.0.0-next.160)(vite@5.3.1(lightningcss@1.25.1)(terser@5.31.1)))(svelte@5.0.0-next.160)(vite@5.3.1(lightningcss@1.25.1)(terser@5.31.1)))(svelte@5.0.0-next.160):
+    dependencies:
+      '@microsoft/fetch-event-source': 2.0.1
+      '@sveltejs/kit': 2.5.17(@sveltejs/vite-plugin-svelte@4.0.0-next.3(svelte@5.0.0-next.160)(vite@5.3.1(lightningcss@1.25.1)(terser@5.31.1)))(svelte@5.0.0-next.160)(vite@5.3.1(lightningcss@1.25.1)(terser@5.31.1))
+      svelte: 5.0.0-next.160
 
   tailwind-merge@2.3.0:
     dependencies:

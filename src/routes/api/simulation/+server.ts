@@ -1,13 +1,12 @@
-import type { Actions } from './$types';
 import type { FSWatcher } from 'chokidar';
+import type { RequestHandler } from './$types';
 
+import { produce } from 'sveltekit-sse';
 import { DEMPS_OUTPUT_DIR } from '$env/static/private';
 import { uniquePool, createWatcher } from '$lib/server';
 
-export const prerender = false;
-
-export const actions = {
-	start: async () => {
+export const POST = (async () => {
+	return produce(async function start({ emit }) {
 		const watcher = createWatcher(DEMPS_OUTPUT_DIR);
 
 		try {
@@ -18,17 +17,11 @@ export const actions = {
 
 			uniquePool.add('watcher', watcher);
 
-			watcher.on('add', (path) => {
-				console.log('File', path, 'has been added');
+			watcher.on('add', async (path) => {
+				emit('message', `${path}`);
 			});
 		} catch {
 			watcher.close();
 		}
-	},
-	stop: async () => {
-		if (uniquePool.has('watcher')) {
-			const watcher = uniquePool.pop<FSWatcher>('watcher');
-			watcher!.close();
-		}
-	}
-} satisfies Actions;
+	});
+}) satisfies RequestHandler;

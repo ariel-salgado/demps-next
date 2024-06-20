@@ -59,6 +59,7 @@
 		"svelte": "5.0.0-next.160",
 		"svelte-check": "^3.8.1",
 		"svelte-sonner": "^0.3.24",
+		"sveltekit-sse": "^0.13.2",
 		"tailwind-merge": "^2.3.0",
 		"tailwindcss": "4.0.0-alpha.16",
 		"tslib": "^2.6.3",
