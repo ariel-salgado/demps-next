@@ -9,16 +9,22 @@ import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 
 export const POST = (async () => {
-	return produce(async function start({ emit }) {
-		const watcher = createWatcher(DEMPS_OUTPUT_DIR);
+	const watcher = createWatcher(DEMPS_OUTPUT_DIR);
 
-		try {
-			if (uniquePool.has('watcher')) {
-				const oldWatcher = uniquePool.pop<FSWatcher>('watcher');
-				oldWatcher!.close();
+	if (uniquePool.has('watcher')) {
+		uniquePool.pop<FSWatcher>('watcher')?.close();
+	}
+
+	uniquePool.add('watcher', watcher);
+
+	return produce(
+		async function start({ emit }) {
+			const { error } = emit('initConnection', 'success');
+
+			if (error) {
+				console.error(error);
+				return;
 			}
-
-			uniquePool.add('watcher', watcher);
 
 			watcher.on('add', async (path) => {
 				const data: string[] = [];
@@ -34,11 +40,14 @@ export const POST = (async () => {
 				});
 
 				readInterface.on('close', () => {
-					emit('message', data.toString());
+					emit('agentsCoordinates', data.toString());
 				});
 			});
-		} catch {
-			watcher.close();
+		},
+		{
+			async stop() {
+				console.log('Connection closed');
+			}
 		}
-	});
+	);
 }) satisfies RequestHandler;
