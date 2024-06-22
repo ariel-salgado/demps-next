@@ -3,10 +3,7 @@ import type { RequestHandler } from './$types';
 
 import { produce } from 'sveltekit-sse';
 import { DEMPS_SIM_DIR } from '$env/static/private';
-import { uniquePool, createWatcher, runDempsSim } from '$lib/server';
-
-import { createReadStream } from 'node:fs';
-import { createInterface } from 'node:readline';
+import { uniquePool, createWatcher, runDempsSim, createFileProcessor } from '$lib/server';
 
 export const POST = (async () => {
 	const dirWatcher = createWatcher(DEMPS_SIM_DIR);
@@ -46,34 +43,14 @@ export const POST = (async () => {
 
 					uniquePool.add('fileWatcher', fileWatcher);
 
+					const fileProcessor = createFileProcessor((data) => {
+						console.log('Emitting data from file processor');
+						emit('a', data);
+					});
+
 					fileWatcher.on('add', async (path) => {
-						try {
-							const data: { lat: string; lng: string }[] = [];
-
-							const readInterface = createInterface({
-								input: createReadStream(path),
-								terminal: false
-							});
-
-							readInterface.on('line', (line) => {
-								if (line.length > 0) {
-									const parsedLine = line.split(' ');
-									const lat = parsedLine[1];
-									const lng = parsedLine[2];
-
-									if (lat && lng) {
-										data.push({ lat, lng });
-									}
-								}
-							});
-
-							readInterface.on('close', () => {
-								const dataString = data.map((item) => `${item.lat}, ${item.lng}`).join('\n');
-								emit('agentsCoordinates', dataString);
-							});
-						} catch (error) {
-							console.error(`Error reading file ${path}:`, error);
-						}
+						fileProcessor.push(path);
+						await fileProcessor.process();
 					});
 				}
 			});
