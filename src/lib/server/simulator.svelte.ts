@@ -32,13 +32,14 @@ export function runDempsSim(): Promise<void> {
 		});
 
 		// User pressed Ctrl+C
-		process.on('SIGINT', () => {
-			shutdown(dempsProcess, 'SIGINT')
-				.then(() => process.exit(0))
-				.catch((error) => {
-					console.error('Error during shutdown:', error);
-					process.exit(1);
-				});
+		process.on('SIGINT', async () => {
+			try {
+				await shutdown(dempsProcess, 'SIGINT');
+				process.exit(0);
+			} catch (error) {
+				console.error('Error during shutdown:', error);
+				process.exit(1);
+			}
 		});
 	});
 }
@@ -55,9 +56,12 @@ async function shutdown(childProcess: ChildProcess, signal: NodeJS.Signals): Pro
 		childProcess.kill(signal);
 
 		const timeout = setTimeout(() => {
-			console.log('Force killing the process...');
-			childProcess.kill('SIGKILL');
-		}, 1000);
+			if (!childProcess.killed) {
+				console.log('Force killing the process...');
+				process.kill(childProcess.pid!, 'SIGKILL');
+				return resolve();
+			}
+		}, 3000);
 
 		childProcess.on('exit', () => {
 			clearTimeout(timeout);
