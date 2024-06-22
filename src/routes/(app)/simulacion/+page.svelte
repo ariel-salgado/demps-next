@@ -22,8 +22,9 @@
 
 	$effect(() => {
 		if (onProgress) {
-			agentsCoordinates = connection.select('agentsCoordinates').transform(() => {
-				return [[-33.015348, -71.550002]];
+			agentsCoordinates = connection.select('agentsCoordinates').transform((data) => {
+				const coordinates = data.split('\n').map((coord) => coord.split(',').map(Number));
+				return coordinates;
 			});
 		}
 	});
@@ -34,6 +35,7 @@
 
 	// TODO: Implement stop simulation
 	function stopSimulation() {
+		connection.close();
 		onProgress = false;
 	}
 </script>
@@ -50,6 +52,7 @@
 	</Button>
 {/if}
 
+<!-- TODO: Make canvas reactive, so when the value changes, update the view -->
 {#if $initConnection === 'success' && onProgress}
 	{#await import('$lib/components/leaflet/map/map.svelte') then Map}
 		{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
