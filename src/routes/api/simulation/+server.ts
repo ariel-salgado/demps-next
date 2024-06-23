@@ -25,23 +25,20 @@ export const POST = (async () => {
 			dirWatcher.on('ready', async () => {
 				try {
 					await dempsProcess.run();
-					emit('status', 'ending');
 					return;
 				} catch {
-					await dempsProcess.abort();
-					emit('status', 'ending');
 					return;
 				}
 			});
 
 			dirWatcher.on('addDir', (path) => {
 				if (path.includes('agents')) {
-					const fileWatcher = createWatcher('fileWatcher', path);
-					fileWatchers.push(fileWatcher);
-
 					const fileProcessor = createFileProcessor((data) => {
 						emit('agents', data);
 					});
+
+					const fileWatcher = createWatcher('fileWatcher', path);
+					fileWatchers.push(fileWatcher);
 
 					fileWatcher.on('ready', () => {
 						emit('ready', 'success');

@@ -5,6 +5,8 @@ import { spawn } from 'child_process';
 import { uniquePool } from '$lib/states';
 import { DEMPS_SIM_DIR } from '$env/static/private';
 
+import treeKill from 'tree-kill';
+
 export function createDempsProcess() {
 	let isRunning: boolean = $state(false);
 	let dempsProcess: ChildProcess | undefined = $state();
@@ -22,26 +24,21 @@ export function createDempsProcess() {
 					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
 					{
 						cwd: DEMPS_SIM_DIR,
-						stdio: 'inherit',
 						shell: true
 					}
 				);
 
 				dempsProcess.on('spawn', () => {
-					console.log('Process spawned');
 					isRunning = true;
 					uniquePool.add('dempsProcess', dempsProcess);
 				});
 
 				dempsProcess.on('error', async (error) => {
-					console.error('Process error:', error);
 					await shutdown('SIGTERM');
 					reject(error);
 				});
 
 				dempsProcess.on('exit', async (code, signal) => {
-					console.log(`Process exited with code ${code} and signal ${signal}`);
-					await shutdown(signal || 'SIGTERM');
 					if (code === 0) {
 						resolve();
 					} else {
@@ -58,7 +55,6 @@ export function createDempsProcess() {
 							process.exit(0);
 						} catch (error) {
 							console.error('Error during shutdown:', error);
-							forceKill();
 							process.exit(1);
 						}
 					});
@@ -77,29 +73,24 @@ export function createDempsProcess() {
 				resolve();
 			}
 
-			console.log(`Shutting down gracefully with signal ${signal}...`);
+			if (!dempsProcess?.killed) {
+				console.log(`Shutting down gracefully with signal ${signal}...`);
 
-			dempsProcess?.kill(signal);
+				if (dempsProcess?.pid) {
+					treeKill(dempsProcess.pid, signal, (err) => {
+						if (err) {
+							console.error('Error killing process:', err);
+						} else {
+							console.log('Process killed successfully');
+						}
+					});
+				} else {
+					dempsProcess?.kill(signal);
+				}
+			}
 
-			const timeout = setTimeout(() => {
-				console.log('Shutdown timeout reached');
-				forceKill();
-				resolve();
-			}, 3000); // Increased timeout to 3 seconds
-
-			dempsProcess?.once('exit', () => {
-				console.log('Process exited during shutdown');
-				clearTimeout(timeout);
-				resolve();
-			});
+			resolve();
 		});
-	}
-
-	function forceKill() {
-		if (dempsProcess && !dempsProcess.killed) {
-			console.log('Force killing the process...');
-			dempsProcess.kill('SIGKILL');
-		}
 	}
 
 	async function abort() {
