@@ -2,8 +2,9 @@ import type { FSWatcher } from 'chokidar';
 import type { RequestHandler } from './$types';
 
 import { produce } from 'sveltekit-sse';
+import { uniquePool } from '$lib/states';
 import { DEMPS_SIM_DIR } from '$env/static/private';
-import { uniquePool, createWatcher, runDempsSim, createFileProcessor } from '$lib/server';
+import { createWatcher, runDempsSim, createFileProcessor } from '$lib/server';
 
 export const POST = (async () => {
 	const dirWatcher = createWatcher(DEMPS_SIM_DIR);
@@ -44,8 +45,7 @@ export const POST = (async () => {
 					uniquePool.add('fileWatcher', fileWatcher);
 
 					const fileProcessor = createFileProcessor((data) => {
-						console.log('Emitting data from file processor');
-						emit('a', data);
+						emit('agents', data);
 					});
 
 					fileWatcher.on('add', async (path) => {

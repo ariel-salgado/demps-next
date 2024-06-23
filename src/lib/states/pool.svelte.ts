@@ -1,6 +1,6 @@
 import { Map } from 'svelte/reactivity';
 
-function createUniquePool() {
+export function createUniquePool() {
 	const pool = new Map();
 
 	function add(key: string, value: any, replace?: boolean) {
@@ -46,5 +46,3 @@ function createUniquePool() {
 		remove
 	};
 }
-
-export const uniquePool = createUniquePool();
