@@ -6,37 +6,60 @@
 	import { Button } from '$lib/components/ui';
 	import { Play, Square } from 'lucide-svelte';
 
-	const connection = source('/api/simulation');
-
 	let onProgress: boolean = $state(false);
 
-	let initConnection: Readable<string> | undefined = $state();
-	let agentsCoordinates: Readable<[number, number][]> | undefined = $state();
+	// Server-Sent Events
+	let status: Readable<string> | undefined = $state();
+	let ready: Readable<string> | undefined = $state();
+	let agents: Readable<[number, number][]> | undefined = $state();
 
-	$effect(() => {
-		if ($initConnection === 'success') {
-			toast.loading('Iniciando simulación...');
-			onProgress = true;
+	const connection = source('/api/simulation', {
+		open: () => {
+			ready = connection.select('ready');
+			toast.loading('Conectando con el servidor...');
+		},
+		close: () => {
+			onProgress = false;
+			toast.success('Conexión con el servidor cerrada.');
+		},
+		error: ({ error }) => {
+			toast.error('Error en la conexión.', {
+				description: error?.message
+			});
 		}
 	});
 
+	// When the simulator is ready
+	$effect(() => {
+		if ($ready === 'success') {
+			onProgress = true;
+			toast.loading('Iniciando simulación...');
+		}
+	});
+
+	// When the coordinates are received
 	$effect(() => {
 		if (onProgress) {
-			agentsCoordinates = connection.select('agents').transform((data) => {
+			agents = connection.select('agents').transform((data) => {
 				const coordinates = data.split('\n').map((coord) => coord.split(',').map(Number));
 				return coordinates;
 			});
 		}
 	});
 
+	// When the simulation is ending
+	$effect(() => {
+		if ($status === 'ending') {
+			toast.info('Finalizando simulación...');
+		}
+	});
+
 	function startSimulation() {
-		initConnection = connection.select('initConnection');
+		status = connection.select('status');
 	}
 
-	// TODO: Implement stop simulation
 	function stopSimulation() {
 		connection.close();
-		onProgress = false;
 	}
 </script>
 
@@ -52,12 +75,12 @@
 	</Button>
 {/if}
 
-{#if $initConnection === 'success' && onProgress}
+{#if onProgress}
 	{#await import('$lib/components/leaflet/map/map.svelte') then Map}
 		{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
 			<svelte:component this={Map.default}>
-				{#if $agentsCoordinates}
-					<svelte:component this={Canvas.default} coordinates={$agentsCoordinates} />
+				{#if $agents}
+					<svelte:component this={Canvas.default} coordinates={$agents} />
 				{/if}
 			</svelte:component>
 		{/await}

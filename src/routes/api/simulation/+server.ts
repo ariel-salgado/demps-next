@@ -1,23 +1,21 @@
-import type { FSWatcher } from 'chokidar';
+import type { Watcher } from '$lib/server';
 import type { RequestHandler } from './$types';
 
 import { produce } from 'sveltekit-sse';
-import { uniquePool } from '$lib/states';
 import { DEMPS_SIM_DIR } from '$env/static/private';
-import { createWatcher, runDempsSim, createFileProcessor } from '$lib/server';
+import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/server';
+
+const fileWatchers: Watcher[] = [];
 
 export const POST = (async () => {
-	const dirWatcher = createWatcher(DEMPS_SIM_DIR);
+	const dempsProcess = createDempsProcess();
 
-	if (uniquePool.has('dirWatcher')) {
-		uniquePool.pop<FSWatcher>('dirWatcher')?.close();
-	}
-
-	uniquePool.add('dirWatcher', dirWatcher);
+	const dirWatcher = createWatcher('dirWatcher', DEMPS_SIM_DIR);
+	fileWatchers.push(dirWatcher);
 
 	return produce(
 		async function start({ emit }) {
-			const { error } = emit('initConnection', 'success');
+			const { error } = emit('status', 'running');
 
 			if (error) {
 				console.error(error);
@@ -26,26 +24,27 @@ export const POST = (async () => {
 
 			dirWatcher.on('ready', async () => {
 				try {
-					await runDempsSim();
+					await dempsProcess.run();
+					emit('status', 'ending');
 					return;
 				} catch {
-					console.error('Error running simulation');
+					await dempsProcess.abort();
+					emit('status', 'ending');
 					return;
 				}
 			});
 
 			dirWatcher.on('addDir', (path) => {
 				if (path.includes('agents')) {
-					const fileWatcher = createWatcher(path);
-
-					if (uniquePool.has('fileWatcher')) {
-						uniquePool.pop<FSWatcher>('fileWatcher')?.close();
-					}
-
-					uniquePool.add('fileWatcher', fileWatcher);
+					const fileWatcher = createWatcher('fileWatcher', path);
+					fileWatchers.push(fileWatcher);
 
 					const fileProcessor = createFileProcessor((data) => {
 						emit('agents', data);
+					});
+
+					fileWatcher.on('ready', () => {
+						emit('ready', 'success');
 					});
 
 					fileWatcher.on('add', async (path) => {
@@ -56,9 +55,11 @@ export const POST = (async () => {
 			});
 		},
 		{
+			ping: 10000,
 			async stop() {
-				if (uniquePool.has('dirWatcher')) {
-					uniquePool.pop<FSWatcher>('dirWatcher')?.close();
+				fileWatchers.forEach((watcher) => watcher.close());
+				if (dempsProcess.isRunning) {
+					await dempsProcess.abort();
 				}
 
 				console.log('Connection closed');
