@@ -7,27 +7,12 @@
 	import { Play, Square } from 'lucide-svelte';
 
 	let onProgress: boolean = $state(false);
+	let connection: ReturnType<typeof source> | undefined = $state();
 
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
 	let ready: Readable<string> | undefined = $state();
 	let agents: Readable<[number, number][]> | undefined = $state();
-
-	const connection = source('/api/simulation', {
-		open: () => {
-			ready = connection.select('ready');
-			toast.loading('Conectando con el servidor...');
-		},
-		close: () => {
-			onProgress = false;
-			toast.success('Conexión con el servidor cerrada.');
-		},
-		error: ({ error }) => {
-			toast.error('Error en la conexión.', {
-				description: error?.message
-			});
-		}
-	});
 
 	// When the simulator is ready
 	$effect(() => {
@@ -40,7 +25,7 @@
 	// When the coordinates are received
 	$effect(() => {
 		if (onProgress) {
-			agents = connection.select('agents').transform((data) => {
+			agents = connection?.select('agents').transform((data) => {
 				const coordinates = data.split('\n').map((coord) => coord.split(',').map(Number));
 				return coordinates;
 			});
@@ -49,17 +34,43 @@
 
 	// When the simulation is ending
 	$effect(() => {
-		if ($status === 'ending') {
+		if ($status === 'closing') {
 			toast.info('Finalizando simulación...');
 		}
 	});
 
 	function startSimulation() {
-		status = connection.select('status');
+		toast.loading('Conectando con el servidor...');
+
+		connection = createConnection();
+
+		setTimeout(() => {
+			status = connection?.select('status');
+		}, 1000);
 	}
 
 	function stopSimulation() {
-		connection.close();
+		connection?.close();
+	}
+
+	function createConnection() {
+		return source('/api/simulation', {
+			open: () => {
+				ready = connection?.select('ready');
+			},
+			close: () => {
+				toast.loading('Finalizando...');
+				setTimeout(() => {
+					onProgress = false;
+					toast.success('Conexión finalizada.');
+				}, 1000);
+			},
+			error: ({ error }) => {
+				toast.error('Error en la conexión.', {
+					description: error?.message
+				});
+			}
+		});
 	}
 </script>
 
