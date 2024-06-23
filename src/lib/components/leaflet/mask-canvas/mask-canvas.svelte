@@ -1,23 +1,40 @@
 <script lang="ts">
+	import type { Layer } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet';
 
-	import { getContext, onMount } from 'svelte';
+	import { uniquePool } from '$lib/states';
 	import { mapContextKey } from '$lib/components/leaflet';
+	import { getContext, onMount, untrack, tick } from 'svelte';
 
 	interface Props {
 		coordinates: [number, number][];
 	}
 
-	let { coordinates = $bindable() }: Props = $props();
+	let { coordinates }: Props = $props();
 
 	const { map } = getContext<MapContext>(mapContextKey);
+
+	let mounted: boolean = $state(false);
+
+	$effect(() => {
+		if (mounted) {
+			coordinates;
+			untrack(async () => await createMaskLayer(coordinates));
+		}
+	});
 
 	onMount(async () => {
 		// @ts-expect-error - maskCanvas is not recognized
 		await import('leaflet-maskcanvas');
 
+		await createMaskLayer(coordinates);
+
+		mounted = true;
+	});
+
+	async function createMaskLayer(coordinates: [number, number][]) {
 		// @ts-expect-error - maskCanvas is not recognized
-		const markerLayer = window.L.TileLayer.maskCanvas({
+		const maskLayer = window.L.TileLayer.maskCanvas({
 			radius: 1,
 			useAbsoluteRadius: true,
 			color: '#7E4BB9',
@@ -26,14 +43,19 @@
 			lineColor: '#6A3D9E'
 		});
 
-		markerLayer.setData(coordinates);
+		maskLayer.setData(coordinates);
 
-		const bounds = markerLayer.bounds;
+		map.addLayer(maskLayer);
 
-		markerLayer.addTo(map);
+		await tick();
 
-		if (bounds.isValid()) {
-			map.fitBounds(bounds);
+		if (uniquePool.has('maskLayer')) {
+			setTimeout(() => {
+				map.removeLayer(uniquePool.pop<Layer>('maskLayer')!);
+				uniquePool.add('maskLayer', maskLayer);
+			}, 50);
+		} else {
+			uniquePool.add('maskLayer', maskLayer);
 		}
-	});
+	}
 </script>

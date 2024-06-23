@@ -22,11 +22,8 @@
 
 	$effect(() => {
 		if (onProgress) {
-			agentsCoordinates = connection.select('a').transform((data) => {
+			agentsCoordinates = connection.select('agents').transform((data) => {
 				const coordinates = data.split('\n').map((coord) => coord.split(',').map(Number));
-
-				console.log(coordinates);
-
 				return coordinates;
 			});
 		}
@@ -55,16 +52,13 @@
 	</Button>
 {/if}
 
-<!-- TODO: Canvas needs to remove old layer to replace it with the new one -->
 {#if $initConnection === 'success' && onProgress}
 	{#await import('$lib/components/leaflet/map/map.svelte') then Map}
 		{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
 			<svelte:component this={Map.default}>
-				{#key $agentsCoordinates}
-					{#if $agentsCoordinates}
-						<svelte:component this={Canvas.default} coordinates={$agentsCoordinates} />
-					{/if}
-				{/key}
+				{#if $agentsCoordinates}
+					<svelte:component this={Canvas.default} coordinates={$agentsCoordinates} />
+				{/if}
 			</svelte:component>
 		{/await}
 	{/await}
