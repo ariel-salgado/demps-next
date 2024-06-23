@@ -1,71 +1,122 @@
+import type { DempsProcess } from '.';
 import type { ChildProcess } from 'child_process';
 
 import { spawn } from 'child_process';
+import { uniquePool } from '$lib/states';
 import { DEMPS_SIM_DIR } from '$env/static/private';
 
-export function runDempsSim(): Promise<void> {
-	return new Promise((resolve, reject) => {
-		const dempsProcess = spawn(
-			'./run.sh',
-			['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
-			{
-				cwd: DEMPS_SIM_DIR,
-				stdio: 'inherit',
-				shell: true
-			}
-		);
+export function createDempsProcess() {
+	let isRunning: boolean = $state(false);
+	let dempsProcess: ChildProcess | undefined = $state();
 
-		dempsProcess.on('error', async (error) => {
-			console.error('Process error:', error);
-			await shutdown(dempsProcess, 'SIGTERM');
-			reject(error);
-		});
+	if (uniquePool.has('dempsProcess')) {
+		const dp = uniquePool.pop<DempsProcess>('dempsProcess');
+		if (dp?.isRunning) dp.abort();
+	}
 
-		dempsProcess.on('exit', async (code, signal) => {
-			console.log('Exit:', code, signal);
-			await shutdown(dempsProcess, signal || 'SIGTERM');
-			if (code === 0) {
-				resolve();
-			} else {
-				reject(new Error(`Process exited with code ${code} and signal ${signal}`));
-			}
-		});
-
-		// User pressed Ctrl+C
-		process.on('SIGINT', async () => {
+	async function run(): Promise<void> {
+		return new Promise((resolve, reject) => {
 			try {
-				await shutdown(dempsProcess, 'SIGINT');
-				process.exit(0);
+				dempsProcess = spawn(
+					'./run.sh',
+					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
+					{
+						cwd: DEMPS_SIM_DIR,
+						stdio: 'inherit',
+						shell: true
+					}
+				);
+
+				dempsProcess.on('spawn', () => {
+					console.log('Process spawned');
+					isRunning = true;
+					uniquePool.add('dempsProcess', dempsProcess);
+				});
+
+				dempsProcess.on('error', async (error) => {
+					console.error('Process error:', error);
+					await shutdown('SIGTERM');
+					reject(error);
+				});
+
+				dempsProcess.on('exit', async (code, signal) => {
+					console.log(`Process exited with code ${code} and signal ${signal}`);
+					await shutdown(signal || 'SIGTERM');
+					if (code === 0) {
+						resolve();
+					} else {
+						reject(new Error(`Process exited with code ${code} and signal ${signal}`));
+					}
+				});
+
+				// Handle both SIGINT and SIGTERM
+				['SIGINT', 'SIGTERM'].forEach((signal) => {
+					process.on(signal, async () => {
+						console.log(`Received ${signal}`);
+						try {
+							await shutdown(signal as NodeJS.Signals);
+							process.exit(0);
+						} catch (error) {
+							console.error('Error during shutdown:', error);
+							forceKill();
+							process.exit(1);
+						}
+					});
+				});
 			} catch (error) {
-				console.error('Error during shutdown:', error);
-				process.exit(1);
+				console.error('Error spawning process:', error);
+				reject(error);
 			}
 		});
-	});
-}
+	}
 
-async function shutdown(childProcess: ChildProcess, signal: NodeJS.Signals): Promise<void> {
-	return new Promise((resolve) => {
-		console.log(`Received ${signal}. Shutting down gracefully...`);
+	async function shutdown(signal: NodeJS.Signals): Promise<void> {
+		return new Promise((resolve) => {
+			if (!dempsProcess || dempsProcess.killed) {
+				console.log('Process was already killed or does not exist');
+				resolve();
+			}
 
-		if (childProcess.killed) {
-			console.log('Process was already killed');
-			return resolve();
+			console.log(`Shutting down gracefully with signal ${signal}...`);
+
+			dempsProcess?.kill(signal);
+
+			const timeout = setTimeout(() => {
+				console.log('Shutdown timeout reached');
+				forceKill();
+				resolve();
+			}, 3000); // Increased timeout to 3 seconds
+
+			dempsProcess?.once('exit', () => {
+				console.log('Process exited during shutdown');
+				clearTimeout(timeout);
+				resolve();
+			});
+		});
+	}
+
+	function forceKill() {
+		if (dempsProcess && !dempsProcess.killed) {
+			console.log('Force killing the process...');
+			dempsProcess.kill('SIGKILL');
 		}
+	}
 
-		childProcess.kill(signal);
+	async function abort() {
+		await shutdown('SIGTERM');
+		reset();
+	}
 
-		const timeout = setTimeout(() => {
-			if (!childProcess.killed) {
-				console.log('Force killing the process...');
-				process.kill(childProcess.pid!, 'SIGKILL');
-				return resolve();
-			}
-		}, 3000);
+	function reset() {
+		isRunning = false;
+		dempsProcess = undefined;
+	}
 
-		childProcess.on('exit', () => {
-			clearTimeout(timeout);
-			resolve();
-		});
-	});
+	return {
+		run,
+		abort,
+		get isRunning() {
+			return isRunning;
+		}
+	};
 }
