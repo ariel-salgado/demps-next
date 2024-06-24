@@ -24,7 +24,8 @@ export function createDempsProcess() {
 					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
 					{
 						cwd: DEMPS_SIM_DIR,
-						shell: true
+						shell: true,
+						stdio: 'inherit'
 					}
 				);
 
