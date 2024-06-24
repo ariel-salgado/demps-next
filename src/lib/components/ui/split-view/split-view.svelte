@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	import { on } from 'svelte/events';
 	import { EllipsisVertical } from 'lucide-svelte';
 
 	interface Props {
@@ -19,12 +20,14 @@
 	let container: HTMLDivElement | undefined = $state();
 
 	$effect(() => {
-		if (isDragging) {
-			document.addEventListener('mouseup', mouseUpHandler);
-			document.addEventListener('mousemove', mouseMoveHandler);
-		} else {
-			document.removeEventListener('mouseup', mouseUpHandler);
-			document.removeEventListener('mousemove', mouseMoveHandler);
+		if (isDragging && container) {
+			const onMouseUp = on(container, 'mouseup', mouseUpHandler);
+			const onMouseMove = on(container, 'mousemove', mouseMoveHandler);
+
+			return () => {
+				onMouseUp();
+				onMouseMove();
+			};
 		}
 	});
 
