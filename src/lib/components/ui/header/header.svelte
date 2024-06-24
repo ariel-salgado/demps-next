@@ -9,7 +9,7 @@
 	const navLinks: NavLinks[] = [
 		{ label: 'inicio', href: '/' },
 		{ label: 'entorno', href: '/entorno' },
-		{ label: 'parámetros', href: '/' }
+		{ label: 'parámetros', href: '/parametros' }
 	];
 </script>
 
