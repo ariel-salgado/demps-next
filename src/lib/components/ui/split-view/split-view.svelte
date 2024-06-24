@@ -69,15 +69,14 @@
 >
 	<!-- Left screen -->
 	<div
-		class={`w-2/3 min-w-[500px] overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
+		class={`w-2/3 min-w-[30.5rem] overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
 		bind:this={leftSide}
 	>
 		{@render left()}
 	</div>
 
 	<!-- Resizer -->
-	<!-- ?: Add button to close right side panel -->
-	<div class="flex h-full w-2 flex-col justify-around bg-slate-600">
+	<div class="flex h-full w-2 flex-col justify-evenly bg-slate-600">
 		{@render resizer()}
 		{@render resizer()}
 		{@render resizer()}
@@ -85,7 +84,7 @@
 
 	<!-- Right screen -->
 	<div
-		class={`min-w-[500px] flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
+		class={`min-w-[28rem] flex-1 overflow-y-auto ${isDragging && 'pointer-events-none select-none'}`}
 	>
 		{@render right()}
 	</div>
