@@ -6,6 +6,6 @@
 <section class="grid h-full place-items-center items-center justify-items-center">
 	<div class="-mt-40 text-center">
 		<h1 class="text-6xl font-bold">DEMPS</h1>
-		<p class="py-1 text-lg text-zinc-500">Disaster Evacuation and Mobility Patterns Simulator.</p>
+		<p class="py-1 text-lg text-slate-500">Disaster Evacuation and Mobility Patterns Simulator.</p>
 	</div>
 </section>
