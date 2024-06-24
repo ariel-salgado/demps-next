@@ -3,7 +3,7 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	import { cn } from '$lib/utils';
-	import { baseStyle, initInput } from './props';
+	import { baseStyle, initInput } from './props.svelte';
 
 	interface Props extends HTMLInputAttributes {
 		validation?: z.ZodType;
