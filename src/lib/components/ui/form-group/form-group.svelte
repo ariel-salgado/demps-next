@@ -13,7 +13,7 @@
 
 <div
 	class={cn(
-		'space-y-2 rounded-md py-3.5 px-5 transition-colors focus-within:bg-zinc-50 hover:bg-zinc-50 has-[.error]:bg-red-600/10 has-[.error]:focus-within:bg-red-600/10 has-[.error]:hover:bg-red-600/10 has-[input:read-only]:bg-zinc-100 has-[select:disabled]:bg-zinc-100',
+		'rounded-md py-3.5 px-5 transition-colors *:mt-2 focus-within:bg-zinc-50 hover:bg-zinc-50 has-[.error]:bg-red-600/10 has-[.error]:focus-within:bg-red-600/10 has-[.error]:hover:bg-red-600/10 has-[input:read-only]:bg-zinc-100 has-[select:disabled]:bg-zinc-100',
 		className
 	)}
 	{...props}
