@@ -1,10 +1,9 @@
 <script lang="ts">
-	import type { Layer } from 'leaflet';
+	import type { LayerGroup, TileLayer } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet';
 
-	import { uniquePool } from '$lib/states';
 	import { mapContextKey } from '$lib/components/leaflet';
-	import { getContext, onMount, untrack, tick } from 'svelte';
+	import { getContext, onDestroy, onMount, untrack } from 'svelte';
 
 	interface Props {
 		coordinates: [number, number][];
@@ -15,11 +14,12 @@
 	const { map } = getContext<MapContext>(mapContextKey);
 
 	let mounted: boolean = $state(false);
+	let layerGroup: LayerGroup<TileLayer> = $state(window.L.layerGroup());
 
 	$effect(() => {
 		if (mounted) {
 			coordinates;
-			untrack(async () => await createMaskLayer(coordinates));
+			untrack(() => createMaskLayer(coordinates));
 		}
 	});
 
@@ -27,35 +27,48 @@
 		// @ts-expect-error - maskCanvas is not recognized
 		await import('leaflet-maskcanvas');
 
-		await createMaskLayer(coordinates);
+		map.addLayer(layerGroup);
+
+		createMaskLayer(coordinates, 1);
 
 		mounted = true;
 	});
 
-	async function createMaskLayer(coordinates: [number, number][]) {
+	onDestroy(() => {
+		layerGroup.clearLayers();
+		map.removeLayer(layerGroup);
+		mounted = false;
+	});
+
+	function createMaskLayer(coordinates: [number, number][], initialOpacity: number = 0) {
 		// @ts-expect-error - maskCanvas is not recognized
 		const maskLayer = window.L.TileLayer.maskCanvas({
 			radius: 1,
 			useAbsoluteRadius: true,
 			color: '#7E4BB9',
-			opacity: 1,
+			opacity: initialOpacity,
 			noMask: true,
 			lineColor: '#6A3D9E'
 		});
 
 		maskLayer.setData(coordinates);
 
-		map.addLayer(maskLayer);
+		layerGroup.addLayer(maskLayer);
 
-		await tick();
+		toggleLayers();
+	}
 
-		if (uniquePool.has('maskLayer')) {
+	function toggleLayers() {
+		if (layerGroup.getLayers().length > 1) {
 			setTimeout(() => {
-				map.removeLayer(uniquePool.pop<Layer>('maskLayer')!);
-				uniquePool.add('maskLayer', maskLayer);
-			}, 50);
-		} else {
-			uniquePool.add('maskLayer', maskLayer);
+				const oldLayer = layerGroup.getLayers()[0] as TileLayer;
+				const newLayer = layerGroup.getLayers()[1] as TileLayer;
+
+				oldLayer.setOpacity(0);
+				newLayer.setOpacity(1);
+
+				layerGroup.removeLayer(oldLayer);
+			}, 150);
 		}
 	}
 </script>
