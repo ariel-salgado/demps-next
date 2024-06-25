@@ -51,14 +51,14 @@
 		{#if isNested}
 			<h3
 				id={key}
-				class="observed col-span-2 mt-4 mb-2 scroll-m-20 px-5 text-2xl font-semibold capitalize tracking-tight"
+				class="observed col-span-2 mt-4 mb-2 scroll-m-24 px-5 text-2xl font-semibold capitalize tracking-tight"
 			>
 				{key}
 			</h3>
 		{:else}
 			<h2
 				id={key}
-				class="observed col-span-2 scroll-m-24 border-b border-slate-300 px-5 pb-2 text-3xl font-semibold capitalize tracking-tight"
+				class="observed col-span-2 mt-2 scroll-m-[6.5rem] border-b border-slate-300 px-5 pb-2 text-3xl font-semibold capitalize tracking-tight"
 			>
 				{key}
 			</h2>
@@ -110,17 +110,17 @@
 			</nav>
 		</div>
 		<div class="space-y-4">
-			<Button type="submit" class="w-full">
+			<Button class="w-full">
 				<Upload class="mr-2 size-5" />
 				<span>Cargar configuración</span>
 			</Button>
-			<Button type="submit" class="w-full">
+			<Button class="w-full">
 				<Download class="mr-2 size-5" />
 				<span>Descargar configuración</span>
 			</Button>
 		</div>
 	</aside>
-	<form class="grid grid-cols-2 gap-4 py-10 px-12" data-sveltekit-keepfocus>
+	<form class="grid grid-cols-2 gap-4 py-8 px-12" data-sveltekit-keepfocus>
 		{@render parametersForm(parametersFormFields, false)}
 	</form>
 </section>
