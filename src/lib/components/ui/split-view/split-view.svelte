@@ -76,7 +76,7 @@
 	</div>
 
 	<!-- Resizer -->
-	<div class="flex h-full w-2 flex-col justify-evenly bg-slate-600">
+	<div class="flex h-full w-2 flex-col justify-evenly bg-slate-700">
 		{@render resizer()}
 		{@render resizer()}
 		{@render resizer()}

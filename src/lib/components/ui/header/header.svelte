@@ -13,7 +13,7 @@
 	];
 </script>
 
-<header class="z-[999] flex h-16 items-center justify-around shadow">
+<header class="sticky top-0 z-[999] flex h-16 items-center justify-around bg-white shadow">
 	<a class="text-3xl font-bold" href="/">DEMPS</a>
 
 	<nav>

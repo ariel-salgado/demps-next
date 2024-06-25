@@ -11,6 +11,6 @@
 	let { children, class: className, ...props }: Props = $props();
 </script>
 
-<p class={cn('text-sm text-slate-600', className)} {...props}>
+<p class={cn('text-sm text-slate-700', className)} {...props}>
 	{@render children()}
 </p>
