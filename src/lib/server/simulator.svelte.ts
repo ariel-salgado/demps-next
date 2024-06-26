@@ -1,7 +1,7 @@
 import type { DempsProcess } from '.';
 import type { ChildProcess } from 'child_process';
 
-import { spawn } from 'child_process';
+import { execFile } from 'child_process';
 import { uniquePool } from '$lib/states';
 import { DEMPS_SIM_DIR } from '$env/static/private';
 
@@ -19,19 +19,25 @@ export function createDempsProcess() {
 	async function run(): Promise<void> {
 		return new Promise((resolve, reject) => {
 			try {
-				dempsProcess = spawn(
+				dempsProcess = execFile(
 					'./run.sh',
 					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
-					{
-						cwd: DEMPS_SIM_DIR,
-						shell: true,
-						stdio: 'inherit'
+					{ cwd: DEMPS_SIM_DIR },
+					(error) => {
+						if (error) {
+							console.error('Error spawning process:', error);
+							reject(error);
+						}
 					}
 				);
 
 				dempsProcess.on('spawn', () => {
 					isRunning = true;
 					uniquePool.add('dempsProcess', dempsProcess);
+				});
+
+				dempsProcess.stdout?.on('data', (data) => {
+					console.log(data.toString());
 				});
 
 				dempsProcess.on('error', async (error) => {
@@ -45,6 +51,10 @@ export function createDempsProcess() {
 					} else {
 						reject(new Error(`Process exited with code ${code} and signal ${signal}`));
 					}
+				});
+
+				dempsProcess.on('close', async () => {
+					await abort();
 				});
 
 				// Handle both SIGINT and SIGTERM
