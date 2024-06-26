@@ -3,8 +3,8 @@ import { createInterface } from 'node:readline';
 
 export function createFileProcessor(emitter: (data: string) => void) {
 	const fileQueue: string[] = $state([]);
-	const coordsData: { lat: string; lng: string }[] = $state([]);
 
+	let dataString: string = $state('');
 	let isProcessing: boolean = $state(false);
 
 	function push(path: string) {
@@ -12,7 +12,6 @@ export function createFileProcessor(emitter: (data: string) => void) {
 	}
 
 	const emit = () => {
-		const dataString = coordsData.map((item) => `${item.lat}, ${item.lng}`).join('\n');
 		emitter(dataString);
 	};
 
@@ -38,16 +37,17 @@ export function createFileProcessor(emitter: (data: string) => void) {
 					const lng = parsedLine[2];
 
 					if (lat && lng) {
-						coordsData.push({ lat, lng });
+						dataString += lat + ',' + lng + '\n';
 					}
 				}
 			}
 
+			readInterface.close();
 			emit();
 		} catch (error) {
 			console.error(`Error reading file ${path}:`, error);
 		} finally {
-			coordsData.length = 0;
+			dataString = '';
 			isProcessing = false;
 			process();
 		}
