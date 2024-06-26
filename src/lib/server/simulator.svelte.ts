@@ -24,10 +24,10 @@ export function createDempsProcess() {
 					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
 					{ cwd: DEMPS_SIM_DIR },
 					(error) => {
-						if (error) {
+						if (error?.signal !== 'SIGTERM' && error?.signal !== 'SIGINT') {
 							console.error('Error spawning process:', error);
-							reject(error);
 						}
+						reject(error);
 					}
 				);
 
