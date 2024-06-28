@@ -1,6 +1,7 @@
 import type { MapContext } from './map';
 
 import { Geoman } from './geoman';
+import { createPopup } from './popup';
 import { Geosearch } from './geosearch';
 import { Map, contextKey } from './map';
 import { MaskCanvas } from './mask-canvas';
@@ -14,6 +15,7 @@ export {
 	Geosearch,
 	contextKey,
 	MaskCanvas,
+	createPopup,
 	ToggleLayers,
 	//
 	contextKey as mapContextKey

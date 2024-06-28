@@ -1,6 +1,10 @@
 import type { ZodType } from 'zod';
 import type { Geometry, GeometryCollection } from 'geojson';
-import type { HTMLInputAttributes, HTMLSelectAttributes } from 'svelte/elements';
+import type {
+	HTMLInputAttributes,
+	HTMLInputTypeAttribute,
+	HTMLSelectAttributes
+} from 'svelte/elements';
 
 export type G = Exclude<Geometry, GeometryCollection>;
 
@@ -21,3 +25,18 @@ export type FormField = {
 } & InputOrSelectProps;
 
 export type FormSchema = Record<string, FormField[] | Record<string, FormField[]>>;
+
+export type InputPopupField = {
+	type: HTMLInputTypeAttribute;
+	defaultValue: string | number | boolean;
+	attributes: HTMLInputAttributes;
+};
+
+export type SelectPopupField = {
+	type: 'select';
+	defaultValue: string | number;
+	attributes: HTMLSelectAttributes;
+	options: string[];
+};
+
+export type PopupFields = Record<string, InputPopupField | SelectPopupField>;

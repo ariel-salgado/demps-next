@@ -1,4 +1,61 @@
-import type { FormSchema } from './types';
+import type { FormSchema, PopupFields } from './types';
+
+export const popupFields = {
+	id: {
+		type: 'text',
+		defaultValue: '',
+		attributes: {
+			readonly: true
+		}
+	},
+	nameID: {
+		type: 'text',
+		defaultValue: '',
+		attributes: {}
+	},
+	zoneType: {
+		type: 'select',
+		defaultValue: '',
+		attributes: {},
+		options: ['initial', 'flood', 'safe']
+	},
+	stroke: {
+		type: 'color',
+		defaultValue: '#3388ff',
+		attributes: {}
+	},
+	'stroke-width': {
+		type: 'number',
+		defaultValue: 3,
+		attributes: {
+			min: 0,
+			step: 1
+		}
+	},
+	'stroke-opacity': {
+		type: 'number',
+		defaultValue: 1,
+		attributes: {
+			min: 0,
+			max: 1,
+			step: 0.1
+		}
+	},
+	fill: {
+		type: 'color',
+		defaultValue: '#3388ff',
+		attributes: {}
+	},
+	'fill-opacity': {
+		type: 'number',
+		defaultValue: 0.2,
+		attributes: {
+			min: 0,
+			max: 1,
+			step: 0.1
+		}
+	}
+} satisfies PopupFields;
 
 export const parametersFormFields = {
 	general: [
