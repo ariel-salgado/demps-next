@@ -8,11 +8,12 @@
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import type { Control, FeatureGroup, Map, MapOptions } from 'leaflet';
+	import type { Control, FeatureGroup, Layer, Map, MapOptions, Popup } from 'leaflet';
 
-	import { cn } from '$lib/utils';
 	import { setContext } from 'svelte';
 	import { LoaderCircle } from 'lucide-svelte';
+	import { cn, parseGeoJSONProps } from '$lib/utils';
+	import { createPopup } from '$lib/components/leaflet';
 
 	type Parameters = Environment | undefined;
 
@@ -108,41 +109,113 @@
 		};
 	};
 
+	// TODO: Lot of cleanup
+	// TODO: Export function from other file
+	// TODO: Delete duplicated code
+	// TODO: Cleaner implementation
+
 	function loadFeatures(features: Feature<G>[]) {
 		window.L.geoJSON(features, {
 			style: (feature) => {
-				if ('properties' in feature! === false) return {};
-
-				const {
-					fill: fillColor,
-					stroke: color,
-					'stroke-width': weight,
-					'fill-opacity': fillOpacity,
-					'stroke-opacity': opacity
-				} = feature.properties;
-
-				return {
-					smoothFactor: 1.5,
-					...(fillColor && { fillColor }),
-					...(color && { color }),
-					...(!Number.isNaN(Number(weight)) && { weight: Number(weight) }),
-					...(!Number.isNaN(Number(fillOpacity)) && { fillOpacity: Number(fillOpacity) }),
-					...(!Number.isNaN(Number(opacity)) && { opacity: Number(opacity) })
-				};
+				return addStyleToFeature(feature!);
 			},
 			onEachFeature(feature, layer) {
-				const { radius, center, nameID } = feature.properties;
-
-				if (radius && center.length > 0) {
-					const coords = new window.L.LatLng(center[0], center[1]);
-					layer = new window.L.Circle(coords, radius).setStyle(layer.options);
-				}
-
-				Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
-
-				featureGroup?.addLayer(layer);
-				overlayLayer?.addOverlay(layer, nameID || feature.id);
+				addFeatureToMap(feature!, layer);
 			}
+		});
+	}
+
+	function addStyleToFeature(feature: Feature) {
+		if ('properties' in feature! === false) return {};
+
+		const {
+			fill: fillColor,
+			stroke: color,
+			'stroke-width': weight,
+			'fill-opacity': fillOpacity,
+			'stroke-opacity': opacity
+		} = feature.properties as Record<string, string | number>;
+
+		return {
+			smoothFactor: 1.5,
+			...(fillColor && { fillColor }),
+			...(color && { color }),
+			...(!Number.isNaN(Number(weight)) && { weight: Number(weight) }),
+			...(!Number.isNaN(Number(fillOpacity)) && { fillOpacity: Number(fillOpacity) }),
+			...(!Number.isNaN(Number(opacity)) && { opacity: Number(opacity) })
+		};
+	}
+
+	function addFeatureToMap(feature: Feature, layer: Layer) {
+		// @ts-expect-error - This are custom properties
+		const { radius, center, nameID } = feature.properties;
+
+		if (radius && center.length > 0) {
+			const coords = new window.L.LatLng(center[0], center[1]);
+			layer = new window.L.Circle(coords, radius).setStyle(layer.options);
+		}
+
+		Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
+
+		const popup = createPopup(feature);
+		attachPopupEvents(popup);
+
+		layer.bindPopup(popup);
+
+		featureGroup?.addLayer(layer);
+		overlayLayer?.addOverlay(layer, nameID || feature.id);
+	}
+
+	function updateFeatureGroup(id: string) {
+		const featureToAdd = environment?.getFeature(id);
+
+		if (!featureToAdd) return;
+
+		// @ts-expect-error - id is a custom property
+		const layerToRemove = featureGroup?.getLayers().find((layer) => layer.id === id);
+
+		if (!layerToRemove) return;
+
+		featureGroup?.removeLayer(layerToRemove);
+		overlayLayer?.removeLayer(layerToRemove);
+
+		window.L.geoJson(featureToAdd, {
+			style: (feature) => {
+				return addStyleToFeature(feature!);
+			},
+			onEachFeature(feature, layer) {
+				addFeatureToMap(feature, layer);
+			}
+		});
+	}
+
+	function updateFeatureProperties(target: EventTarget | null) {
+		const form = target as HTMLFormElement;
+		const formData = new FormData(form);
+
+		const id = formData.get('id') as string;
+		let props = parseGeoJSONProps(Object.fromEntries(formData));
+		delete props?.id;
+
+		environment?.updateFeatureProperties(id, props);
+		updateFeatureGroup(id);
+	}
+
+	function attachPopupEvents(popup: Popup) {
+		popup.on('add', ({ sourceTarget }) => {
+			const form = sourceTarget._container.querySelector('form') as HTMLFormElement;
+
+			form.addEventListener('submit', ({ target }) => {
+				updateFeatureProperties(target);
+			});
+		});
+
+		popup.on('remove', ({ sourceTarget }) => {
+			const form = sourceTarget._container.querySelector('form') as HTMLFormElement;
+
+			form.removeEventListener('submit', ({ target }) => {
+				updateFeatureProperties(target);
+			});
 		});
 	}
 
