@@ -1,8 +1,10 @@
 import type { DempsProcess } from '.';
 import type { ChildProcess } from 'child_process';
 
+import { join } from 'node:path';
 import { execFile } from 'child_process';
 import { uniquePool } from '$lib/states';
+import { directoryExists } from './utils';
 import { DEMPS_SIM_DIR } from '$env/static/private';
 
 import treeKill from 'tree-kill';
@@ -11,23 +13,24 @@ export function createDempsProcess() {
 	let isRunning: boolean = $state(false);
 	let dempsProcess: ChildProcess | undefined = $state();
 
-	if (uniquePool.has('dempsProcess')) {
-		const dp = uniquePool.pop<DempsProcess>('dempsProcess');
-		if (dp?.isRunning) dp.abort();
-	}
+	killExistingProcess();
 
 	async function run(): Promise<void> {
 		return new Promise((resolve, reject) => {
+			if (!directoryExists(DEMPS_SIM_DIR)) {
+				reject(new Error('Simulator directory does not exist'));
+			}
+
 			try {
 				dempsProcess = execFile(
 					'./run.sh',
 					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
 					{ cwd: DEMPS_SIM_DIR },
 					(error) => {
-						if (error?.signal !== 'SIGTERM' && error?.signal !== 'SIGINT') {
-							console.error('Error spawning process:', error);
+						if (error && error.code === 'ENOENT') {
+							console.error(`File not found: ${join(DEMPS_SIM_DIR, './run.sh')}.`);
+							reject(error);
 						}
-						reject(error);
 					}
 				);
 
@@ -36,87 +39,72 @@ export function createDempsProcess() {
 					uniquePool.add('dempsProcess', dempsProcess);
 				});
 
-				dempsProcess.stdout?.on('data', (data) => {
-					console.log(data.toString());
-				});
-
 				dempsProcess.on('error', async (error) => {
-					await shutdown('SIGTERM');
+					console.error('Error starting the process.');
+					await kill();
 					reject(error);
 				});
 
-				dempsProcess.on('exit', async (code, signal) => {
+				dempsProcess.on('exit', (code, signal) => {
 					if (code === 0) {
 						resolve();
-					} else {
-						reject(new Error(`Process exited with code ${code} and signal ${signal}`));
 					}
+
+					reject(new Error(`Process exited with code ${code} and signal ${signal}`));
 				});
 
-				dempsProcess.on('close', async () => {
-					await abort();
-				});
-
-				// Handle both SIGINT and SIGTERM
-				['SIGINT', 'SIGTERM'].forEach((signal) => {
-					process.on(signal, async () => {
-						console.log(`Received ${signal}`);
-						try {
-							await shutdown(signal as NodeJS.Signals);
-							process.exit(0);
-						} catch (error) {
-							console.error('Error during shutdown:', error);
-							process.exit(1);
-						}
-					});
-				});
+				dempsProcess.on('close', async () => await kill());
 			} catch (error) {
-				console.error('Error spawning process:', error);
 				reject(error);
 			}
 		});
 	}
 
-	async function shutdown(signal: NodeJS.Signals): Promise<void> {
-		return new Promise((resolve) => {
-			if (!dempsProcess || dempsProcess.killed) {
-				console.log('Process was already killed or does not exist');
+	async function kill(signal: NodeJS.Signals = 'SIGTERM'): Promise<void> {
+		if (!dempsProcess || dempsProcess.killed) {
+			console.log('Process was already killed or does not exist');
+			return;
+		}
+
+		console.log(`Shutting down gracefully with signal ${signal}...`);
+
+		return new Promise((resolve, reject) => {
+			if (dempsProcess?.pid) {
+				treeKill(dempsProcess?.pid, signal, (err) => {
+					if (err) {
+						reject(err);
+					} else {
+						console.log('Process killed successfully');
+						cleanup();
+						resolve();
+					}
+				});
+			} else {
+				console.log('No PID found, killing process directly');
+				cleanup();
 				resolve();
 			}
-
-			if (!dempsProcess?.killed) {
-				console.log(`Shutting down gracefully with signal ${signal}...`);
-
-				if (dempsProcess?.pid) {
-					treeKill(dempsProcess.pid, signal, (err) => {
-						if (err) {
-							console.error('Error killing process:', err);
-						} else {
-							console.log('Process killed successfully');
-						}
-					});
-				} else {
-					dempsProcess?.kill(signal);
-				}
-			}
-
-			resolve();
 		});
 	}
 
-	async function abort() {
-		await shutdown('SIGTERM');
-		reset();
-	}
-
-	function reset() {
+	function cleanup() {
+		killExistingProcess();
 		isRunning = false;
 		dempsProcess = undefined;
 	}
 
+	function killExistingProcess() {
+		if (uniquePool.has('dempsProcess')) {
+			const current = uniquePool.pop<DempsProcess>('dempsProcess');
+			if (current && current.isRunning) {
+				current.kill();
+			}
+		}
+	}
+
 	return {
 		run,
-		abort,
+		kill,
 		get isRunning() {
 			return isRunning;
 		}
