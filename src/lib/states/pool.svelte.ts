@@ -1,7 +1,7 @@
-import { Map } from 'svelte/reactivity';
+import { SvelteMap } from 'svelte/reactivity';
 
 export function createUniquePool() {
-	const pool = new Map();
+	const pool = new SvelteMap();
 
 	function add(key: string, value: any, replace?: boolean) {
 		if (pool.has(key) && !replace) {
