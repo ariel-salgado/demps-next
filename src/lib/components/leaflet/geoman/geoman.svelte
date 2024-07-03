@@ -6,11 +6,13 @@
 
 	import { randomID } from '$lib/utils';
 	import { getContext, onMount } from 'svelte';
-	import { mapContextKey } from '$lib/components/leaflet';
+	import { createPopup, mapContextKey } from '$lib/components/leaflet';
 	import {
 		geometryToGeoJSON,
 		geoJSONToGeometry,
-		layerToGeometry
+		layerToGeometry,
+		attachPopupEvents,
+		updateFeatureProperties
 	} from '$lib/components/leaflet/helpers';
 
 	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(mapContextKey);
@@ -54,10 +56,16 @@
 
 		if (!feature) return;
 
-		// TODO: Add form popup on layer
-
 		const id = randomID();
 		Object.defineProperty(feature, 'id', { value: id, writable: false });
+
+		const popup = createPopup(geometryToGeoJSON(feature) as Feature<G>);
+
+		attachPopupEvents(popup, (popupForm) => {
+			updateFeatureProperties(popupForm, featureGroup);
+		});
+
+		feature.bindPopup(popup);
 
 		featureGroup.addLayer(feature);
 		overlayLayer.addOverlay(feature, id);
@@ -67,6 +75,7 @@
 		environment.addFeature(featureGeoJSON!, id);
 	});
 
+	// TODO: Maybe can edit the layer directly ?
 	featureGroup.on('pm:edit', ({ layer }) => {
 		const feature = geometryToGeoJSON(layer) as Feature<G>;
 		const { id, geometry } = feature;
