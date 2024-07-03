@@ -1,6 +1,8 @@
 import type { G } from '$lib/types';
 import type { Feature, GeoJsonProperties } from 'geojson';
-import type { Circle, Layer, PathOptions, Polygon, Popup } from 'leaflet';
+import type { Circle, FeatureGroup, Layer, PathOptions, Polygon, Popup } from 'leaflet';
+
+import { environment } from '$lib/states';
 
 export function parseGeoJSONStyle(properties: GeoJsonProperties) {
 	const toConvert = ['stroke-width', 'fill-opacity', 'stroke-opacity'];
@@ -100,4 +102,30 @@ export function attachPopupEvents(popup: Popup, onSubmit: (form: HTMLFormElement
 			onSubmit(target as HTMLFormElement);
 		});
 	});
+}
+
+export function updateFeatureProperties(form: HTMLFormElement, featureGroup: FeatureGroup) {
+	const formData = new FormData(form);
+
+	const { id, ...props } = parseGeoJSONStyle(Object.fromEntries(formData)) as Record<
+		string,
+		string
+	>;
+
+	environment?.updateFeatureProperties(id, props);
+	updateLayerStyle(id, featureGroup);
+}
+
+function updateLayerStyle(id: string, featureGroup: FeatureGroup) {
+	const feature = environment?.getFeature(id);
+
+	if (!feature) return;
+
+	// @ts-expect-error - id is added property
+	const layer = featureGroup?.getLayers().find((layer) => layer.id === id) as Path;
+
+	if (!layer) return;
+
+	layer.setStyle(getStylesFromFeature(feature));
+	layer.redraw();
 }

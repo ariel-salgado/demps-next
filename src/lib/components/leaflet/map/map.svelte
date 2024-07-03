@@ -4,10 +4,10 @@
 
 <script lang="ts">
 	import type { G } from '$lib/types';
-	import type { Feature, FeatureCollection } from 'geojson';
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import type { Feature, FeatureCollection } from 'geojson';
 	import type { Map, MapOptions, FeatureGroup, Control, Layer, Path } from 'leaflet';
 
 	import { cn } from '$lib/utils';
@@ -18,7 +18,7 @@
 		attachPopupEvents,
 		geoJSONToGeometry,
 		getStylesFromFeature,
-		parseGeoJSONStyle
+		updateFeatureProperties
 	} from '$lib/components/leaflet/helpers';
 
 	type Parameters = Environment | undefined;
@@ -136,39 +136,13 @@
 		const popup = createPopup(feature);
 
 		attachPopupEvents(popup, (popupForm) => {
-			updateFeatureProperties(popupForm);
+			updateFeatureProperties(popupForm, featureGroup!);
 		});
 
 		layer.bindPopup(popup);
 
 		featureGroup?.addLayer(layer);
 		overlayLayer?.addOverlay(layer, nameID || feature.id);
-	}
-
-	function updateFeatureProperties(form: HTMLFormElement) {
-		const formData = new FormData(form);
-
-		const { id, ...props } = parseGeoJSONStyle(Object.fromEntries(formData)) as Record<
-			string,
-			string
-		>;
-
-		environment?.updateFeatureProperties(id, props);
-		updateLayerStyle(id);
-	}
-
-	function updateLayerStyle(id: string) {
-		const feature = environment?.getFeature(id);
-
-		if (!feature) return;
-
-		// @ts-expect-error - id is a custom property
-		const layer = featureGroup?.getLayers().find((layer) => layer.id === id) as Path;
-
-		if (!layer) return;
-
-		layer.setStyle(getStylesFromFeature(feature));
-		layer.redraw();
 	}
 
 	function clearLayers() {
