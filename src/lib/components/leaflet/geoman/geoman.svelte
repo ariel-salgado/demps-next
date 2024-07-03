@@ -1,12 +1,17 @@
 <script lang="ts">
 	import type { G } from '$lib/types';
+	import type { Layer } from 'leaflet';
 	import type { Feature } from 'geojson';
-	import type { Circle, Layer, Polygon } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet';
 
 	import { randomID } from '$lib/utils';
 	import { getContext, onMount } from 'svelte';
 	import { mapContextKey } from '$lib/components/leaflet';
+	import {
+		geometryToGeoJSON,
+		geoJSONToGeometry,
+		layerToGeometry
+	} from '$lib/components/leaflet/helpers';
 
 	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(mapContextKey);
 
@@ -42,58 +47,14 @@
 		});
 	});
 
-	function layerToGeometry(layer: Layer) {
-		if (layer instanceof window.L.Polygon) {
-			const coordinates = layer.getLatLngs();
-			return new window.L.Polygon(coordinates);
-		} else if (layer instanceof window.L.Circle) {
-			const coordinates = layer.getLatLng();
-			const radius = Number(layer.getRadius().toFixed(6));
-			return new window.L.Circle(coordinates, radius);
-		}
-		return;
-	}
-
-	function geometryToGeoJSON<T extends Layer | Polygon | Circle>(feature: T) {
-		let featureGeoJSON: Feature<G> | undefined;
-
-		if (feature instanceof window.L.Circle) {
-			featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature, 18).toGeoJSON(6);
-
-			featureGeoJSON.properties!.radius = Number(feature.getRadius().toFixed(6));
-			featureGeoJSON.properties!.center = [
-				Number(feature.getLatLng().lat.toFixed(6)),
-				Number(feature.getLatLng().lng.toFixed(6))
-			];
-		} else if (feature instanceof window.L.Polygon) {
-			featureGeoJSON = feature.toGeoJSON(6);
-		} else {
-			return;
-		}
-
-		//@ts-expect-error - id is an added property
-		return { id: feature.id, ...featureGeoJSON };
-	}
-
-	function geoJSONToGeometry(feature: Feature<G>) {
-		//@ts-expect-error - radius and center are added properties
-		const { radius, center } = feature.properties;
-
-		if (radius && center.length > 0) {
-			const coordinates = new window.L.LatLng(center[0], center[1]);
-			return new window.L.Circle(coordinates, radius);
-		} else {
-			const coordinates = window.L.GeoJSON.coordsToLatLngs(feature.geometry.coordinates.flat());
-			return new window.L.Polygon(coordinates);
-		}
-	}
-
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
 
 		const feature = layerToGeometry(layer);
 
 		if (!feature) return;
+
+		// TODO: Add form popup on layer
 
 		const id = randomID();
 		Object.defineProperty(feature, 'id', { value: id, writable: false });
@@ -107,8 +68,6 @@
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
-		if (!(layer instanceof window.L.Circle) || !(layer instanceof window.L.Polygon)) return;
-
 		const feature = geometryToGeoJSON(layer) as Feature<G>;
 		const { id, geometry } = feature;
 
