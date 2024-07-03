@@ -5,6 +5,7 @@ export function createFileProcessor(emitter: (data: string) => void) {
 	const fileQueue: string[] = $state([]);
 
 	let dataString: string = $state('');
+	let isFirstLine: boolean = $state(true);
 	let isProcessing: boolean = $state(false);
 
 	function push(path: string) {
@@ -32,12 +33,16 @@ export function createFileProcessor(emitter: (data: string) => void) {
 
 			for await (const line of readInterface) {
 				if (line.length > 0) {
-					const parsedLine = line.split(' ');
-					const lat = parsedLine[1];
-					const lng = parsedLine[2];
+					if (isFirstLine) {
+						isFirstLine = false;
+					} else {
+						const parsedLine = line.split(' ');
+						const lat = parsedLine[1];
+						const lng = parsedLine[2];
 
-					if (lat && lng) {
-						dataString += lat + ',' + lng + '\n';
+						if (lat && lng) {
+							dataString += lat + ',' + lng + '\n';
+						}
 					}
 				}
 			}
