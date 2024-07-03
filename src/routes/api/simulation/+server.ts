@@ -7,7 +7,6 @@ import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/ser
 
 const fileWatchers: Watcher[] = [];
 
-// TODO: Add error handling when no sim founded
 export const POST = (async () => {
 	const dempsProcess = createDempsProcess();
 
