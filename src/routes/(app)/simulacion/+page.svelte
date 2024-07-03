@@ -13,7 +13,7 @@
 
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
-	let agents: Readable<[number, number][]> | undefined = $state();
+	let coordinates: Readable<[number, number][]> | undefined = $state();
 
 	$effect(() => {
 		// When the simulation is ready
@@ -46,7 +46,7 @@
 	// When the coordinates are received
 	$effect(() => {
 		if (onProgress) {
-			agents = connection?.select('agents').transform((data) => {
+			coordinates = connection?.select('agents').transform((data) => {
 				const coordinates = data.split('\n').map((coord) => coord.split(',').map(Number));
 				return coordinates;
 			});
@@ -76,7 +76,7 @@
 	}
 </script>
 
-<section>
+<section class="size-full">
 	<div>
 		<Button onclick={startSimulation} disabled={onProgress}>
 			{#if onProgress}
@@ -95,14 +95,16 @@
 	</div>
 
 	{#if onProgress}
-		{#await import('$lib/components/leaflet/map/map.svelte') then Map}
-			{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
-				<svelte:component this={Map.default}>
-					{#if $agents}
-						<svelte:component this={Canvas.default} coordinates={$agents} />
-					{/if}
-				</svelte:component>
+		<div class="size-full">
+			{#await import('$lib/components/leaflet/map/map.svelte') then Map}
+				{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
+					<svelte:component this={Map.default}>
+						{#if $coordinates}
+							<svelte:component this={Canvas.default} coordinates={$coordinates} />
+						{/if}
+					</svelte:component>
+				{/await}
 			{/await}
-		{/await}
+		</div>
 	{/if}
 </section>
