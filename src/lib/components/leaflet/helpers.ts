@@ -89,6 +89,7 @@ export function attachPopupEvents(popup: Popup, onSubmit: (form: HTMLFormElement
 
 		form.addEventListener('submit', ({ target }) => {
 			onSubmit(target as HTMLFormElement);
+			popup.close();
 		});
 	});
 
