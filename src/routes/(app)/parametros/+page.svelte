@@ -6,6 +6,7 @@
 	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
 	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
+	import { splitCamelCase } from '$lib/utils';
 
 	let selected: string = $state($page.url.hash.slice(1) || 'general');
 
@@ -37,7 +38,7 @@
 		<li
 			class={`rounded-md text-base font-medium text-slate-500 transition-colors focus-within:bg-slate-100 focus-within:text-slate-700 hover:bg-slate-100 hover:text-slate-700 ${isNested && `pl-4`} ${isSelected && `bg-slate-700 text-white focus-within:bg-slate-700/85 focus-within:text-white hover:bg-slate-700/85 hover:text-white`}`}
 		>
-			<a href={`#${key}`} class="block py-1.5 px-4 capitalize">{key}</a>
+			<a href={`#${key}`} class="block py-1.5 px-4 capitalize">{splitCamelCase(key)}</a>
 		</li>
 
 		{#if !Array.isArray(value)}

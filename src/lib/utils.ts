@@ -105,3 +105,7 @@ export function debounce<T extends (...args: Parameters<T>) => void>(
 		timer = setTimeout(() => fn.apply(this, args), delay);
 	};
 }
+
+export function splitCamelCase(word: string) {
+	return word.replace(/([a-z])([A-Z])/g, '$1 $2');
+}
