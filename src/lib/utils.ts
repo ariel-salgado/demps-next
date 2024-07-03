@@ -1,6 +1,6 @@
 import type { G } from '$lib/types';
 import type { ClassValue } from 'clsx';
-import type { Feature, FeatureCollection, GeoJsonProperties } from 'geojson';
+import type { Feature, FeatureCollection } from 'geojson';
 
 // Others
 import { clsx } from 'clsx';
@@ -104,16 +104,4 @@ export function debounce<T extends (...args: Parameters<T>) => void>(
 		clearTimeout(timer);
 		timer = setTimeout(() => fn.apply(this, args), delay);
 	};
-}
-
-export function parseGeoJSONProps(properties: GeoJsonProperties) {
-	const toConvert = ['stroke-width', 'fill-opacity', 'stroke-opacity'];
-
-	for (const target of toConvert) {
-		if (properties![target] && !Number.isNaN(properties![target])) {
-			properties![target] = Number(properties![target]);
-		}
-	}
-
-	return properties;
 }
