@@ -17,6 +17,11 @@
 	const { environment } = getContext<EditorContext>(editorContextKey);
 
 	function clearData() {
+		if (environment.getFeatures().length === 0) {
+			toast.info('No hay datos para borrar.');
+			return;
+		}
+
 		if (!confirm('Está seguro que desea borrar los datos?')) return;
 
 		environment.clear();
