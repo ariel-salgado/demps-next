@@ -51,7 +51,7 @@
 		{#if isNested}
 			<h3
 				id={key}
-				class="observed col-span-2 mt-4 mb-2 scroll-m-24 px-5 text-2xl font-semibold capitalize tracking-tight"
+				class="observed col-span-2 mt-4 scroll-m-24 px-5 text-2xl font-semibold capitalize tracking-tight"
 			>
 				{key}
 			</h3>
