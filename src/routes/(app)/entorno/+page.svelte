@@ -13,7 +13,7 @@
 	let reload: boolean = $state(false);
 	let files: FileList | null = $state(null);
 
-	function triggerReload() {
+	function triggerFullReload() {
 		reload = true;
 	}
 </script>
@@ -33,11 +33,11 @@
 			</Map>
 		{/snippet}
 		{#snippet right()}
-			<Editor {environment} onChanges={triggerReload}>
+			<Editor {environment} onChanges={triggerFullReload}>
 				<DownloadFile />
 				<CopyToClipboard />
-				<ClearData onClear={triggerReload} />
-				<UploadFile accept=".geojson" {files} onUpload={triggerReload} />
+				<ClearData onClear={triggerFullReload} />
+				<UploadFile accept=".geojson" {files} onUpload={triggerFullReload} />
 			</Editor>
 		{/snippet}
 	</SplitView>
