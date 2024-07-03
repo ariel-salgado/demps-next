@@ -4,16 +4,22 @@
 
 <script lang="ts">
 	import type { G } from '$lib/types';
-	import type { Feature } from 'geojson';
+	import type { Feature, FeatureCollection } from 'geojson';
 	import type { Action } from 'svelte/action';
 	import type { Environment } from '$lib/states';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import type { Control, FeatureGroup, Layer, Map, MapOptions, Popup } from 'leaflet';
+	import type { Map, MapOptions, FeatureGroup, Control, Layer, Path } from 'leaflet';
 
+	import { cn } from '$lib/utils';
 	import { setContext } from 'svelte';
 	import { LoaderCircle } from 'lucide-svelte';
-	import { cn, parseGeoJSONProps } from '$lib/utils';
 	import { createPopup } from '$lib/components/leaflet';
+	import {
+		attachPopupEvents,
+		geoJSONToGeometry,
+		getStylesFromFeature,
+		parseGeoJSONStyle
+	} from '$lib/components/leaflet/helpers';
 
 	type Parameters = Environment | undefined;
 
@@ -62,7 +68,7 @@
 		}
 	});
 
-	// @ts-expect-error - Svelte action can't be async, but works anyway
+	// @ts-expect-error - Svelte action can't be async by type definition
 	const initMap: MapAction = async (mapContainer, environment) => {
 		if (!window.L) {
 			await import('leaflet');
@@ -104,84 +110,16 @@
 		return {
 			destroy() {
 				map?.remove();
-				map = undefined;
+				mapContainer.remove();
 			}
 		};
 	};
 
-	// TODO: Lot of cleanup
-	// TODO: Export function from other file
-	// TODO: Delete duplicated code
-	// TODO: Cleaner implementation
-
-	function loadFeatures(features: Feature<G>[]) {
+	// TODO: Fix styles not applying on load
+	function loadFeatures(features: Feature<G> | Feature<G>[] | FeatureCollection<G>) {
 		window.L.geoJSON(features, {
 			style: (feature) => {
-				return addStyleToFeature(feature!);
-			},
-			onEachFeature(feature, layer) {
-				addFeatureToMap(feature!, layer);
-			}
-		});
-	}
-
-	function addStyleToFeature(feature: Feature) {
-		if ('properties' in feature! === false) return {};
-
-		const {
-			fill: fillColor,
-			stroke: color,
-			'stroke-width': weight,
-			'fill-opacity': fillOpacity,
-			'stroke-opacity': opacity
-		} = feature.properties as Record<string, string | number>;
-
-		return {
-			smoothFactor: 1.5,
-			...(fillColor && { fillColor }),
-			...(color && { color }),
-			...(!Number.isNaN(Number(weight)) && { weight: Number(weight) }),
-			...(!Number.isNaN(Number(fillOpacity)) && { fillOpacity: Number(fillOpacity) }),
-			...(!Number.isNaN(Number(opacity)) && { opacity: Number(opacity) })
-		};
-	}
-
-	function addFeatureToMap(feature: Feature, layer: Layer) {
-		// @ts-expect-error - This are custom properties
-		const { radius, center, nameID } = feature.properties;
-
-		if (radius && center.length > 0) {
-			const coords = new window.L.LatLng(center[0], center[1]);
-			layer = new window.L.Circle(coords, radius).setStyle(layer.options);
-		}
-
-		Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
-
-		const popup = createPopup(feature);
-		attachPopupEvents(popup);
-
-		layer.bindPopup(popup);
-
-		featureGroup?.addLayer(layer);
-		overlayLayer?.addOverlay(layer, nameID || feature.id);
-	}
-
-	function updateFeatureGroup(id: string) {
-		const featureToAdd = environment?.getFeature(id);
-
-		if (!featureToAdd) return;
-
-		// @ts-expect-error - id is a custom property
-		const layerToRemove = featureGroup?.getLayers().find((layer) => layer.id === id);
-
-		if (!layerToRemove) return;
-
-		featureGroup?.removeLayer(layerToRemove);
-		overlayLayer?.removeLayer(layerToRemove);
-
-		window.L.geoJson(featureToAdd, {
-			style: (feature) => {
-				return addStyleToFeature(feature!);
+				return getStylesFromFeature(feature!);
 			},
 			onEachFeature(feature, layer) {
 				addFeatureToMap(feature, layer);
@@ -189,34 +127,50 @@
 		});
 	}
 
-	function updateFeatureProperties(target: EventTarget | null) {
-		const form = target as HTMLFormElement;
-		const formData = new FormData(form);
+	function addFeatureToMap(feature: Feature, layer: Layer) {
+		// @ts-expect-error - This are custom properties
+		const { nameID } = feature.properties;
 
-		const id = formData.get('id') as string;
-		let props = parseGeoJSONProps(Object.fromEntries(formData));
-		delete props?.id;
+		layer = geoJSONToGeometry(feature as Feature<G>);
 
-		environment?.updateFeatureProperties(id, props);
-		updateFeatureGroup(id);
+		Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
+
+		const popup = createPopup(feature);
+
+		attachPopupEvents(popup, (popupForm) => {
+			updateFeatureProperties(popupForm);
+		});
+
+		layer.bindPopup(popup);
+
+		featureGroup?.addLayer(layer);
+		overlayLayer?.addOverlay(layer, nameID || feature.id);
 	}
 
-	function attachPopupEvents(popup: Popup) {
-		popup.on('add', ({ sourceTarget }) => {
-			const form = sourceTarget._container.querySelector('form') as HTMLFormElement;
+	function updateFeatureProperties(form: HTMLFormElement) {
+		const formData = new FormData(form);
 
-			form.addEventListener('submit', ({ target }) => {
-				updateFeatureProperties(target);
-			});
-		});
+		const { id, ...props } = parseGeoJSONStyle(Object.fromEntries(formData)) as Record<
+			string,
+			string
+		>;
 
-		popup.on('remove', ({ sourceTarget }) => {
-			const form = sourceTarget._container.querySelector('form') as HTMLFormElement;
+		environment?.updateFeatureProperties(id, props);
+		updateLayerStyle(id);
+	}
 
-			form.removeEventListener('submit', ({ target }) => {
-				updateFeatureProperties(target);
-			});
-		});
+	function updateLayerStyle(id: string) {
+		const feature = environment?.getFeature(id);
+
+		if (!feature) return;
+
+		// @ts-expect-error - id is a custom property
+		const layer = featureGroup?.getLayers().find((layer) => layer.id === id) as Path;
+
+		if (!layer) return;
+
+		layer.setStyle(getStylesFromFeature(feature));
+		layer.redraw();
 	}
 
 	function clearLayers() {
@@ -233,14 +187,14 @@
 	}
 
 	function fitBounds() {
-		if (!featureGroup) return;
+		if (!map || !featureGroup) return;
 
 		const bounds = featureGroup.getBounds();
 
 		if (bounds.isValid()) {
-			map?.fitBounds(bounds, {
+			map.fitBounds(bounds, {
 				animate: true,
-				padding: [50, 50]
+				padding: [100, 100]
 			});
 		}
 	}
