@@ -4,7 +4,7 @@
 
 	import { getContext } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { RotateCcw } from 'lucide-svelte';
+	import { Trash2 } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { editorContextKey } from '$lib/components/codemirror';
 
@@ -36,5 +36,5 @@
 	title="Borrar datos"
 	{...rest}
 >
-	<RotateCcw />
+	<Trash2 />
 </Button>
