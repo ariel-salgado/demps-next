@@ -53,6 +53,7 @@ export function createFileProcessor(emitter: (data: string) => void) {
 			console.error(`Error reading file ${path}:`, error);
 		} finally {
 			dataString = '';
+			isFirstLine = true;
 			isProcessing = false;
 			process();
 		}
