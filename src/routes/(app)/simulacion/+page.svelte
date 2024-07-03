@@ -20,7 +20,7 @@
 		if ($status === 'ready') {
 			onProgress = true;
 			toast.loading('Iniciando simulación...', {
-				duration: 5000,
+				duration: 10000,
 				description: 'Esperando datos de los agentes. Por favor, espere...'
 			});
 		}
