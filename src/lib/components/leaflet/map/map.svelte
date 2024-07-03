@@ -115,12 +115,8 @@
 		};
 	};
 
-	// TODO: Fix styles not applying on load
 	function loadFeatures(features: Feature<G> | Feature<G>[] | FeatureCollection<G>) {
 		window.L.geoJSON(features, {
-			style: (feature) => {
-				return getStylesFromFeature(feature!);
-			},
 			onEachFeature(feature, layer) {
 				addFeatureToMap(feature, layer);
 			}
@@ -132,6 +128,8 @@
 		const { nameID } = feature.properties;
 
 		layer = geoJSONToGeometry(feature as Feature<G>);
+
+		(layer as Path).setStyle(getStylesFromFeature(feature as Feature<G>));
 
 		Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
 
