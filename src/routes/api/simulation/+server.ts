@@ -7,6 +7,7 @@ import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/ser
 
 const fileWatchers: Watcher[] = [];
 
+// TODO: Add error handling when no sim founded
 export const POST = (async () => {
 	const dempsProcess = createDempsProcess();
 
@@ -15,7 +16,7 @@ export const POST = (async () => {
 
 	return produce(
 		async function start({ emit }) {
-			const { error } = emit('status', 'running');
+			const { error } = emit('status', 'init');
 
 			if (error) {
 				console.error(error);
@@ -25,8 +26,12 @@ export const POST = (async () => {
 			dirWatcher.on('ready', async () => {
 				try {
 					await dempsProcess.run();
-					return;
+					emit('status', 'finished');
 				} catch {
+					console.log('There was an error, closing the connection.');
+					emit('status', 'error');
+				} finally {
+					// eslint-disable-next-line no-unsafe-finally
 					return;
 				}
 			});
@@ -41,7 +46,7 @@ export const POST = (async () => {
 					fileWatchers.push(fileWatcher);
 
 					fileWatcher.on('ready', () => {
-						emit('ready', 'success');
+						emit('status', 'ready');
 					});
 
 					fileWatcher.on('add', async (path) => {
@@ -56,7 +61,7 @@ export const POST = (async () => {
 			async stop() {
 				fileWatchers.forEach((watcher) => watcher.close());
 				if (dempsProcess.isRunning) {
-					await dempsProcess.abort();
+					await dempsProcess.kill();
 				}
 
 				console.log('Connection closed');
