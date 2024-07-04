@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export const contextKey = Symbol();
-</script>
-
 <script lang="ts">
 	import type { G } from '$lib/types';
 	import type { Action } from 'svelte/action';
@@ -13,7 +9,7 @@
 	import { cn } from '$lib/utils';
 	import { setContext } from 'svelte';
 	import { LoaderCircle } from 'lucide-svelte';
-	import { createPopup } from '$lib/components/leaflet';
+	import { contextKey, createPopup } from '$lib/components/leaflet';
 	import {
 		attachPopupEvents,
 		geoJSONToGeometry,

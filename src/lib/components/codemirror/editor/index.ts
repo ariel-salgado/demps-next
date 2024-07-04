@@ -1,7 +1,8 @@
 import type { Environment } from '$lib/states';
 import type { EditorView } from '@codemirror/view';
 
-import Editor, { contextKey } from './editor.svelte';
+import Editor from './editor.svelte';
+import { contextKey } from './context';
 
 type EditorContext = {
 	editor: EditorView;

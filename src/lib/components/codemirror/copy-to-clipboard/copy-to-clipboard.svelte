@@ -5,7 +5,7 @@
 	import { getContext } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui';
-	import { editorContextKey } from '$lib/components/codemirror';
+	import { contextKey } from '$lib/components/codemirror';
 	import { ClipboardCopy, ClipboardCheck } from 'lucide-svelte';
 
 	interface Props extends HTMLButtonAttributes {
@@ -14,7 +14,7 @@
 
 	const { timeout = 1500, ...rest }: Props = $props();
 
-	const { editor } = getContext<EditorContext>(editorContextKey);
+	const { editor } = getContext<EditorContext>(contextKey);
 
 	let copied: boolean = $state(false);
 

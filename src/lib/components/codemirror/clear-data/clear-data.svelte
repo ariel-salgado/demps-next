@@ -6,7 +6,7 @@
 	import { toast } from 'svelte-sonner';
 	import { Trash2 } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
-	import { editorContextKey } from '$lib/components/codemirror';
+	import { contextKey } from '$lib/components/codemirror';
 
 	interface Props extends HTMLButtonAttributes {
 		onClear?: () => void;
@@ -14,7 +14,7 @@
 
 	const { onClear, ...rest }: Props = $props();
 
-	const { environment } = getContext<EditorContext>(editorContextKey);
+	const { environment } = getContext<EditorContext>(contextKey);
 
 	function clearData() {
 		if (environment.getFeatures().length === 0) {

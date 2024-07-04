@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export const contextKey = Symbol();
-</script>
-
 <script lang="ts">
 	import type { G } from '$lib/types';
 	import type { Snippet } from 'svelte';
@@ -13,6 +9,7 @@
 	import { extensions } from './extensions';
 	import { EditorView } from '@codemirror/view';
 	import { EditorState } from '@codemirror/state';
+	import { contextKey } from '$lib/components/codemirror';
 	import { debounce, isValidGeoJSON, strEqualsObj } from '$lib/utils';
 
 	interface Props {

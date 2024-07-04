@@ -6,7 +6,7 @@
 	import { toast } from 'svelte-sonner';
 	import { Download } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
-	import { editorContextKey } from '$lib/components/codemirror';
+	import { contextKey } from '$lib/components/codemirror';
 
 	interface Props extends HTMLAnchorAttributes {
 		download?: string;
@@ -14,7 +14,7 @@
 
 	const { download: download = 'data', ...rest }: Props = $props();
 
-	const { editor } = getContext<EditorContext>(editorContextKey);
+	const { editor } = getContext<EditorContext>(contextKey);
 
 	let URLdata: string | null = $state(null);
 

@@ -2,7 +2,7 @@
 	import type { LayerGroup, TileLayer } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet';
 
-	import { mapContextKey } from '$lib/components/leaflet';
+	import { contextKey } from '$lib/components/leaflet';
 	import { getContext, onDestroy, onMount, untrack } from 'svelte';
 
 	interface Props {
@@ -11,7 +11,7 @@
 
 	let { coordinates }: Props = $props();
 
-	const { map } = getContext<MapContext>(mapContextKey);
+	const { map } = getContext<MapContext>(contextKey);
 
 	let mounted: boolean = $state(false);
 	let layerGroup: LayerGroup<TileLayer> = $state(window.L.layerGroup());

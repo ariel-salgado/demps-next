@@ -6,7 +6,7 @@
 
 	import { randomID } from '$lib/utils';
 	import { getContext, onMount } from 'svelte';
-	import { createPopup, mapContextKey } from '$lib/components/leaflet';
+	import { createPopup, contextKey } from '$lib/components/leaflet';
 	import {
 		geometryToGeoJSON,
 		geoJSONToGeometry,
@@ -15,7 +15,7 @@
 		updateFeatureProperties
 	} from '$lib/components/leaflet/helpers';
 
-	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(mapContextKey);
+	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(contextKey);
 
 	onMount(async () => {
 		if (!map.pm) {

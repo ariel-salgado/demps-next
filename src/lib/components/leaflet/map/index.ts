@@ -1,7 +1,8 @@
 import type { Environment } from '$lib/states';
 import type { Map as LMap, FeatureGroup, Control } from 'leaflet';
 
-import Map, { contextKey } from './map.svelte';
+import Map from './map.svelte';
+import { contextKey } from './context';
 
 type MapContext = {
 	map: LMap;

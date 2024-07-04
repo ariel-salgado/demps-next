@@ -5,14 +5,14 @@
 
 	import { getContext } from 'svelte';
 	import { EyeOff } from 'lucide-svelte';
-	import { mapContextKey } from '$lib/components/leaflet';
+	import { contextKey } from '$lib/components/leaflet';
 
 	interface ToggleLayer extends Control.Layers {
 		showLayers(): void;
 		hideLayers(): void;
 	}
 
-	let { overlayLayer } = getContext<MapContext>(mapContextKey);
+	let { overlayLayer } = getContext<MapContext>(contextKey);
 
 	let hiddenLayers: boolean = $state(false);
 
