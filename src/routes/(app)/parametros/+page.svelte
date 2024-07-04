@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { FormField, FormSchema } from '$lib/types';
 
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { splitCamelCase } from '$lib/utils';
 	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
 	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
-	import { splitCamelCase } from '$lib/utils';
 
-	let selected: string = $state($page.url.hash.slice(1) || 'general');
+	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
 	onMount(() => {
 		const observer = new IntersectionObserver(
@@ -29,6 +29,10 @@
 		for (const section of sections) {
 			observer.observe(section);
 		}
+	});
+
+	onDestroy(() => {
+		selected = null;
 	});
 </script>
 
