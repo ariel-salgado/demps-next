@@ -5,7 +5,7 @@ import { SvelteMap } from 'svelte/reactivity';
 import { loadLocalStorage, saveLocalStorage } from '$lib/utils';
 
 export function createEnvironment(features?: Feature<G>[]) {
-	const _features: Map<string, Feature<G>> = new SvelteMap();
+	const _features: SvelteMap<string, Feature<G>> = new SvelteMap();
 
 	$effect.root(() => {
 		const stored = loadLocalStorage<Feature<G>[]>('environment');
