@@ -14,7 +14,7 @@
 
 	let { overlayLayer } = getContext<MapContext>(contextKey);
 
-	let hiddenLayers: boolean = $state(false);
+	let hiddenLayers: boolean | null = $state(false);
 
 	function toggleLayers() {
 		if (hiddenLayers) {
@@ -54,6 +54,7 @@
 		return {
 			destroy() {
 				node.remove();
+				hiddenLayers = null;
 			}
 		};
 	};

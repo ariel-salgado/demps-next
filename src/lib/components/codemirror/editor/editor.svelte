@@ -79,7 +79,6 @@
 		return {
 			destroy() {
 				editor?.destroy();
-				editor = undefined;
 			}
 		};
 	};

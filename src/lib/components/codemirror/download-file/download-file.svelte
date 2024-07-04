@@ -2,7 +2,7 @@
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 	import type { EditorContext } from '$lib/components/codemirror';
 
-	import { getContext } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { Download } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
@@ -36,6 +36,10 @@
 			throw new Error('Error al exportar los datos');
 		}
 	}
+
+	onDestroy(() => {
+		URLdata = null;
+	});
 </script>
 
 <Button

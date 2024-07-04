@@ -2,7 +2,7 @@
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import type { EditorContext } from '$lib/components/codemirror';
 
-	import { getContext } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui';
 	import { contextKey } from '$lib/components/codemirror';
@@ -16,7 +16,7 @@
 
 	const { editor } = getContext<EditorContext>(contextKey);
 
-	let copied: boolean = $state(false);
+	let copied: boolean | null = $state(false);
 
 	function copyToClipboard() {
 		if (!editor) {
@@ -27,11 +27,17 @@
 		navigator.clipboard.writeText(editor.state.doc.toString()).then(() => {
 			copied = true;
 			toast.success('Copiado al portapapeles.');
-			setTimeout(() => {
+			const cleanup = setTimeout(() => {
 				copied = false;
 			}, timeout);
+
+			clearTimeout(cleanup);
 		});
 	}
+
+	onDestroy(() => {
+		copied = null;
+	});
 </script>
 
 <Button
