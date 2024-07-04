@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { FormField, FormSchema } from '$lib/types';
 
-	import { onDestroy, onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { parameters } from '$lib/states';
 	import { splitCamelCase } from '$lib/utils';
+	import { onDestroy, onMount } from 'svelte';
 	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
 	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
@@ -82,10 +83,16 @@
 	<FormGroup>
 		<Label for={field.attributes.name}>{field.label}</Label>
 		{#if field.type === 'input'}
-			<Input id={field.attributes.name} {...field.attributes} validation={field.validation} />
+			<Input
+				id={field.attributes.name}
+				bind:value={parameters.value[field.attributes.name!]}
+				{...field.attributes}
+				validation={field.validation}
+			/>
 		{:else if field.type === 'select'}
 			<Select
 				id={field.attributes.name}
+				bind:value={parameters.value[field.attributes.name!]}
 				{...field.attributes}
 				options={field.options}
 				validation={field.validation}
