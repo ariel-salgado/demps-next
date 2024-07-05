@@ -141,18 +141,17 @@
 				</ul>
 			</nav>
 		</div>
-		<div class="space-y-4">
+		<div class="flex gap-3">
 			<Button
-				class="w-full"
+				class="w-full p-0"
 				aria-label="Cargar archivo de configuración"
 				title="Cargar configuración"
 			>
 				<label
-					class="flex size-full cursor-pointer items-center justify-center p-1.5"
+					class="flex size-full w-full cursor-pointer items-center justify-center p-1.5"
 					for="fileUpload"
 				>
-					<Upload />
-					<span class="ml-2">Cargar configuración</span>
+					<Upload class="size-5" />
 				</label>
 
 				<input
@@ -165,9 +164,13 @@
 				/>
 			</Button>
 
-			<Button type="submit" class="w-full" form="parameters-form">
-				<Download class="mr-2 size-5" />
-				<span>Descargar configuración</span>
+			<Button
+				type="submit"
+				class="w-full p-0"
+				form="parameters-form"
+				title="Descargar configuración"
+			>
+				<Download class="size-5" />
 			</Button>
 		</div>
 	</aside>
