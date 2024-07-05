@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { PageData } from './$types';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { FormField, FormSchema, ParametersSchema } from '$lib/types';
 
@@ -12,10 +13,25 @@
 	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
 
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
+
 	let files: FileList | null = $state(null);
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
 	let form: HTMLFormElement | undefined = $state();
+
+	$effect.pre(() => {
+		parametersFormFields.general.forEach((field) => {
+			if (field.attributes.name === 'baseDirSim') {
+				// @ts-expect-error - This assignment is valid
+				field.options = data.baseDirSimOptions;
+			}
+		});
+	});
 
 	onMount(() => {
 		const observer = new IntersectionObserver(
