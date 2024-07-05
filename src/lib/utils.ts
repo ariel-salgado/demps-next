@@ -136,3 +136,20 @@ export function flattenJSON(obj: object, prefix: string = '') {
 
 	return flatObj;
 }
+
+export function deflattenJSON(obj: object) {
+	return Object.keys(obj).reduce(
+		(deflatObj, key) => {
+			const keys = key.split('.');
+			let currentObj = deflatObj;
+			for (let i = 0; i < keys.length - 1; i++) {
+				const currentKey = keys[i] as string;
+				currentObj[currentKey] = currentObj?.[currentKey] || (/^\d+$/.test(keys[i + 1]!) ? [] : {});
+				currentObj = currentObj[currentKey] as Record<string, unknown>;
+			}
+			currentObj[keys.at(-1)!] = obj[key as keyof typeof obj];
+			return deflatObj;
+		},
+		{} as Record<string, unknown>
+	);
+}

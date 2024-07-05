@@ -1,13 +1,15 @@
 <script lang="ts">
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { FormField, FormSchema, ParametersSchema } from '$lib/types';
 
 	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { parameters } from '$lib/states';
 	import { onDestroy, onMount } from 'svelte';
 	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
-	import { flattenJSON, splitCamelCase } from '$lib/utils';
+	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
 
 	let files: FileList | null = $state(null);
@@ -37,7 +39,9 @@
 	});
 
 	onDestroy(() => {
+		files = null;
 		selected = null;
+		form?.remove();
 	});
 
 	function handleUpload({ target }: Event) {
@@ -73,6 +77,43 @@
 			reader.readAsText(blob);
 		}
 	}
+
+	const handleSubmit: SubmitFunction = async () => {
+		return async ({ result }) => {
+			if (result.type !== 'success' || !result.data) {
+				toast.error('Error al descargar configuración', {
+					description: 'Ocurrió un error al generar el archivo de configuración.'
+				});
+				return;
+			}
+
+			if ('errors' in result.data) {
+				Object.keys(result.data.errors).forEach((id) => {
+					const el = document.getElementById(id);
+					const event = new Event('change', { bubbles: true, cancelable: true });
+					el?.dispatchEvent(event);
+				});
+				toast.error('Error al descargar configuración', {
+					description: 'Corrija los errores en el formulario antes de descargar la configuración.'
+				});
+				return;
+			}
+
+			const deflatten = JSON.stringify(deflattenJSON(result.data), null, '\t');
+			const blob = new Blob([deflatten], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'parameters.config';
+
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+
+			URL.revokeObjectURL(url);
+		};
+	};
 </script>
 
 <svelte:head>
@@ -116,13 +157,21 @@
 				/>
 			</Button>
 
-			<Button class="w-full">
+			<Button type="submit" class="w-full" form="parameters-form">
 				<Download class="mr-2 size-5" />
 				<span>Descargar configuración</span>
 			</Button>
 		</div>
 	</aside>
-	<form class="grid grid-cols-2 gap-4 py-8 px-12" bind:this={form} data-sveltekit-keepfocus>
+	<form
+		id="parameters-form"
+		class="grid grid-cols-2 gap-4 py-8 px-12"
+		bind:this={form}
+		method="POST"
+		action="?/download"
+		use:enhance={handleSubmit}
+		data-sveltekit-keepfocus
+	>
 		{@render parametersForm(parametersFormFields, false)}
 	</form>
 </section>
