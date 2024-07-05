@@ -99,8 +99,10 @@
 				return;
 			}
 
-			const deflatten = JSON.stringify(deflattenJSON(result.data), null, '\t');
-			const blob = new Blob([deflatten], { type: 'application/json' });
+			const parsedData = deflattenJSON(result.data) as ParametersSchema;
+			const data = JSON.stringify(addInputOutputPrefixes(parsedData), null, 2);
+
+			const blob = new Blob([data], { type: 'application/json' });
 			const url = URL.createObjectURL(blob);
 
 			const a = document.createElement('a');
@@ -114,6 +116,12 @@
 			URL.revokeObjectURL(url);
 		};
 	};
+
+	function addInputOutputPrefixes(data: ParametersSchema) {
+		data.input.directory = `input/${data.input.directory}`;
+		data.output.directory = `output/${data.output.directory}`;
+		return data;
+	}
 </script>
 
 <svelte:head>
