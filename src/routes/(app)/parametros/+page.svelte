@@ -1,15 +1,19 @@
 <script lang="ts">
-	import type { FormField, FormSchema } from '$lib/types';
+	import type { FormField, FormSchema, ParametersSchema } from '$lib/types';
 
 	import { page } from '$app/stores';
+	import { toast } from 'svelte-sonner';
 	import { parameters } from '$lib/states';
-	import { splitCamelCase } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
+	import { flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
 
+	let files: FileList | null = $state(null);
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
+
+	let form: HTMLFormElement | undefined = $state();
 
 	onMount(() => {
 		const observer = new IntersectionObserver(
@@ -35,7 +39,93 @@
 	onDestroy(() => {
 		selected = null;
 	});
+
+	function handleUpload({ target }: Event) {
+		if (!!files && files.length > 0) {
+			const reader = new FileReader();
+
+			reader.onload = () => {
+				const uploadedData = reader.result as string;
+
+				try {
+					const data = flattenJSON(JSON.parse(uploadedData));
+
+					const fieldNames = Array.from(form!.elements)
+						.filter((element) => element.hasAttribute('name'))
+						.map((element) => element.getAttribute('name'));
+
+					if (Object.keys(data).every((element) => fieldNames.includes(element))) {
+						parameters.value = data;
+						toast.success('Configuración cargada correctamente');
+					} else {
+						toast.error('Archivo de configuración inválido');
+					}
+				} catch {
+					toast.error('Archivo de configuración inválido');
+				} finally {
+					(target! as HTMLInputElement).value = '';
+				}
+			};
+
+			const file = files[0] as File;
+			const blob = new Blob([file], { type: file.type });
+
+			reader.readAsText(blob);
+		}
+	}
 </script>
+
+<svelte:head>
+	<title>DEMPS | Parametros</title>
+	<meta name="description" content="Configuración de parámetros" />
+</svelte:head>
+
+<section class="grid grid-cols-[20rem_1fr] divide-x divide-slate-300">
+	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-1 flex-col justify-between p-10">
+		<div>
+			<h2 class="border-b border-slate-300 pb-2 text-3xl font-semibold tracking-tight">
+				Navegación
+			</h2>
+			<nav>
+				<ul class="space-y-1 py-4">
+					{@render navItems(parametersFormFields, false)}
+				</ul>
+			</nav>
+		</div>
+		<div class="space-y-4">
+			<Button
+				class="w-full"
+				aria-label="Cargar archivo de configuración"
+				title="Cargar configuración"
+			>
+				<label
+					class="flex size-full cursor-pointer items-center justify-center p-1.5"
+					for="fileUpload"
+				>
+					<Upload />
+					<span class="ml-2">Cargar configuración</span>
+				</label>
+
+				<input
+					id="fileUpload"
+					type="file"
+					class="hidden"
+					accept=".config"
+					bind:files
+					onchange={handleUpload}
+				/>
+			</Button>
+
+			<Button class="w-full">
+				<Download class="mr-2 size-5" />
+				<span>Descargar configuración</span>
+			</Button>
+		</div>
+	</aside>
+	<form class="grid grid-cols-2 gap-4 py-8 px-12" bind:this={form} data-sveltekit-keepfocus>
+		{@render parametersForm(parametersFormFields, false)}
+	</form>
+</section>
 
 {#snippet navItems(items: FormSchema, isNested: boolean)}
 	{#each Object.entries(items) as [key, value]}
@@ -85,14 +175,14 @@
 		{#if field.type === 'input'}
 			<Input
 				id={field.attributes.name}
-				bind:value={parameters.value[field.attributes.name!]}
+				bind:value={parameters.value[field.attributes.name! as keyof ParametersSchema]}
 				{...field.attributes}
 				validation={field.validation}
 			/>
 		{:else if field.type === 'select'}
 			<Select
 				id={field.attributes.name}
-				bind:value={parameters.value[field.attributes.name!]}
+				bind:value={parameters.value[field.attributes.name! as keyof ParametersSchema]}
 				{...field.attributes}
 				options={field.options}
 				validation={field.validation}
@@ -103,36 +193,3 @@
 		{/if}
 	</FormGroup>
 {/snippet}
-
-<svelte:head>
-	<title>DEMPS | Parametros</title>
-	<meta name="description" content="Configuración de parámetros" />
-</svelte:head>
-
-<section class="grid grid-cols-[20rem_1fr] divide-x divide-slate-300">
-	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-1 flex-col justify-between p-10">
-		<div>
-			<h2 class="border-b border-slate-300 pb-2 text-3xl font-semibold tracking-tight">
-				Navegación
-			</h2>
-			<nav>
-				<ul class="space-y-1 py-4">
-					{@render navItems(parametersFormFields, false)}
-				</ul>
-			</nav>
-		</div>
-		<div class="space-y-4">
-			<Button class="w-full">
-				<Upload class="mr-2 size-5" />
-				<span>Cargar configuración</span>
-			</Button>
-			<Button class="w-full">
-				<Download class="mr-2 size-5" />
-				<span>Descargar configuración</span>
-			</Button>
-		</div>
-	</aside>
-	<form class="grid grid-cols-2 gap-4 py-8 px-12" data-sveltekit-keepfocus>
-		{@render parametersForm(parametersFormFields, false)}
-	</form>
-</section>
