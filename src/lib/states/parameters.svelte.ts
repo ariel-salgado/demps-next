@@ -1,10 +1,14 @@
+import type { ParametersSchema } from '$lib/types';
+
 import { loadLocalStorage, saveLocalStorage } from '$lib/utils';
 
-export function createParameters(parameters?: Record<string, string>) {
-	let _parameters: Record<string, string> | null = $state({});
+type PartialParameters = Partial<ParametersSchema>;
+
+export function createParameters(parameters?: PartialParameters) {
+	let _parameters: PartialParameters | null = $state({});
 
 	$effect.root(() => {
-		const stored = loadLocalStorage<Record<string, string>>('parameters');
+		const stored = loadLocalStorage<PartialParameters>('parameters');
 		const init = stored ? stored : parameters || {};
 
 		_parameters = init;
@@ -20,9 +24,9 @@ export function createParameters(parameters?: Record<string, string>) {
 
 	return {
 		get value() {
-			return _parameters as Record<string, string>;
+			return _parameters as PartialParameters;
 		},
-		set value(newValue: Record<string, string>) {
+		set value(newValue: PartialParameters) {
 			_parameters = newValue;
 		}
 	};
