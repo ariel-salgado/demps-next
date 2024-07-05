@@ -10,7 +10,7 @@ export type G = Exclude<Geometry, GeometryCollection>;
 
 export type SelectOptions = {
 	label: string | null;
-	value: string | number | boolean;
+	value: string | number | boolean | null;
 	selected?: boolean | undefined;
 }[];
 
