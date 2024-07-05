@@ -108,6 +108,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'duration',
 				type: 'number',
+				value: 3600,
 				placeholder: 'Ingrese la duración de la simulación'
 			}
 		},
@@ -118,6 +119,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'calibration',
 				type: 'number',
+				value: 50,
 				placeholder: 'Ingrese la calibración de la simulación'
 			}
 		},
@@ -128,6 +130,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'quadSize',
 				type: 'number',
+				value: 10,
 				placeholder: 'Ingrese el tamaño de los cuadrantes'
 			}
 		},
@@ -138,6 +141,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'closeEnough',
 				type: 'number',
+				value: 50,
 				placeholder: 'Ingrese la distancia de cercanía'
 			}
 		},
@@ -148,6 +152,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'randomWalkwayRadius',
 				type: 'number',
+				value: 100,
 				placeholder: 'Ingrese el radio de la caminata aleatoria'
 			}
 		},
@@ -158,6 +163,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'attractionRadius',
 				type: 'number',
+				value: 5,
 				placeholder: 'Ingrese el radio de atracción'
 			}
 		},
@@ -168,6 +174,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'deltaT',
 				type: 'number',
+				value: 1.0,
 				placeholder: 'Ingrese el delta T'
 			}
 		},
@@ -178,6 +185,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'threads',
 				type: 'number',
+				value: 4,
 				placeholder: 'Ingrese la cantidad de hilos'
 			}
 		},
@@ -192,12 +200,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'floodModelEnable',
-				placeholder: 'Seleccione el modelo de inundación'
+				name: 'floodModelEnable'
+				// placeholder: 'Seleccione el modelo de inundación'
 			}
 		},
 		{
@@ -211,12 +220,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'densityModelEnable',
-				placeholder: 'Seleccione el modelo de densidad'
+				name: 'densityModelEnable'
+				// placeholder: 'Seleccione el modelo de densidad'
 			}
 		},
 		{
@@ -230,12 +240,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'panicModelEnable',
-				placeholder: 'Seleccione el modelo de pánico'
+				name: 'panicModelEnable'
+				// placeholder: 'Seleccione el modelo de pánico'
 			}
 		},
 		{
@@ -249,12 +260,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'elevationModelEnable',
-				placeholder: 'Seleccione el modelo de elevación'
+				name: 'elevationModelEnable'
+				// placeholder: 'Seleccione el modelo de elevación'
 			}
 		},
 		{
@@ -268,12 +280,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'debrisModelEnable',
-				placeholder: 'Seleccione el modelo de escombros'
+				name: 'debrisModelEnable'
+				// placeholder: 'Seleccione el modelo de escombros'
 			}
 		},
 		{
@@ -303,6 +316,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'samplingInterval',
 				type: 'number',
+				value: 100,
 				placeholder: 'Ingrese el intervalo de muestreo'
 			}
 		},
@@ -313,6 +327,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'baseDirSim',
 				type: 'text',
+				value: '/home/demps-user/sim',
 				placeholder: 'Ingrese el directorio base de la simulación'
 			}
 		}
@@ -335,6 +350,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'input.map',
 				type: 'text',
+				value: 'map.osrm',
 				placeholder: 'Ingrese el mapa'
 			}
 		},
@@ -357,7 +373,8 @@ export const parametersFormFields = {
 			options: [
 				{
 					value: true,
-					label: 'Habilitado'
+					label: 'Habilitado',
+					selected: true
 				},
 				{
 					value: false,
@@ -365,8 +382,8 @@ export const parametersFormFields = {
 				}
 			],
 			attributes: {
-				name: 'output.progressBar',
-				placeholder: 'Seleccione la barra de progreso'
+				name: 'output.progressBar'
+				// placeholder: 'Seleccione la barra de progreso'
 			}
 		},
 		{
@@ -396,7 +413,8 @@ export const parametersFormFields = {
 			options: [
 				{
 					value: true,
-					label: 'Habilitado'
+					label: 'Habilitado',
+					selected: true
 				},
 				{
 					value: false,
@@ -404,8 +422,8 @@ export const parametersFormFields = {
 				}
 			],
 			attributes: {
-				name: 'output.agents-out',
-				placeholder: 'Seleccione la salida de agentes'
+				name: 'output.agents-out'
+				// placeholder: 'Seleccione la salida de agentes'
 			}
 		},
 		{
@@ -415,6 +433,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.agents-path',
 				type: 'text',
+				value: 'agents/',
 				placeholder: 'Ingrese el directorio de agentes'
 			}
 		},
@@ -435,6 +454,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.agents-sufix',
 				type: 'text',
+				value: 'txt',
 				placeholder: 'Ingrese el sufijo de agentes'
 			}
 		},
@@ -445,7 +465,8 @@ export const parametersFormFields = {
 			options: [
 				{
 					value: true,
-					label: 'Habilitado'
+					label: 'Habilitado',
+					selected: true
 				},
 				{
 					value: false,
@@ -453,8 +474,8 @@ export const parametersFormFields = {
 				}
 			],
 			attributes: {
-				name: 'output.stats-out',
-				placeholder: 'Seleccione la salida de estadísticas'
+				name: 'output.stats-out'
+				// placeholder: 'Seleccione la salida de estadísticas'
 			}
 		},
 		{
@@ -474,6 +495,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.stats-path',
 				type: 'text',
+				value: 'stats/',
 				placeholder: 'Ingrese el directorio de estadísticas'
 			}
 		},
@@ -484,6 +506,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.anim-config',
 				type: 'text',
+				value: 'animacion.config.json',
 				placeholder: 'Ingrese nombre de archivo de configuración de animación'
 			}
 		},
@@ -498,12 +521,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'output.heatMap-out',
-				placeholder: 'Seleccione la salida de mapa de calor'
+				name: 'output.heatMap-out'
+				// placeholder: 'Seleccione la salida de mapa de calor'
 			}
 		},
 		{
@@ -513,6 +537,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.heatMap-size',
 				type: 'number',
+				value: 2,
 				placeholder: 'Ingrese el tamaño del mapa de calor'
 			}
 		},
@@ -523,6 +548,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.heatMap-interval',
 				type: 'number',
+				value: 120,
 				placeholder: 'Ingrese el intervalo del mapa de calor'
 			}
 		},
@@ -533,6 +559,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.heatMap-path',
 				type: 'text',
+				value: 'heatMaps/',
 				placeholder: 'Ingrese el directorio del mapa de calor'
 			}
 		}
@@ -545,6 +572,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.direction',
 				type: 'text',
+				value: 'N->S;W->E',
 				placeholder: 'Ingrese la dirección'
 			}
 		},
@@ -555,6 +583,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.sampleStateInterval',
 				type: 'number',
+				value: 10,
 				placeholder: 'Ingrese el intervalo de muestreo de estado'
 			}
 		},
@@ -565,6 +594,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.arrivalTime',
 				type: 'number',
+				value: -1550,
 				placeholder: 'Ingrese el tiempo de llegada'
 			}
 		},
@@ -575,6 +605,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.speedWaterProp',
 				type: 'number',
+				value: 0.75,
 				placeholder: 'Ingrese la velocidad del agua proporcional'
 			}
 		},
@@ -585,6 +616,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.speedWaterLevel',
 				type: 'number',
+				value: 0.000165,
 				placeholder: 'Ingrese la velocidad del agua nivel'
 			}
 		},
@@ -595,6 +627,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.criticalLevel',
 				type: 'number',
+				value: 0.1,
 				placeholder: 'Ingrese el nivel crítico'
 			}
 		},
@@ -605,6 +638,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.minSpeedFactor',
 				type: 'number',
+				value: 0.1,
 				placeholder: 'Ingrese el factor de velocidad mínimo'
 			}
 		},
@@ -619,12 +653,13 @@ export const parametersFormFields = {
 				},
 				{
 					value: false,
-					label: 'Deshabilitado'
+					label: 'Deshabilitado',
+					selected: true
 				}
 			],
 			attributes: {
-				name: 'floodParams.imagesEnable',
-				placeholder: 'Seleccione la habilitación de imágenes'
+				name: 'floodParams.imagesEnable'
+				// placeholder: 'Seleccione la habilitación de imágenes'
 			}
 		},
 		{
@@ -634,6 +669,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.imagesDir',
 				type: 'text',
+				value: 'floodImgs/',
 				placeholder: 'Ingrese el directorio de imágenes'
 			}
 		},
@@ -644,7 +680,8 @@ export const parametersFormFields = {
 			options: [
 				{
 					value: true,
-					label: 'Habilitado'
+					label: 'Habilitado',
+					selected: true
 				},
 				{
 					value: false,
@@ -652,8 +689,8 @@ export const parametersFormFields = {
 				}
 			],
 			attributes: {
-				name: 'floodParams.stateEnable',
-				placeholder: 'Seleccione la habilitación de estado'
+				name: 'floodParams.stateEnable'
+				// placeholder: 'Seleccione la habilitación de estado'
 			}
 		},
 		{
@@ -663,6 +700,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.stateDir',
 				type: 'text',
+				value: 'floodState/',
 				placeholder: 'Ingrese el directorio de estado'
 			}
 		}
@@ -675,6 +713,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'densityParams.minDensity',
 				type: 'number',
+				value: 0.3,
 				placeholder: 'Ingrese la densidad mínima'
 			}
 		},
@@ -685,6 +724,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'densityParams.maxDensity',
 				type: 'number',
+				value: 6.0,
 				placeholder: 'Ingrese la densidad máxima'
 			}
 		},
@@ -695,6 +735,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'densityParams.minVelocity',
 				type: 'number',
+				value: 0.2,
 				placeholder: 'Ingrese la velocidad mínima'
 			}
 		}
@@ -720,6 +761,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.number',
 					type: 'number',
+					value: 41686,
 					placeholder: 'Ingrese el número'
 				}
 			},
@@ -730,6 +772,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.responseTime.tau',
 					type: 'number',
+					value: 0,
 					placeholder: 'Ingrese el tau'
 				}
 			},
@@ -740,6 +783,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.responseTime.sigma',
 					type: 'number',
+					value: 144,
 					placeholder: 'Ingrese el sigma'
 				}
 			},
@@ -750,6 +794,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.phoneUse.meanTimeTakePhone',
 					type: 'number',
+					value: 20.0,
 					placeholder: 'Ingrese el tiempo medio de toma de teléfono'
 				}
 			},
@@ -760,6 +805,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.phoneUse.probPhoneUseConst',
 					type: 'number',
+					value: 10,
 					placeholder: 'Ingrese la probabilidad de uso de teléfono constante'
 				}
 			},
@@ -770,6 +816,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G0.prob',
 					type: 'number',
+					value: 0.1651,
 					placeholder: 'Ingrese la probabilidad G0'
 				}
 			},
@@ -780,6 +827,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G0.minSpeed',
 					type: 'number',
+					value: 1.14,
 					placeholder: 'Ingrese la velocidad mínima G0'
 				}
 			},
@@ -790,6 +838,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G0.maxSpeed',
 					type: 'number',
+					value: 1.4,
 					placeholder: 'Ingrese la velocidad máxima G0'
 				}
 			},
@@ -800,6 +849,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G1.prob',
 					type: 'number',
+					value: 0.2597,
 					placeholder: 'Ingrese la probabilidad G1'
 				}
 			},
@@ -810,6 +860,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G1.minSpeed',
 					type: 'number',
+					value: 1.28,
 					placeholder: 'Ingrese la velocidad mínima G1'
 				}
 			},
@@ -820,6 +871,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G1.maxSpeed',
 					type: 'number',
+					value: 1.71,
 					placeholder: 'Ingrese la velocidad máxima G1'
 				}
 			},
@@ -830,6 +882,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G2.prob',
 					type: 'number',
+					value: 0.4267,
 					placeholder: 'Ingrese la probabilidad G2'
 				}
 			},
@@ -840,6 +893,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G2.minSpeed',
 					type: 'number',
+					value: 1.28,
 					placeholder: 'Ingrese la velocidad mínima G2'
 				}
 			},
@@ -850,6 +904,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G2.maxSpeed',
 					type: 'number',
+					value: 1.71,
 					placeholder: 'Ingrese la velocidad máxima G2'
 				}
 			},
@@ -860,6 +915,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G3.prob',
 					type: 'number',
+					value: 0.1485,
 					placeholder: 'Ingrese la probabilidad G3'
 				}
 			},
@@ -870,6 +926,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G3.minSpeed',
 					type: 'number',
+					value: 0.44,
 					placeholder: 'Ingrese la velocidad mínima G3'
 				}
 			},
@@ -880,6 +937,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.ageRange.G3.maxSpeed',
 					type: 'number',
+					value: 1.1,
 					placeholder: 'Ingrese la velocidad máxima G3'
 				}
 			},
@@ -890,6 +948,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.SFM.timeRelax',
 					type: 'number',
+					value: 5.0,
 					placeholder: 'Ingrese el tiempo de relajación'
 				}
 			},
@@ -900,6 +959,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.SFM.sigma',
 					type: 'number',
+					value: 0.6,
 					placeholder: 'Ingrese el sigma'
 				}
 			},
@@ -910,6 +970,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.SFM.repulsiveForceAgents',
 					type: 'number',
+					value: 50.1,
 					placeholder: 'Ingrese la fuerza repulsiva de agentes'
 				}
 			},
@@ -920,6 +981,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.SFM.cosphi',
 					type: 'number',
+					value: -0.17365,
 					placeholder: 'Ingrese el cos phi'
 				}
 			},
@@ -930,6 +992,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.emotionThreshold',
 					type: 'number',
+					value: 0.0,
 					placeholder: 'Ingrese el umbral de emoción'
 				}
 			},
@@ -940,6 +1003,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.probInfectedToRecovered',
 					type: 'number',
+					value: 0.7,
 					placeholder: 'Ingrese la probabilidad de infectado a recuperado'
 				}
 			},
@@ -950,6 +1014,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.probRecoveredToSusceptible',
 					type: 'number',
+					value: 0.3,
 					placeholder: 'Ingrese la probabilidad de recuperado a susceptible'
 				}
 			},
@@ -960,6 +1025,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.meanTimeInInfected',
 					type: 'number',
+					value: 300,
 					placeholder: 'Ingrese el tiempo medio en infectado'
 				}
 			},
@@ -970,6 +1036,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.sdTimeInInfected',
 					type: 'number',
+					value: 1.0,
 					placeholder: 'Ingrese la desviación estándar de tiempo en infectado'
 				}
 			},
@@ -980,6 +1047,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.meanTimeInRecovered',
 					type: 'number',
+					value: 300,
 					placeholder: 'Ingrese el tiempo medio en recuperado'
 				}
 			},
@@ -990,6 +1058,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.0.panicModel.sdTimeInRecovered',
 					type: 'number',
+					value: 1.0,
 					placeholder: 'Ingrese la desviación estándar de tiempo en recuperado'
 				}
 			}
@@ -1014,6 +1083,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.number',
 					type: 'number',
+					value: 0,
 					placeholder: 'Ingrese el número'
 				}
 			},
@@ -1024,6 +1094,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.responseTime.tau',
 					type: 'number',
+					value: 0,
 					placeholder: 'Ingrese el tau'
 				}
 			},
@@ -1034,6 +1105,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.responseTime.sigma',
 					type: 'number',
+					value: 383.0,
 					placeholder: 'Ingrese el sigma'
 				}
 			},
@@ -1044,6 +1116,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.phoneUse.meanTimeTakePhone',
 					type: 'number',
+					value: 5.0,
 					placeholder: 'Ingrese el tiempo medio de toma de teléfono'
 				}
 			},
@@ -1054,6 +1127,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.phoneUse.probPhoneUseConst',
 					type: 'number',
+					value: 10,
 					placeholder: 'Ingrese la probabilidad de uso de teléfono constante'
 				}
 			},
@@ -1064,6 +1138,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G0.prob',
 					type: 'number',
+					value: 0.1651,
 					placeholder: 'Ingrese la probabilidad G0'
 				}
 			},
@@ -1074,6 +1149,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G0.minSpeed',
 					type: 'number',
+					value: 1.04,
 					placeholder: 'Ingrese la velocidad mínima G0'
 				}
 			},
@@ -1084,6 +1160,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G0.maxSpeed',
 					type: 'number',
+					value: 1.4,
 					placeholder: 'Ingrese la velocidad máxima G0'
 				}
 			},
@@ -1094,6 +1171,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G1.prob',
 					type: 'number',
+					value: 0.2597,
 					placeholder: 'Ingrese la probabilidad G1'
 				}
 			},
@@ -1104,6 +1182,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G1.minSpeed',
 					type: 'number',
+					value: 1.28,
 					placeholder: 'Ingrese la velocidad mínima G1'
 				}
 			},
@@ -1114,6 +1193,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G1.maxSpeed',
 					type: 'number',
+					value: 1.68,
 					placeholder: 'Ingrese la velocidad máxima G1'
 				}
 			},
@@ -1124,6 +1204,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G2.prob',
 					type: 'number',
+					value: 0.4267,
 					placeholder: 'Ingrese la probabilidad G2'
 				}
 			},
@@ -1134,6 +1215,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G2.minSpeed',
 					type: 'number',
+					value: 1.08,
 					placeholder: 'Ingrese la velocidad mínima G2'
 				}
 			},
@@ -1144,6 +1226,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G2.maxSpeed',
 					type: 'number',
+					value: 1.6,
 					placeholder: 'Ingrese la velocidad máxima G2'
 				}
 			},
@@ -1154,6 +1237,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G3.prob',
 					type: 'number',
+					value: 0.1485,
 					placeholder: 'Ingrese la probabilidad G3'
 				}
 			},
@@ -1164,6 +1248,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G3.minSpeed',
 					type: 'number',
+					value: 0.41,
 					placeholder: 'Ingrese la velocidad mínima G3'
 				}
 			},
@@ -1174,6 +1259,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.ageRange.G3.maxSpeed',
 					type: 'number',
+					value: 0.93,
 					placeholder: 'Ingrese la velocidad máxima G3'
 				}
 			},
@@ -1184,6 +1270,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.SFM.timeRelax',
 					type: 'number',
+					value: 1.5,
 					placeholder: 'Ingrese el tiempo de relajación'
 				}
 			},
@@ -1194,6 +1281,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.SFM.sigma',
 					type: 'number',
+					value: 0.1,
 					placeholder: 'Ingrese el sigma'
 				}
 			},
@@ -1204,6 +1292,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.SFM.repulsiveForceAgents',
 					type: 'number',
+					value: 50.1,
 					placeholder: 'Ingrese la fuerza repulsiva de agentes'
 				}
 			},
@@ -1214,6 +1303,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.SFM.cosphi',
 					type: 'number',
+					value: 0.17365,
 					placeholder: 'Ingrese el cos phi'
 				}
 			},
@@ -1224,6 +1314,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.emotionThreshold',
 					type: 'number',
+					value: 0.6,
 					placeholder: 'Ingrese el umbral de emoción'
 				}
 			},
@@ -1234,6 +1325,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.probInfectedToRecovered',
 					type: 'number',
+					value: 0.7,
 					placeholder: 'Ingrese la probabilidad de infectado a recuperado'
 				}
 			},
@@ -1244,6 +1336,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.probRecoveredToSusceptible',
 					type: 'number',
+					value: 0.3,
 					placeholder: 'Ingrese la probabilidad de recuperado a susceptible'
 				}
 			},
@@ -1254,6 +1347,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.meanTimeInInfected',
 					type: 'number',
+					value: 300,
 					placeholder: 'Ingrese el tiempo medio en infectado'
 				}
 			},
@@ -1264,6 +1358,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.sdTimeInInfected',
 					type: 'number',
+					value: 1.0,
 					placeholder: 'Ingrese la desviación estándar de tiempo en infectado'
 				}
 			},
@@ -1274,6 +1369,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.meanTimeInRecovered',
 					type: 'number',
+					value: 300,
 					placeholder: 'Ingrese el tiempo medio en recuperado'
 				}
 			},
@@ -1284,6 +1380,7 @@ export const parametersFormFields = {
 				attributes: {
 					name: 'agents.1.panicModel.sdTimeInRecovered',
 					type: 'number',
+					value: 1.0,
 					placeholder: 'Ingrese la desviación estándar de tiempo en recuperado'
 				}
 			}
