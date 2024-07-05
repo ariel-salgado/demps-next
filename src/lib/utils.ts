@@ -109,3 +109,30 @@ export function debounce<T extends (...args: Parameters<T>) => void>(
 export function splitCamelCase(word: string) {
 	return word.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
+
+export function flattenJSON(obj: object, prefix: string = '') {
+	const flatObj: Record<string, unknown> = {};
+
+	for (const key of Object.keys(obj)) {
+		const value: Array<unknown> = obj[key as keyof typeof obj];
+		const fullKey = prefix ? `${prefix}.${key}` : key;
+
+		if (value && typeof value === 'object') {
+			if (Array.isArray(value)) {
+				value.forEach((item, index) => {
+					if (typeof item === 'object') {
+						Object.assign(flatObj, flattenJSON(item!, `${fullKey}.${index}`));
+					} else {
+						flatObj[`${fullKey}.${index}`] = item;
+					}
+				});
+			} else {
+				Object.assign(flatObj, flattenJSON(value, fullKey));
+			}
+		} else {
+			flatObj[fullKey] = value;
+		}
+	}
+
+	return flatObj;
+}
