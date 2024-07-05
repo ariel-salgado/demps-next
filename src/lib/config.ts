@@ -393,6 +393,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.interval',
 				type: 'number',
+				value: 10,
 				placeholder: 'Ingrese el intervalo'
 			}
 		},
@@ -444,6 +445,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.agents-precision',
 				type: 'number',
+				value: 8,
 				placeholder: 'Ingrese la precisión de agentes'
 			}
 		},
