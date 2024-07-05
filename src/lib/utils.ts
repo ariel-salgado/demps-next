@@ -1,4 +1,4 @@
-import type { G } from '$lib/types';
+import type { G, SelectOptions } from '$lib/types';
 import type { ClassValue } from 'clsx';
 import type { Feature, FeatureCollection } from 'geojson';
 
@@ -152,4 +152,8 @@ export function deflattenJSON(obj: object) {
 		},
 		{} as Record<string, unknown>
 	);
+}
+
+export function arrayToSelectOptions(array: string[]): SelectOptions {
+	return array.map((value) => ({ value: value, label: value }));
 }
