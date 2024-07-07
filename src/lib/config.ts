@@ -323,14 +323,12 @@ export const parametersFormFields = {
 		{
 			label: 'Base Dir Sim',
 			description: 'Directorio base de la simulación',
-			type: 'select',
-			// The options are filled before rendering the form.
-			options: [],
+			type: 'input',
 			attributes: {
-				name: 'baseDirSim'
-				// type: 'text',
-				// value: '/home/demps-user/sim',
-				// placeholder: 'Ingrese el directorio base de la simulación'
+				name: 'baseDirSim',
+				type: 'text',
+				value: '/home/demps-user/sim',
+				placeholder: 'Ingrese el directorio base de la simulación'
 			}
 		}
 	],
