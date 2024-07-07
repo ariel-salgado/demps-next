@@ -1,9 +1,11 @@
-import type { G, SelectOptions } from '$lib/types';
 import type { ClassValue } from 'clsx';
+import type { Action } from 'svelte/action';
+import type { FormField, FormSchema, G, SelectOptions } from '$lib/types';
 import type { Feature, FeatureCollection } from 'geojson';
 
 // Others
 import { clsx } from 'clsx';
+import { on } from 'svelte/events';
 import { twMerge } from 'tailwind-merge';
 import { browser } from '$app/environment';
 
@@ -156,4 +158,78 @@ export function deflattenJSON(obj: object) {
 
 export function arrayToSelectOptions(array: string[]): SelectOptions {
 	return array.map((value) => ({ value: value, label: value }));
+}
+
+export function getPathUpTo(fullPath: string, dir: string) {
+	const segments = fullPath.split('/');
+	const targetIndex = segments.indexOf(dir);
+
+	if (targetIndex === -1) {
+		return null;
+	}
+
+	return segments.slice(0, targetIndex + 1).join('/');
+}
+
+export function joinPath(path1: string, path2: string) {
+	const segments1 = path1.split('/').filter(Boolean);
+	const segments2 = path2.split('/').filter(Boolean);
+
+	for (const segment of segments2) {
+		if (segment === '..') {
+			if (segments1.length > 0) {
+				segments1.pop();
+			}
+		} else if (segment !== '.') {
+			segments1.push(segment);
+		}
+	}
+
+	return '/' + segments1.join('/');
+}
+
+export const clickOutside: Action<HTMLElement, () => void> = (node, callback) => {
+	const onClick = on(node.parentElement as HTMLElement, 'click', ({ target }) => {
+		if (!node.contains(target as Node)) {
+			callback();
+		}
+	});
+
+	return {
+		destroy() {
+			onClick();
+		}
+	};
+};
+
+export function extractDefaultValues(schema: FormSchema): Record<string, any> {
+	const defaultValues: Record<string, any> = {};
+
+	function processField(field: FormField) {
+		const name = 'name' in field.attributes ? field.attributes.name : undefined;
+		if (!name) return;
+
+		if (field.type === 'input' && 'value' in field.attributes) {
+			defaultValues[name] = field.attributes.value;
+		} else if (field.type === 'select') {
+			const selectedOption = field.options.find((option) => option.selected);
+			if (selectedOption) {
+				defaultValues[name] = selectedOption.value;
+			}
+		}
+	}
+
+	function processFields(fields: FormField[] | Record<string, FormField[]>) {
+		if (Array.isArray(fields)) {
+			fields.forEach((field) => processField(field));
+		} else {
+			Object.values(fields)
+				.flat()
+				.forEach((field) => processField(field));
+		}
+	}
+
+	Object.values(schema).forEach((fields) => processFields(fields));
+
+	return defaultValues;
 }
