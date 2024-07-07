@@ -48,9 +48,8 @@ export const POST = (async () => {
 						emit('status', 'ready');
 					});
 
-					fileWatcher.on('add', async (path) => {
+					fileWatcher.on('add', (path) => {
 						fileProcessor.push(path);
-						await fileProcessor.process();
 					});
 				}
 			});
