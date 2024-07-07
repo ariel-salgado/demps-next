@@ -3,6 +3,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { FormField, FormSchema, ParametersSchema } from '$lib/types';
 
+	import { on } from 'svelte/events';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -10,8 +11,9 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
+	import { Explorer } from '$lib/components/file-explorer';
 	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
-	import { FormGroup, Label, Input, Select, Description, Button } from '$lib/components/ui';
+	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
 
 	interface Props {
 		data: PageData;
@@ -19,21 +21,24 @@
 
 	let { data }: Props = $props();
 
+	const { baseDir, directoryTree } = data;
+
+	let showDialog: boolean = $state(false);
 	let files: FileList | null = $state(null);
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
+	let selectedPath: string = $state('');
 	let form: HTMLFormElement | undefined = $state();
 
-	$effect.pre(() => {
-		parametersFormFields.general.forEach((field) => {
-			if (field.attributes.name === 'baseDirSim') {
-				// @ts-expect-error - This assignment is valid
-				field.options = data.baseDirSimOptions;
-			}
-		});
+	$effect(() => {
+		if (selectedPath === '') return;
+
+		parameters.value['baseDirSim'] = selectedPath;
 	});
 
 	onMount(() => {
+		attachDialog();
+
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const entry of entries) {
@@ -138,12 +143,46 @@
 		data.output.directory = `output/${data.output.directory}`;
 		return data;
 	}
+
+	function attachDialog() {
+		const baseDirSim = document.querySelector('input[name="baseDirSim"]') as HTMLInputElement;
+
+		const onClick = on(baseDirSim, 'click', () => {
+			showDialog = true;
+		});
+
+		const onFocus = on(baseDirSim, 'focus', () => {
+			showDialog = true;
+		});
+
+		return () => {
+			onClick();
+			onFocus();
+		};
+	}
+
+	function onPathSelected() {
+		setTimeout(() => {
+			showDialog = false;
+		}, 300);
+	}
 </script>
 
 <svelte:head>
 	<title>DEMPS | Parametros</title>
 	<meta name="description" content="Configuración de parámetros" />
 </svelte:head>
+
+<Dialog bind:show={showDialog}>
+	<Explorer
+		{baseDir}
+		{directoryTree}
+		folderAction="?/getDirectories"
+		deleteAction="?/deleteDirectory"
+		bind:selectedPath
+		onSelect={onPathSelected}
+	/>
+</Dialog>
 
 <section class="grid grid-cols-[20rem_1fr] divide-x divide-slate-300">
 	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-1 flex-col justify-between p-10">
@@ -251,9 +290,9 @@
 		{#if field.type === 'input'}
 			<Input
 				id={field.attributes.name}
-				bind:value={parameters.value[field.attributes.name! as keyof ParametersSchema]}
 				{...field.attributes}
 				validation={field.validation}
+				bind:value={parameters.value[field.attributes.name! as keyof ParametersSchema]}
 			/>
 		{:else if field.type === 'select'}
 			<Select

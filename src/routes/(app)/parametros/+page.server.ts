@@ -1,26 +1,20 @@
 import type { Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
+import { joinPath } from '$lib/utils';
 import { getValidationSchema } from '$lib/config';
-import { arrayToSelectOptions } from '$lib/utils';
-import { getDirectories } from '$lib/server/utils';
 import { DEMPS_BASE_DIR } from '$env/static/private';
+import {
+	createDirectory,
+	deleteDirectory,
+	directoryExists,
+	getDirectories
+} from '$lib/server/utils';
 
 export const prerender = false;
 
 export const load = (async () => {
-	const availableDirectories = getDirectories(DEMPS_BASE_DIR) as string[];
-	let baseDirSimOptions = arrayToSelectOptions(availableDirectories);
-
-	// Swap indexes so '/home/demps-user/sim' is the first option
-	const simIndex = baseDirSimOptions.findIndex((option) => option.value === '/home/demps-user/sim');
-
-	if (simIndex !== -1) {
-		const simOption = baseDirSimOptions.splice(simIndex, 1)[0];
-		baseDirSimOptions = [simOption, ...baseDirSimOptions];
-	}
-
-	return { baseDirSimOptions };
+	return { baseDir: DEMPS_BASE_DIR, directoryTree: getDirectories(DEMPS_BASE_DIR) };
 }) satisfies PageServerLoad;
 
 export const actions = {
@@ -38,5 +32,58 @@ export const actions = {
 		}
 
 		return formData;
+	},
+	getDirectories: async ({ request }) => {
+		const formData = await request.formData();
+		const directory = formData.get('directory') as string;
+
+		if (!directory) {
+			return { errorMessage: 'Error al enviar la información al servidor.' };
+		}
+
+		if (!directoryExists(directory)) {
+			return { errorMessage: 'El directorio no existe.' };
+		}
+
+		return { currentDirectory: directory, directoryTree: getDirectories(directory) };
+	},
+	createDirectory: async ({ request }) => {
+		const formData = await request.formData();
+		const directory = formData.get('directory') as string;
+		const currentDirectory = formData.get('currentDirectory') as string;
+
+		if (!directory || !currentDirectory) {
+			return { errorMessage: 'Error al enviar la información al servidor.' };
+		}
+
+		const newDirectory = joinPath(currentDirectory, directory);
+
+		if (directoryExists(newDirectory)) {
+			return { errorMessage: 'El directorio ya existe.' };
+		}
+
+		createDirectory(newDirectory);
+
+		return { directoryTree: getDirectories(currentDirectory) };
+	},
+	deleteDirectory: async ({ request }) => {
+		const formData = await request.formData();
+		const toDelete = formData.get('delete') as string;
+
+		if (!toDelete) {
+			return { errorMessage: 'Error al enviar la información al servidor.' };
+		}
+
+		if (!directoryExists(toDelete)) {
+			return { errorMessage: 'El directorio no existe.' };
+		}
+
+		const res = deleteDirectory(toDelete);
+
+		if (!res) {
+			return { errorMessage: 'Error al eliminar el directorio.' };
+		}
+
+		return { deleted: toDelete };
 	}
 } satisfies Actions;
