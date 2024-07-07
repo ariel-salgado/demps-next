@@ -76,6 +76,7 @@
 	});
 
 	// TODO: Maybe can edit the layer directly ?
+	// TODO: Prevent popup open on edit. It bugs the popup and won't open again.
 	featureGroup.on('pm:edit', ({ layer }) => {
 		const feature = geometryToGeoJSON(layer) as Feature<G>;
 		const { id, geometry } = feature;
