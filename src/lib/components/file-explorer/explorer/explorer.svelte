@@ -13,7 +13,7 @@
 		directoryTree: string[];
 		folderAction: string;
 		deleteAction: string;
-		selectedPath?: string;
+		selectedPath: string;
 		onSelect?: () => void;
 	}
 
@@ -114,10 +114,7 @@
 
 	function handleSelect(path: string) {
 		selecting = true;
-
-		if (selectedPath) {
-			selectedPath = path;
-		}
+		selectedPath = path;
 
 		if (onSelect) {
 			onSelect();
