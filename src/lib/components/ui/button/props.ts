@@ -13,6 +13,8 @@ const variantLink = 'text-slate-700 underline-offset-4 hover:underline';
 // Style by size
 const sizeDefault = 'h-9 px-4 py-2 text-sm';
 
+const sizeSmall = 'h-7 px-3 py-1 text-xs';
+
 const sizeIcon = 'size-8 p-1.5 shadow-sm';
 
 // Exports
@@ -24,6 +26,7 @@ const variants = {
 
 const sizes = {
 	default: sizeDefault,
+	sm: sizeSmall,
 	icon: sizeIcon
 };
 
