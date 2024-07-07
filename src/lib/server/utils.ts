@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, rm, statSync } from 'node:fs';
 
 export function directoryExists(path: string) {
 	return existsSync(path) && statSync(path).isDirectory();
@@ -36,4 +36,23 @@ export function getDirectoryTree(path: string) {
 
 	traverseDir(path);
 	return folders;
+}
+
+export function createDirectory(path: string) {
+	return existsSync(path) || mkdirSync(path);
+}
+
+export function deleteDirectory(path: string) {
+	if (!directoryExists(path)) {
+		return false;
+	}
+
+	rm(path, { recursive: true, force: false }, (error) => {
+		if (error) {
+			console.error(error);
+			return false;
+		}
+	});
+
+	return true;
 }
