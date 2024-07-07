@@ -81,6 +81,7 @@
 
 					if (Object.keys(data).every((element) => fieldNames.includes(element))) {
 						parameters.value = data;
+						selectedPath = data.baseDirSim as string;
 						toast.success('Configuración cargada correctamente');
 					} else {
 						toast.error('Archivo de configuración inválido');
