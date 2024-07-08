@@ -21,7 +21,8 @@
 
 	let { data }: Props = $props();
 
-	const { baseDir, directoryTree } = data;
+	let baseDir: string = $state(data.baseDir);
+	let directoryTree: string[] = $state(data.directoryTree);
 
 	let showDialog: boolean = $state(false);
 	let files: FileList | null = $state(null);
@@ -176,8 +177,8 @@
 
 <Dialog bind:show={showDialog}>
 	<Explorer
-		{baseDir}
-		{directoryTree}
+		bind:baseDir
+		bind:directoryTree
 		folderAction="?/getDirectories"
 		deleteAction="?/deleteDirectory"
 		bind:selectedPath

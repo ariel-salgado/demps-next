@@ -18,8 +18,8 @@
 	}
 
 	let {
-		baseDir,
-		directoryTree,
+		baseDir = $bindable(),
+		directoryTree = $bindable(),
 		folderAction,
 		deleteAction,
 		selectedPath = $bindable(),
