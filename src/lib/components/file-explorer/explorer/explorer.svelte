@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SubmitFunction } from '@sveltejs/kit';
 
+	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { joinPath } from '$lib/utils';
@@ -9,8 +10,7 @@
 	import { Folder, FolderPlus, CornerUpLeft, Circle, CircleCheckBig, Trash2 } from 'lucide-svelte';
 
 	interface Props {
-		baseDir: string;
-		directoryTree: string[];
+		currentDirectory: string;
 		folderAction: string;
 		deleteAction: string;
 		selectedPath: string;
@@ -18,16 +18,44 @@
 	}
 
 	let {
-		baseDir = $bindable(),
-		directoryTree = $bindable(),
+		currentDirectory = $bindable(),
 		folderAction,
 		deleteAction,
 		selectedPath = $bindable(),
 		onSelect
 	}: Props = $props();
 
-	let selecting: boolean = $state(false);
-	let currentDirectory: string = $state(baseDir);
+	let selected: string = $state(selectedPath);
+	let initForm: HTMLButtonElement | undefined = $state();
+
+	let directoryTree: string[] = $state([]);
+
+	onMount(() => {
+		initForm?.click();
+	});
+
+	const handleInit: SubmitFunction = async () => {
+		return async ({ result }) => {
+			if (result.type !== 'success' || !result.data) {
+				toast.error('Error', {
+					description: 'Ocurrió un error al conectar con el servidor.'
+				});
+				return;
+			}
+
+			if ('errorMessage' in result.data) {
+				toast.error('Error', {
+					description: result.data.errorMessage
+				});
+				return;
+			}
+
+			if ('directoryTree' in result.data) {
+				directoryTree = result.data.directoryTree;
+				return;
+			}
+		};
+	};
 
 	const handleSubmit: SubmitFunction = async () => {
 		return async ({ result }) => {
@@ -113,18 +141,19 @@
 	}
 
 	function handleSelect(path: string) {
-		selecting = true;
+		currentDirectory = path;
 		selectedPath = path;
 
 		if (onSelect) {
 			onSelect();
 		}
-
-		setTimeout(() => {
-			selecting = false;
-		}, 1000);
 	}
 </script>
+
+<form class="hidden" method="POST" action={folderAction} use:enhance={handleInit}>
+	<input type="hidden" name="directory" value={currentDirectory} />
+	<button type="submit" class="hidden" bind:this={initForm}></button>
+</form>
 
 <div class="size-full bg-white p-6">
 	<h2 class="text-3xl font-bold leading-normal">Seleccionar directorio</h2>
@@ -146,7 +175,7 @@
 	</div>
 
 	<div class="divide-y divide-slate-300 overflow-scroll rounded-xl border border-slate-300">
-		{#if currentDirectory.length > baseDir.length}
+		{#if currentDirectory.split('/').length > 2}
 			{@const folder = '..'}
 			<form
 				class="flex h-10 items-center px-4 transition-colors hover:bg-slate-50"
@@ -186,7 +215,7 @@
 							size="sm"
 							onclick={() => handleSelect(joinPath(currentDirectory, folder))}
 						>
-							{#if !selecting}
+							{#if folder !== selected}
 								<Circle class="mr-1.5 size-4" />
 							{:else}
 								<CircleCheckBig class="mr-1.5 size-4" />

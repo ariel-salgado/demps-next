@@ -21,8 +21,9 @@
 
 	let { data }: Props = $props();
 
-	let baseDir: string = $state(data.baseDir);
-	let directoryTree: string[] = $state(data.directoryTree);
+	let currentDirectory: string = $state(
+		data.baseDir !== parameters.value.baseDirSim ? parameters.value.baseDirSim : data.baseDir
+	) as string;
 
 	let showDialog: boolean = $state(false);
 	let files: FileList | null = $state(null);
@@ -175,12 +176,9 @@
 	<meta name="description" content="Configuración de parámetros" />
 </svelte:head>
 
-<!-- TODO: Directory tree should show the actual tree of the value on load -->
-<!-- TODO: Update breadcrumb to keep in sync with directory path -->
 <Dialog bind:show={showDialog}>
 	<Explorer
-		bind:baseDir
-		bind:directoryTree
+		bind:currentDirectory
 		folderAction="?/getDirectories"
 		deleteAction="?/deleteDirectory"
 		bind:selectedPath

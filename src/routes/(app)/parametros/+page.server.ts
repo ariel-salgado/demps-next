@@ -14,7 +14,7 @@ import {
 export const prerender = false;
 
 export const load = (async () => {
-	return { baseDir: DEMPS_BASE_DIR, directoryTree: getDirectories(DEMPS_BASE_DIR) };
+	return { baseDir: DEMPS_BASE_DIR };
 }) satisfies PageServerLoad;
 
 export const actions = {
