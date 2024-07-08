@@ -37,7 +37,8 @@
 </script>
 
 <div class="flex items-center gap-x-2 py-1.5 px-4">
-	{#each currentDirectory.split('/') as dir, i}
+	<span class="text-slate-500">/</span>
+	{#each currentDirectory.split('/') as dir}
 		{#if dir}
 			<form method="POST" action={formAction} use:enhance={handleSubmit}>
 				<input type="hidden" name="directory" value={getPathUpTo(currentDirectory, dir)} />
@@ -48,10 +49,7 @@
 				>
 					{dir}
 				</Button>
-
-				{#if i !== 0}
-					<span class="text-slate-500">/</span>
-				{/if}
+				<span class="text-slate-500">/</span>
 			</form>
 		{/if}
 	{/each}
