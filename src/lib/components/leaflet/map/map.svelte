@@ -162,7 +162,7 @@
 		if (bounds.isValid()) {
 			map.fitBounds(bounds, {
 				animate: true,
-				padding: [100, 100]
+				padding: [150, 150]
 			});
 		}
 	}
