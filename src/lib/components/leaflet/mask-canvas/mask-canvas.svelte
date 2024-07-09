@@ -13,6 +13,8 @@
 
 	const { map } = getContext<MapContext>(contextKey);
 
+	// TODO:Improve performance and memory usage
+
 	let mounted: boolean = $state(false);
 	let layerGroup: LayerGroup<TileLayer> = $state(window.L.layerGroup());
 
