@@ -25,7 +25,6 @@
 		onSelect
 	}: Props = $props();
 
-	let selected: string = $state(selectedPath);
 	let initForm: HTMLButtonElement | undefined = $state();
 
 	let directoryTree: string[] = $state([]);
@@ -215,12 +214,13 @@
 							size="sm"
 							onclick={() => handleSelect(joinPath(currentDirectory, folder))}
 						>
-							{#if folder !== selected}
-								<Circle class="mr-1.5 size-4" />
-							{:else}
+							{#if selectedPath === joinPath(currentDirectory, folder)}
 								<CircleCheckBig class="mr-1.5 size-4" />
+								<span>Seleccionado</span>
+							{:else}
+								<Circle class="mr-1.5 size-4" />
+								<span>Seleccionar</span>
 							{/if}
-							<span>Seleccionar</span>
 						</Button>
 					</div>
 					<form method="POST" use:enhance={handleDelete}>

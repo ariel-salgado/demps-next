@@ -21,20 +21,19 @@
 
 	let { data }: Props = $props();
 
-	let currentDirectory: string = $state(
+	const baseDirInitValue = (
 		data.baseDir !== parameters.value.baseDirSim ? parameters.value.baseDirSim : data.baseDir
 	) as string;
 
 	let showDialog: boolean = $state(false);
+	let form: HTMLFormElement | undefined = $state();
+	let selectedPath: string = $state(baseDirInitValue);
+	let currentDirectory: string = $state(baseDirInitValue);
+
 	let files: FileList | null = $state(null);
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
-	let selectedPath: string = $state('');
-	let form: HTMLFormElement | undefined = $state();
-
 	$effect(() => {
-		if (selectedPath === '') return;
-
 		parameters.value['baseDirSim'] = selectedPath;
 	});
 
