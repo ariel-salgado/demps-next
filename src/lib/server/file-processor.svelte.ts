@@ -3,6 +3,7 @@ import { createInterface } from 'node:readline';
 
 export function createFileProcessor(emitter: (data: string) => void) {
 	const fileQueue: string[] = $state([]);
+
 	let isProcessing: boolean = $state(false);
 
 	function push(path: string) {
@@ -24,13 +25,32 @@ export function createFileProcessor(emitter: (data: string) => void) {
 		const path = fileQueue.shift()!;
 
 		try {
-			// console.time('readFile');
+			const data: string[] = [];
 
-			const data = await readFile(path);
+			const readInterface = createInterface({
+				input: createReadStream(path),
+				terminal: false
+			});
 
-			// console.timeEnd('readFile');
+			let firstLineSkipped = false;
 
-			emit(data);
+			for await (const line of readInterface) {
+				if (!firstLineSkipped) {
+					firstLineSkipped = true;
+					continue;
+				}
+
+				const splitted = line.split(' ');
+
+				const lat = splitted.at(1);
+				const lng = splitted.at(2);
+
+				data.push(lat + ',' + lng + '$');
+			}
+
+			readInterface.close();
+
+			emit(data.join(''));
 		} catch (error) {
 			console.error(`Error reading file ${path}:`, error);
 		} finally {
@@ -42,21 +62,4 @@ export function createFileProcessor(emitter: (data: string) => void) {
 	return {
 		push
 	};
-}
-
-async function readFile(path: string) {
-	const data: string[] = [];
-
-	const readInterface = createInterface({
-		input: createReadStream(path),
-		output: process.stdout,
-		terminal: false
-	});
-
-	for await (const line of readInterface) {
-		const [, lat, lng] = line.split(' ');
-		data.push(`${lat},${lng}`);
-	}
-
-	return data.join('\n');
 }

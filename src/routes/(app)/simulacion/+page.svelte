@@ -20,7 +20,7 @@
 		if ($status === 'ready') {
 			onProgress = true;
 			toast.loading('Iniciando simulación...', {
-				duration: 10000,
+				duration: 20000,
 				description: 'Esperando datos de los agentes. Por favor, espere...'
 			});
 		}
@@ -47,7 +47,7 @@
 	$effect(() => {
 		if (onProgress) {
 			coordinates = connection?.select('agents').transform((data) => {
-				const coordinates = data.split('\n').map((coord) => coord.split(',').map(Number));
+				const coordinates = data.split('$').map((coord) => coord.split(',').map(Number));
 				return coordinates;
 			});
 		}
