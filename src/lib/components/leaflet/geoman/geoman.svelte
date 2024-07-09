@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { G } from '$lib/types';
-	import type { Layer } from 'leaflet';
+	import type { Layer, Path } from 'leaflet';
 	import type { Feature } from 'geojson';
 	import type { MapContext } from '$lib/components/leaflet';
 
@@ -75,8 +75,6 @@
 		environment.addFeature(featureGeoJSON!, id);
 	});
 
-	// TODO: Maybe can edit the layer directly ?
-	// TODO: Prevent popup open on edit. It bugs the popup and won't open again.
 	featureGroup.on('pm:edit', ({ layer }) => {
 		const feature = geometryToGeoJSON(layer) as Feature<G>;
 		const { id, geometry } = feature;
@@ -93,7 +91,18 @@
 		overlayLayer.removeLayer(layer);
 
 		const editedLayer = geoJSONToGeometry(editedFeature);
+
+		(editedLayer as Path).setStyle(layer.options);
+
 		Object.defineProperty(editedLayer, 'id', { value: id, writable: false });
+
+		const popup = createPopup(geometryToGeoJSON(editedLayer) as Feature<G>);
+
+		attachPopupEvents(popup, (popupForm) => {
+			updateFeatureProperties(popupForm, featureGroup);
+		});
+
+		editedLayer.bindPopup(popup);
 
 		featureGroup.addLayer(editedLayer);
 		overlayLayer.addOverlay(editedLayer, id as string);
@@ -105,5 +114,15 @@
 
 		// @ts-expect-error - id is an added property
 		environment.removeFeature(layer.id);
+	});
+
+	featureGroup.on('pm:dragstart', ({ layer }) => {
+		layer.removeEventListener('click');
+	});
+
+	featureGroup.on('pm:dragend', ({ layer }) => {
+		layer.addEventListener('click', () => {
+			layer.openPopup();
+		});
 	});
 </script>
