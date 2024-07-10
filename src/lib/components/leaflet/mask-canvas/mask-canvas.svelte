@@ -7,13 +7,13 @@
 
 	interface Props {
 		coordinates: [number, number][];
+		color: string;
+		lineColor: string;
 	}
 
-	let { coordinates }: Props = $props();
+	let { coordinates, color, lineColor }: Props = $props();
 
 	const { map } = getContext<MapContext>(contextKey);
-
-	// TODO:Improve performance and memory usage
 
 	let mounted: boolean = $state(false);
 	let layerGroup: LayerGroup<TileLayer> = $state(window.L.layerGroup());
@@ -26,7 +26,7 @@
 	});
 
 	onMount(async () => {
-		// @ts-expect-error - maskCanvas is not recognized
+		// @ts-expect-error - maskCanvas is not typed
 		await import('leaflet-maskcanvas');
 
 		map.addLayer(layerGroup);
@@ -37,20 +37,20 @@
 	});
 
 	onDestroy(() => {
-		layerGroup.clearLayers();
-		map.removeLayer(layerGroup);
 		mounted = false;
+		map.removeLayer(layerGroup);
+		layerGroup.clearLayers();
 	});
 
 	function createMaskLayer(coordinates: [number, number][], initialOpacity: number = 0) {
-		// @ts-expect-error - maskCanvas is not recognized
+		// @ts-expect-error - maskCanvas is not typed
 		const maskLayer = window.L.TileLayer.maskCanvas({
 			radius: 1,
-			useAbsoluteRadius: true,
-			color: '#7E4BB9',
-			opacity: initialOpacity,
 			noMask: true,
-			lineColor: '#6A3D9E'
+			useAbsoluteRadius: true,
+			color: color,
+			lineColor: lineColor,
+			opacity: initialOpacity
 		});
 
 		maskLayer.setData(coordinates);
@@ -61,16 +61,18 @@
 	}
 
 	function toggleLayers() {
-		if (layerGroup.getLayers().length > 1) {
-			setTimeout(() => {
-				const oldLayer = layerGroup.getLayers()[0] as TileLayer;
-				const newLayer = layerGroup.getLayers()[1] as TileLayer;
+		const layers = layerGroup.getLayers();
 
-				oldLayer.setOpacity(0);
-				newLayer.setOpacity(1);
+		if (layers.length <= 1) return;
 
-				layerGroup.removeLayer(oldLayer);
-			}, 150);
-		}
+		// Remove old layer with a delay to prevent flickering
+		setTimeout(() => {
+			const [oldLayer, newLayer] = layers as [TileLayer, TileLayer];
+
+			oldLayer.setOpacity(0);
+			newLayer.setOpacity(1);
+
+			layerGroup.removeLayer(oldLayer);
+		}, 160);
 	}
 </script>
