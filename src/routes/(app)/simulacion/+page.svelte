@@ -100,7 +100,12 @@
 				{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
 					<svelte:component this={Map.default}>
 						{#if $coordinates}
-							<svelte:component this={Canvas.default} coordinates={$coordinates} />
+							<svelte:component
+								this={Canvas.default}
+								coordinates={$coordinates}
+								color={'#7E4BB9'}
+								lineColor={'#6A3D9E'}
+							/>
 						{/if}
 					</svelte:component>
 				{/await}
