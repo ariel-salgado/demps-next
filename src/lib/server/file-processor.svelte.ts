@@ -45,7 +45,9 @@ export function createFileProcessor(emitter: (data: string) => void) {
 				const lat = splitted.at(1);
 				const lng = splitted.at(2);
 
-				data.push(lat + ',' + lng + '$');
+				if (lat && lng) {
+					data.push(lat + ',' + lng + '$');
+				}
 			}
 
 			readInterface.close();
