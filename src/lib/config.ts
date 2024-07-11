@@ -327,7 +327,7 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'baseDirSim',
 				type: 'text',
-				value: '/home/demps-user/sim',
+				value: '/home/demps-user/sim/',
 				placeholder: 'Ingrese el directorio base de la simulación'
 			}
 		}
