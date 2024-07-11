@@ -123,7 +123,7 @@
 			}
 
 			const parsedData = deflattenJSON(result.data) as ParametersSchema;
-			const data = JSON.stringify(addInputOutputPrefixes(parsedData), null, 2);
+			const data = JSON.stringify(addInputOutputPrefixes(parsedData), null, '\t');
 
 			const blob = new Blob([data], { type: 'application/json' });
 			const url = URL.createObjectURL(blob);
