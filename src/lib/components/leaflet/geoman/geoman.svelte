@@ -1,21 +1,21 @@
 <script lang="ts">
 	import type { G } from '$lib/types';
-	import type { Layer, Path } from 'leaflet';
 	import type { Feature } from 'geojson';
+	import type { Layer, Path } from 'leaflet';
 	import type { MapContext } from '$lib/components/leaflet';
 
 	import { randomID } from '$lib/utils';
 	import { getContext, onMount } from 'svelte';
-	import { createPopup, contextKey } from '$lib/components/leaflet';
+	import { contextKey } from '$lib/components/leaflet';
 	import {
 		geometryToGeoJSON,
 		geoJSONToGeometry,
 		layerToGeometry,
-		attachPopupEvents,
-		updateFeatureProperties
+		addPopupToLayer
 	} from '$lib/components/leaflet/helpers';
 
-	const { map, environment, featureGroup, overlayLayer } = getContext<MapContext>(contextKey);
+	const { map, environment, featureGroup, overlayLayer, isLayerEditable } =
+		getContext<MapContext>(contextKey);
 
 	onMount(async () => {
 		if (!map.pm) {
@@ -52,27 +52,23 @@
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
 
-		const feature = layerToGeometry(layer);
+		const createdLayer = layerToGeometry(layer);
 
-		if (!feature) return;
+		if (!createdLayer) return;
 
 		const id = randomID();
-		Object.defineProperty(feature, 'id', { value: id, writable: false });
+		Object.defineProperty(createdLayer, 'id', { value: id, writable: false });
 
-		const popup = createPopup(geometryToGeoJSON(feature) as Feature<G>);
+		const createdFeature = geometryToGeoJSON(createdLayer) as Feature<G>;
 
-		attachPopupEvents(popup, (popupForm) => {
-			updateFeatureProperties(popupForm, featureGroup);
-		});
+		if (isLayerEditable) {
+			addPopupToLayer(createdLayer, createdFeature, featureGroup);
+		}
 
-		feature.bindPopup(popup);
+		featureGroup.addLayer(createdLayer);
+		overlayLayer.addOverlay(createdLayer, id);
 
-		featureGroup.addLayer(feature);
-		overlayLayer.addOverlay(feature, id);
-
-		const featureGeoJSON = geometryToGeoJSON(feature);
-
-		environment.addFeature(featureGeoJSON!, id);
+		environment.addFeature(createdFeature, id);
 	});
 
 	featureGroup.on('pm:edit', ({ layer }) => {
@@ -96,13 +92,9 @@
 
 		Object.defineProperty(editedLayer, 'id', { value: id, writable: false });
 
-		const popup = createPopup(geometryToGeoJSON(editedLayer) as Feature<G>);
-
-		attachPopupEvents(popup, (popupForm) => {
-			updateFeatureProperties(popupForm, featureGroup);
-		});
-
-		editedLayer.bindPopup(popup);
+		if (isLayerEditable) {
+			addPopupToLayer(editedLayer, editedFeature, featureGroup);
+		}
 
 		featureGroup.addLayer(editedLayer);
 		overlayLayer.addOverlay(editedLayer, id as string);

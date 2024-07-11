@@ -9,12 +9,11 @@
 	import { cn } from '$lib/utils';
 	import { setContext } from 'svelte';
 	import { LoaderCircle } from 'lucide-svelte';
-	import { contextKey, createPopup } from '$lib/components/leaflet';
+	import { contextKey } from '$lib/components/leaflet';
 	import {
-		attachPopupEvents,
+		addPopupToLayer,
 		geoJSONToGeometry,
-		getStylesFromFeature,
-		updateFeatureProperties
+		getStylesFromFeature
 	} from '$lib/components/leaflet/helpers';
 
 	type Parameters = Environment | undefined;
@@ -26,6 +25,7 @@
 		center?: [number, number];
 		environment?: Environment;
 		reload?: boolean;
+		isLayerEditable?: boolean;
 	}
 
 	let {
@@ -34,6 +34,7 @@
 		center = [-33.015348, -71.550002],
 		environment,
 		reload = $bindable(),
+		isLayerEditable,
 		class: className,
 		...rest
 	}: Props = $props();
@@ -61,6 +62,9 @@
 		},
 		get overlayLayer() {
 			return overlayLayer;
+		},
+		get isLayerEditable() {
+			return isLayerEditable;
 		}
 	});
 
@@ -129,13 +133,9 @@
 
 		Object.defineProperty(layer, 'id', { value: feature.id, writable: false });
 
-		const popup = createPopup(feature);
-
-		attachPopupEvents(popup, (popupForm) => {
-			updateFeatureProperties(popupForm, featureGroup!);
-		});
-
-		layer.bindPopup(popup);
+		if (isLayerEditable) {
+			addPopupToLayer(layer, feature, featureGroup!);
+		}
 
 		featureGroup?.addLayer(layer);
 		overlayLayer?.addOverlay(layer, nameID || feature.id);

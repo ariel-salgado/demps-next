@@ -26,7 +26,7 @@
 <section class="size-full">
 	<SplitView>
 		{#snippet left()}
-			<Map {environment} bind:reload>
+			<Map {environment} bind:reload isLayerEditable>
 				<Geoman />
 				<Geosearch />
 				<ToggleLayers />

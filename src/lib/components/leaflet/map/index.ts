@@ -9,6 +9,7 @@ type MapContext = {
 	environment: Environment;
 	featureGroup: FeatureGroup;
 	overlayLayer: Control.Layers;
+	isLayerEditable: boolean;
 };
 
 export type { MapContext };
