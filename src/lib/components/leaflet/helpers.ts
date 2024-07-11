@@ -1,7 +1,8 @@
 import type { G } from '$lib/types';
 import type { Feature, GeoJsonProperties } from 'geojson';
-import type { Circle, FeatureGroup, Layer, PathOptions, Polygon, Popup } from 'leaflet';
+import type { Circle, FeatureGroup, Layer, Path, PathOptions, Polygon, Popup } from 'leaflet';
 
+import { createPopup } from './popup';
 import { environment } from '$lib/states';
 
 export function parseGeoJSONStyle(properties: GeoJsonProperties) {
@@ -128,4 +129,14 @@ function updateLayerStyle(id: string, featureGroup: FeatureGroup) {
 
 	layer.setStyle(getStylesFromFeature(feature));
 	layer.redraw();
+}
+
+export function addPopupToLayer(layer: Layer, feature: Feature, featureGroup: FeatureGroup) {
+	const popup = createPopup(feature);
+
+	attachPopupEvents(popup, (popupForm) => {
+		updateFeatureProperties(popupForm, featureGroup!);
+	});
+
+	layer.bindPopup(popup);
 }
