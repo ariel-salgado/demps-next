@@ -174,7 +174,7 @@
 	</div>
 
 	<div class="divide-y divide-slate-300 overflow-scroll rounded-xl border border-slate-300">
-		{#if currentDirectory.split('/').length > 2}
+		{#if currentDirectory.split('/').length > 3}
 			{@const folder = '..'}
 			<form
 				class="flex h-10 items-center px-4 transition-colors hover:bg-slate-50"

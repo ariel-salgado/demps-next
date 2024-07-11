@@ -185,7 +185,9 @@ export function joinPath(path1: string, path2: string) {
 		}
 	}
 
-	return '/' + segments1.join('/');
+	const path = segments1.join('/');
+
+	return '/' + path + (path.endsWith('/') ? '' : '/');
 }
 
 export const clickOutside: Action<HTMLElement, () => void> = (node, callback) => {
