@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
 	plugins: [sveltekit(), tailwindcss()],
 	server: {
-		hmr: false,
+		hmr: true,
 		host: '0.0.0.0'
 	},
 	build: {
