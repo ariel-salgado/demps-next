@@ -4,7 +4,7 @@ import type { ChildProcess } from 'child_process';
 import { join } from 'node:path';
 import { execFile } from 'child_process';
 import { uniquePool } from '$lib/states';
-import { directoryExists } from './utils';
+import { isDirectory } from './utils';
 import { DEMPS_SIM_DIR } from '$env/static/private';
 
 import treeKill from 'tree-kill';
@@ -17,7 +17,7 @@ export function createDempsProcess() {
 
 	async function run(): Promise<void> {
 		return new Promise((resolve, reject) => {
-			if (!directoryExists(DEMPS_SIM_DIR)) {
+			if (!isDirectory(DEMPS_SIM_DIR)) {
 				reject(new Error('Simulator directory does not exist'));
 			}
 
