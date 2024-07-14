@@ -124,14 +124,14 @@ importers:
         specifier: ^0.408.0
         version: 0.408.0(svelte@5.0.0-next.182)
       prettier:
-        specifier: ^3.3.2
-        version: 3.3.2
+        specifier: ^3.3.3
+        version: 3.3.3
       prettier-plugin-svelte:
         specifier: ^3.2.5
-        version: 3.2.5(prettier@3.3.2)(svelte@5.0.0-next.182)
+        version: 3.2.5(prettier@3.3.3)(svelte@5.0.0-next.182)
       prettier-plugin-tailwindcss:
         specifier: ^0.6.5
-        version: 0.6.5(prettier-plugin-svelte@3.2.5(prettier@3.3.2)(svelte@5.0.0-next.182))(prettier@3.3.2)
+        version: 0.6.5(prettier-plugin-svelte@3.2.5(prettier@3.3.3)(svelte@5.0.0-next.182))(prettier@3.3.3)
       svelte:
         specifier: 5.0.0-next.182
         version: 5.0.0-next.182
@@ -139,8 +139,8 @@ importers:
         specifier: ^3.8.4
         version: 3.8.4(postcss-load-config@3.1.4(postcss@8.4.39))(postcss@8.4.39)(svelte@5.0.0-next.182)
       svelte-sonner:
-        specifier: ^0.3.25
-        version: 0.3.25(svelte@5.0.0-next.182)
+        specifier: ^0.3.27
+        version: 0.3.27(svelte@5.0.0-next.182)
       sveltekit-sse:
         specifier: ^0.13.2
         version: 0.13.2(@microsoft/fetch-event-source@2.0.1)(@sveltejs/kit@2.5.18(@sveltejs/vite-plugin-svelte@4.0.0-next.4(svelte@5.0.0-next.182)(vite@5.3.3(@types/node@20.14.10)(lightningcss@1.25.1)(terser@5.31.2)))(svelte@5.0.0-next.182)(vite@5.3.3(@types/node@20.14.10)(lightningcss@1.25.1)(terser@5.31.2)))(svelte@5.0.0-next.182)
@@ -1960,8 +1960,8 @@ packages:
       prettier-plugin-svelte:
         optional: true
 
-  prettier@3.3.2:
-    resolution: {integrity: sha512-rAVeHYMcv8ATV5d508CFdn+8/pHPpXeIid1DdrPwXnaAdH7cqjVbpJaT5eq4yRAFU/lsbwYwSF/n5iNrdJHPQA==}
+  prettier@3.3.3:
+    resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -2210,8 +2210,8 @@ packages:
       typescript:
         optional: true
 
-  svelte-sonner@0.3.25:
-    resolution: {integrity: sha512-jYAHqDc1fBAotI+9g9SW2Pc6sKJ8oVl7aXB/EhQsxiVADAZ9AX4w7dxDI1oyskD6pG8mhYIKXi+5WqFmCRqFyw==}
+  svelte-sonner@0.3.27:
+    resolution: {integrity: sha512-+PvbuePNTyTNCepCWqKcFeu+Lo27yYuwfSc7zJvrWjCRMJrWAmccPg3j7jO1W13QoN3TySXU5Trb956VBQiM5Q==}
     peerDependencies:
       svelte: ^3.0.0 || ^4.0.0 || ^5.0.0-next.1
 
@@ -4201,18 +4201,18 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-svelte@3.2.5(prettier@3.3.2)(svelte@5.0.0-next.182):
+  prettier-plugin-svelte@3.2.5(prettier@3.3.3)(svelte@5.0.0-next.182):
     dependencies:
-      prettier: 3.3.2
+      prettier: 3.3.3
       svelte: 5.0.0-next.182
 
-  prettier-plugin-tailwindcss@0.6.5(prettier-plugin-svelte@3.2.5(prettier@3.3.2)(svelte@5.0.0-next.182))(prettier@3.3.2):
+  prettier-plugin-tailwindcss@0.6.5(prettier-plugin-svelte@3.2.5(prettier@3.3.3)(svelte@5.0.0-next.182))(prettier@3.3.3):
     dependencies:
-      prettier: 3.3.2
+      prettier: 3.3.3
     optionalDependencies:
-      prettier-plugin-svelte: 3.2.5(prettier@3.3.2)(svelte@5.0.0-next.182)
+      prettier-plugin-svelte: 3.2.5(prettier@3.3.3)(svelte@5.0.0-next.182)
 
-  prettier@3.3.2: {}
+  prettier@3.3.3: {}
 
   punycode@2.3.1: {}
 
@@ -4465,7 +4465,7 @@ snapshots:
       postcss-load-config: 3.1.4(postcss@8.4.39)
       typescript: 5.5.3
 
-  svelte-sonner@0.3.25(svelte@5.0.0-next.182):
+  svelte-sonner@0.3.27(svelte@5.0.0-next.182):
     dependencies:
       svelte: 5.0.0-next.182
 
