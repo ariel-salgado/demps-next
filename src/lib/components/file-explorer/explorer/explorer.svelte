@@ -1,237 +1,123 @@
 <script lang="ts">
-	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { FetchDirectoryOptions } from '$lib/types';
 
-	import { onMount } from 'svelte';
-	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { joinPath } from '$lib/utils';
+	import { FolderPlus } from 'lucide-svelte';
 	import { Button, Input } from '$lib/components/ui';
-	import { Breadcrum } from '$lib/components/file-explorer';
-	import { Folder, FolderPlus, CornerUpLeft, Circle, CircleCheckBig, Trash2 } from 'lucide-svelte';
+	import { Breadcrumb, Item } from '$lib/components/file-explorer';
 
-	interface Props {
-		currentDirectory: string;
-		folderAction: string;
-		deleteAction: string;
-		selectedPath: string;
-		onSelect?: () => void;
-	}
+	type Props = {
+		directory: string;
+		selected: string;
+		onSelected?: () => void;
+	} & FetchDirectoryOptions;
 
 	let {
-		currentDirectory = $bindable(),
-		folderAction,
-		deleteAction,
-		selectedPath = $bindable(),
-		onSelect
+		directory = $bindable(),
+		selected = $bindable(),
+		onSelected,
+		includeFiles = true,
+		includeFolders = true,
+		extensions = null
 	}: Props = $props();
 
-	let initForm: HTMLButtonElement | undefined = $state();
+	let files: string[] = $state([]);
+	let folders: string[] = $state([]);
 
-	let directoryTree: string[] = $state([]);
+	let directoryToCreate: string | null = $state(null);
 
-	onMount(() => {
-		initForm?.click();
+	$effect(() => {
+		fetchDirectory(directory, { extensions, includeFiles, includeFolders });
 	});
 
-	const handleInit: SubmitFunction = async () => {
-		return async ({ result }) => {
-			if (result.type !== 'success' || !result.data) {
-				toast.error('Error', {
-					description: 'Ocurrió un error al conectar con el servidor.'
-				});
-				return;
-			}
-
-			if ('errorMessage' in result.data) {
-				toast.error('Error', {
-					description: result.data.errorMessage
-				});
-				return;
-			}
-
-			if ('directoryTree' in result.data) {
-				directoryTree = result.data.directoryTree;
-				return;
-			}
-		};
-	};
-
-	const handleSubmit: SubmitFunction = async () => {
-		return async ({ result }) => {
-			if (result.type !== 'success' || !result.data) {
-				toast.error('Error', {
-					description: 'Ocurrió un error al conectar con el servidor.'
-				});
-				return;
-			}
-
-			if ('errorMessage' in result.data) {
-				toast.error('Error', {
-					description: result.data.errorMessage
-				});
-				return;
-			}
-
-			if ('currentDirectory' in result.data && 'directoryTree' in result.data) {
-				currentDirectory = result.data.currentDirectory;
-				directoryTree = result.data.directoryTree;
-				return;
-			}
-		};
-	};
-
-	const handleCreate: SubmitFunction = async () => {
-		return async ({ result, formElement }) => {
-			if (result.type !== 'success' || !result.data) {
-				toast.error('Error', {
-					description: 'Ocurrió un error al conectar con el servidor.'
-				});
-				return;
-			}
-
-			if ('errorMessage' in result.data) {
-				toast.error('Error', {
-					description: result.data.errorMessage
-				});
-				return;
-			}
-
-			if ('directoryTree' in result.data) {
-				directoryTree = result.data.directoryTree;
-				formElement.reset();
-				toast.success('Directorio creado', {
-					description: 'El directorio ha sido creado correctamente.'
-				});
-				return;
-			}
-		};
-	};
-
-	const handleDelete: SubmitFunction = async () => {
-		return async ({ result }) => {
-			if (result.type !== 'success' || !result.data) {
-				toast.error('Error', {
-					description: 'Ocurrió un error al conectar con el servidor.'
-				});
-				return;
-			}
-
-			if ('errorMessage' in result.data) {
-				toast.error('Error', {
-					description: result.data.errorMessage
-				});
-				return;
-			}
-
-			if ('deleted' in result.data) {
-				directoryTree = directoryTree.filter((dir) => dir !== result.data?.deleted);
-				toast.success('Directorio eliminado', {
-					description: 'El directorio ha sido eliminado correctamente.'
-				});
-				return;
-			}
-		};
-	};
-
-	function confirmDelete(event: MouseEvent) {
-		if (!confirm('¿Estás seguro de que deseas eliminar este directorio?')) {
-			event.preventDefault();
+	async function fetchDirectory(
+		path: string,
+		options: FetchDirectoryOptions = {
+			extensions,
+			includeFiles,
+			includeFolders
 		}
+	) {
+		const response = await fetch('/api/directory/get', {
+			method: 'POST',
+			body: JSON.stringify({ path, options }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { error, contents } = await response.json();
+
+		if (error) {
+			toast.error('Error', {
+				description: error.message
+			});
+			return;
+		}
+
+		files = contents.files;
+		folders = contents.folders;
 	}
 
-	function handleSelect(path: string) {
-		currentDirectory = path;
-		selectedPath = path;
-
-		if (onSelect) {
-			onSelect();
+	async function createDirectory() {
+		if (!directoryToCreate) {
+			toast.error('Error', {
+				description: 'Por favor, ingrese un nombre para el directorio a crear'
+			});
+			return;
 		}
+
+		const path = joinPath(directory, directoryToCreate!);
+
+		const response = await fetch('/api/directory/create', {
+			method: 'POST',
+			body: JSON.stringify({ path }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { error, created } = await response.json();
+
+		if (error) {
+			toast.error('Error', {
+				description: error.message
+			});
+			return;
+		}
+
+		folders.push(directoryToCreate);
+		directoryToCreate = null;
+		toast.success('Creado', {
+			description: `El directorio ${created} ha sido creado`
+		});
 	}
 </script>
 
-<form class="hidden" method="POST" action={folderAction} use:enhance={handleInit}>
-	<input type="hidden" name="directory" value={currentDirectory} />
-	<button type="submit" class="hidden" bind:this={initForm}></button>
-</form>
+<div class="flex size-full flex-col gap-y-2 bg-white p-6">
+	<h2 class="text-3xl font-bold">Seleccionar directorio</h2>
 
-<div class="size-full bg-white p-6">
-	<h2 class="text-3xl font-bold leading-normal">Seleccionar directorio</h2>
-
-	<div class="mb-1 flex w-full justify-between">
-		<Breadcrum bind:currentDirectory bind:directoryTree formAction={folderAction} />
-		<form
-			class="flex items-center gap-x-2"
-			method="POST"
-			action="?/createDirectory"
-			use:enhance={handleCreate}
-		>
-			<input type="hidden" name="currentDirectory" value={currentDirectory} />
-			<Input class="h-8" name="directory" placeholder="Nuevo directorio" />
-			<Button type="submit" size="icon">
+	<div class="flex w-full items-center justify-between">
+		<Breadcrumb bind:directory />
+		<div class="flex gap-x-1.5">
+			<Input class="h-8" placeholder="Crear directorio" bind:value={directoryToCreate} />
+			<Button size="icon" onclick={createDirectory}>
 				<FolderPlus />
 			</Button>
-		</form>
+		</div>
 	</div>
 
 	<div class="divide-y divide-slate-300 overflow-scroll rounded-xl border border-slate-300">
-		{#if currentDirectory.split('/').length > 3}
-			{@const folder = '..'}
-			<form
-				class="flex h-10 items-center px-4 transition-colors hover:bg-slate-50"
-				method="POST"
-				action={folderAction}
-				use:enhance={handleSubmit}
-			>
-				<input type="hidden" name="directory" value={joinPath(currentDirectory, folder)} />
-				<button class="inline-flex size-full cursor-pointer items-center gap-x-1.5">
-					<CornerUpLeft class="size-4" />
-					<span>{folder}</span>
-				</button>
-			</form>
+		{#if directory.split('/').length > 4}
+			<Item bind:directory path={'..'} />
 		{/if}
-		{#each directoryTree as directory}
-			{@const folder = directory.split('/').pop() as string}
-			<div
-				class="group flex h-10 items-center justify-between gap-x-2 pl-4 transition-colors hover:bg-slate-50"
-			>
-				<form class="flex-1" method="POST" use:enhance={handleSubmit}>
-					<input type="hidden" name="directory" value={joinPath(currentDirectory, folder)} />
-					<button
-						type="submit"
-						class="inline-flex size-full cursor-pointer items-center gap-x-1.5"
-						formaction={folderAction}
-					>
-						<Folder class="size-4" />
-						<span>{folder}</span>
-					</button>
-				</form>
-				<div
-					class="flex items-center gap-x-2 px-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-				>
-					<div>
-						<Button
-							variant="outline"
-							size="sm"
-							onclick={() => handleSelect(joinPath(currentDirectory, folder))}
-						>
-							{#if selectedPath === joinPath(currentDirectory, folder)}
-								<CircleCheckBig class="mr-1.5 size-4" />
-								<span>Seleccionado</span>
-							{:else}
-								<Circle class="mr-1.5 size-4" />
-								<span>Seleccionar</span>
-							{/if}
-						</Button>
-					</div>
-					<form method="POST" use:enhance={handleDelete}>
-						<input type="hidden" name="delete" value={joinPath(currentDirectory, folder)} />
-						<Button type="submit" size="sm" formaction={deleteAction} onclick={confirmDelete}>
-							<Trash2 class="mr-1.5 size-4" />
-							<span>Eliminar</span>
-						</Button>
-					</form>
-				</div>
-			</div>
+		{#each folders as folder}
+			<Item bind:directory bind:folders bind:selected path={folder} {onSelected} />
+		{/each}
+
+		{#each files as file}
+			<Item bind:directory bind:files bind:selected path={file} {onSelected} />
 		{/each}
 	</div>
 </div>

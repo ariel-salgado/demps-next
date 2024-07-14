@@ -1,4 +1,5 @@
-import { Breadcrum } from './breadcrum';
+import { Item } from './item';
 import { Explorer } from './explorer';
+import { Breadcrumb } from './breadcrumb';
 
-export { Explorer, Breadcrum };
+export { Explorer, Breadcrumb, Item };

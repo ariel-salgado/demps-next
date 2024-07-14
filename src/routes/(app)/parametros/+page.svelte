@@ -164,9 +164,7 @@
 	}
 
 	function onPathSelected() {
-		setTimeout(() => {
-			showDialog = false;
-		}, 300);
+		showDialog = false;
 	}
 </script>
 
@@ -177,11 +175,10 @@
 
 <Dialog bind:show={showDialog}>
 	<Explorer
-		bind:currentDirectory
-		folderAction="?/getDirectories"
-		deleteAction="?/deleteDirectory"
-		bind:selectedPath
-		onSelect={onPathSelected}
+		bind:directory={currentDirectory}
+		bind:selected={selectedPath}
+		onSelected={onPathSelected}
+		includeFiles={false}
 	/>
 </Dialog>
 

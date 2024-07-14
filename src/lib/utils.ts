@@ -168,7 +168,9 @@ export function getPathUpTo(fullPath: string, dir: string) {
 		return null;
 	}
 
-	return segments.slice(0, targetIndex + 1).join('/');
+	const path = segments.slice(0, targetIndex + 1).join('/');
+
+	return path + (path.endsWith('/') ? '' : '/');
 }
 
 export function joinPath(path1: string, path2: string) {

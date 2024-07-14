@@ -6,6 +6,12 @@ import type {
 	HTMLSelectAttributes
 } from 'svelte/elements';
 
+export type FetchDirectoryOptions = Partial<{
+	extensions: string[] | null;
+	includeFiles: boolean;
+	includeFolders: boolean;
+}>;
+
 export type G = Exclude<Geometry, GeometryCollection>;
 
 export type SelectOptions = {
