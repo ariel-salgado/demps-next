@@ -9,7 +9,7 @@
 
 	type Props = {
 		directory: string;
-		selected: string;
+		selected: string | null;
 		onSelected?: () => void;
 	} & FetchDirectoryOptions;
 

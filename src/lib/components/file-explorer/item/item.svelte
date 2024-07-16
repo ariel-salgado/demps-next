@@ -9,7 +9,7 @@
 		files?: string[];
 		folders?: string[];
 		directory: string;
-		selected?: string;
+		selected?: string | null;
 		onSelected?: () => void;
 	}
 
