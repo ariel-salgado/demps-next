@@ -76,21 +76,21 @@
 </script>
 
 <div
-	class="group flex h-10 items-center justify-between gap-x-2 pl-4 transition-colors hover:bg-slate-50"
+	class="group flex h-10 items-center justify-between gap-x-2 transition-colors hover:bg-slate-50"
 >
 	<!-- Folder or File -->
 	{#if path === '..'}
-		<button class="inline-flex cursor-pointer items-center gap-x-1.5" onclick={handleBrowsing}>
+		<button class="inline-flex cursor-pointer items-center gap-x-1.5 px-4" onclick={handleBrowsing}>
 			<CornerUpLeft class="size-4" />
 			<span>{path}</span>
 		</button>
 	{:else if folders}
-		<button class="inline-flex cursor-pointer items-center gap-x-1.5" onclick={handleBrowsing}>
+		<button class="inline-flex cursor-pointer items-center gap-x-1.5 px-4" onclick={handleBrowsing}>
 			<Folder class="size-4 fill-slate-300" />
 			<span>{path}</span>
 		</button>
 	{:else if files}
-		<button class="inline-flex cursor-pointer items-center gap-x-1.5">
+		<button class="inline-flex cursor-pointer items-center gap-x-1.5 px-4">
 			<File class="size-4" />
 			<span>{path}</span>
 		</button>
