@@ -185,8 +185,8 @@
 <section class="grid grid-cols-[20rem_1fr] divide-x divide-slate-300">
 	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-1 flex-col justify-between p-10">
 		<div>
-			<h2 class="border-b border-slate-300 pb-2 text-3xl font-semibold tracking-tight">
-				Navegación
+			<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">
+				Parámetros
 			</h2>
 			<nav>
 				<ul class="space-y-1 py-4">
