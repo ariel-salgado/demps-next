@@ -106,7 +106,7 @@
 		}
 	}
 
-	const handleSubmit: SubmitFunction = async () => {
+	const handleDownload: SubmitFunction = async () => {
 		return async ({ result }) => {
 			if (result.type !== 'success' || !result.data) {
 				toast.error('Error al descargar configuración', {
@@ -172,9 +172,45 @@
 		showDirSimDialog = false;
 	}
 
-	function onConfigSelected() {
-		showConfigDialog = false;
-		console.log(selectedConfigFile);
+	async function onConfigSelected() {
+		const response = await fetch('/api/file/get', {
+			method: 'POST',
+			body: JSON.stringify({ path: selectedConfigFile }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { error, data } = await response.json();
+
+		if (error) {
+			toast.error('Error', {
+				description: error.message
+			});
+			showConfigDialog = false;
+			return;
+		}
+
+		try {
+			const loadedData = flattenJSON(JSON.parse(data));
+
+			const fieldNames = Array.from(form!.elements)
+				.filter((element) => element.hasAttribute('name'))
+				.map((element) => element.getAttribute('name'));
+
+			if (Object.keys(loadedData).every((element) => fieldNames.includes(element))) {
+				parameters.value = loadedData;
+				selectedDirSim = loadedData.baseDirSim as string;
+				toast.success('Configuración cargada correctamente');
+			} else {
+				toast.error('Archivo de configuración inválido');
+			}
+		} catch {
+			toast.error('Archivo de configuración inválido');
+		} finally {
+			selectedConfigFile = null;
+			showConfigDialog = false;
+		}
 	}
 </script>
 
@@ -223,7 +259,7 @@
 		bind:this={form}
 		method="POST"
 		action="?/download"
-		use:enhance={handleSubmit}
+		use:enhance={handleDownload}
 		data-sveltekit-keepfocus
 	>
 		{@render parametersForm(parametersFormFields, false)}
