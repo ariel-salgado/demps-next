@@ -96,7 +96,7 @@
 </script>
 
 <div class="flex size-full flex-col gap-y-2 bg-white p-6">
-	<h2 class="text-3xl font-bold">Seleccionar directorio</h2>
+	<h2 class="text-3xl font-bold">Seleccionar {`${includeFolders ? 'directorio' : 'archivo'}`}</h2>
 
 	<div class="flex w-full items-center justify-between">
 		<Breadcrumb bind:directory />
