@@ -209,56 +209,63 @@
 		{@render parametersForm(parametersFormFields, false)}
 	</form>
 	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-col gap-y-4 p-10">
-		<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">
-			Hola mundo!
-		</h2>
+		<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">Opciones</h2>
 
-		<div class="flex-1 space-y-3">
-			<Button
-				class="w-full p-0"
-				variant="outline"
-				aria-label="Cargar archivo de configuración local"
-				title="Cargar archivo de configuración local"
-			>
-				<label
-					class="flex size-full w-full cursor-pointer items-center justify-center p-1.5"
-					for="fileUpload"
+		<div class="flex-1 space-y-8">
+			<div class="space-y-2">
+				<Button
+					class="w-full p-0"
+					variant="outline"
+					aria-label="Cargar archivo de configuración local"
+					title="Cargar archivo de configuración local"
 				>
-					<CloudUpload class="mr-2 size-5" />
-					<span class="text-base">Subir archivo</span>
-				</label>
+					<label
+						class="flex size-full w-full cursor-pointer items-center justify-center p-1.5"
+						for="fileUpload"
+					>
+						<CloudUpload class="mr-2 size-5" />
+						<span class="text-base">Subir archivo</span>
+					</label>
 
-				<input
-					id="fileUpload"
-					type="file"
-					class="hidden"
-					accept=".config"
-					bind:files
-					onchange={handleUpload}
-				/>
-			</Button>
+					<input
+						id="fileUpload"
+						type="file"
+						class="hidden"
+						accept=".config"
+						bind:files
+						onchange={handleUpload}
+					/>
+				</Button>
+				<Description>Subir un archivo local para modificar en la página.</Description>
+			</div>
 
-			<Button
-				class="w-full p-0"
-				variant="outline"
-				aria-label="Cargar archivo de configuración del servidor"
-				title="Cargar archivo de configuración del servidor"
-			>
-				<Database class="mr-2 size-5" />
-				<span class="text-base">Cargar archivo</span>
-			</Button>
+			<div class="space-y-2">
+				<Button
+					class="w-full p-0"
+					variant="outline"
+					aria-label="Cargar archivo de configuración del servidor"
+					title="Cargar archivo de configuración del servidor"
+				>
+					<Database class="mr-2 size-5" />
+					<span class="text-base">Cargar archivo</span>
+				</Button>
+				<Description>Cargar un archivo desde el servidor para modificar en la página.</Description>
+			</div>
 
-			<Button
-				type="submit"
-				class="w-full p-0"
-				variant="outline"
-				form="parameters-form"
-				aria-label="Descargar archivo de configuración actual"
-				title="Descargar archivo de configuración actual"
-			>
-				<Download class="mr-2 size-5" />
-				<span class="text-base">Descargar archivo</span>
-			</Button>
+			<div class="space-y-2">
+				<Button
+					type="submit"
+					class="w-full p-0"
+					variant="outline"
+					form="parameters-form"
+					aria-label="Descargar archivo de configuración actual"
+					title="Descargar archivo de configuración actual"
+				>
+					<Download class="mr-2 size-5" />
+					<span class="text-base">Descargar archivo</span>
+				</Button>
+				<Description>Descargar la configuración actual.</Description>
+			</div>
 		</div>
 
 		<div class="*:mt-2">
