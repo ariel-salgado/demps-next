@@ -25,6 +25,6 @@ export const POST = (async ({ request }) => {
 	}
 
 	return json({
-		contents: getDirectoryContents(path, options)
+		contents: getDirectoryContents(path, { ...options, includeFolders: true })
 	});
 }) satisfies RequestHandler;

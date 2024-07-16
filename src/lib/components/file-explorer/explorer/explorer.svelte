@@ -113,11 +113,27 @@
 			<Item bind:directory path={'..'} />
 		{/if}
 		{#each folders as folder}
-			<Item bind:directory bind:folders bind:selected path={folder} {onSelected} />
+			<Item
+				bind:directory
+				bind:folders
+				bind:selected
+				path={folder}
+				{onSelected}
+				{includeFolders}
+				{includeFiles}
+			/>
 		{/each}
 
 		{#each files as file}
-			<Item bind:directory bind:files bind:selected path={file} {onSelected} />
+			<Item
+				bind:directory
+				bind:files
+				bind:selected
+				path={file}
+				{onSelected}
+				{includeFolders}
+				{includeFiles}
+			/>
 		{/each}
 	</div>
 </div>

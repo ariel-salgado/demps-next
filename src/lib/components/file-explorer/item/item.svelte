@@ -10,6 +10,8 @@
 		folders?: string[];
 		directory: string;
 		selected?: string | null;
+		includeFiles?: boolean;
+		includeFolders?: boolean;
 		onSelected?: () => void;
 	}
 
@@ -19,6 +21,8 @@
 		folders = $bindable(),
 		directory = $bindable(),
 		selected = $bindable(),
+		includeFiles = true,
+		includeFolders = true,
 		onSelected
 	}: Props = $props();
 
@@ -89,32 +93,37 @@
 			<Folder class="size-4 fill-slate-300" />
 			<span>{path}</span>
 		</button>
+		{#if includeFolders}
+			{@render actions()}
+		{/if}
 	{:else if files}
 		<button class="inline-flex cursor-pointer items-center gap-x-1.5 px-4">
 			<File class="size-4" />
 			<span>{path}</span>
 		</button>
-	{/if}
-
-	<!-- Actions -->
-	{#if folders || files}
-		<div
-			class="flex items-center gap-x-2 px-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-		>
-			<Button variant="outline" size="sm" onclick={handleSelected}>
-				{#if selected === joinPath(directory, path)}
-					<CircleCheckBig class="mr-1.5 size-4" />
-					<span>Seleccionado</span>
-				{:else}
-					<Circle class="mr-1.5 size-4" />
-					<span>Seleccionar</span>
-				{/if}
-			</Button>
-
-			<Button size="sm" onclick={handleDelete}>
-				<Trash2 class="mr-1.5 size-4" />
-				<span>Eliminar</span>
-			</Button>
-		</div>
+		{#if includeFiles}
+			{@render actions()}
+		{/if}
 	{/if}
 </div>
+
+{#snippet actions()}
+	<div
+		class="flex items-center gap-x-2 px-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+	>
+		<Button variant="outline" size="sm" onclick={handleSelected}>
+			{#if selected === joinPath(directory, path)}
+				<CircleCheckBig class="mr-1.5 size-4" />
+				<span>Seleccionado</span>
+			{:else}
+				<Circle class="mr-1.5 size-4" />
+				<span>Seleccionar</span>
+			{/if}
+		</Button>
+
+		<Button size="sm" onclick={handleDelete}>
+			<Trash2 class="mr-1.5 size-4" />
+			<span>Eliminar</span>
+		</Button>
+	</div>
+{/snippet}
