@@ -25,16 +25,21 @@
 		data.baseDir !== parameters.value.baseDirSim ? parameters.value.baseDirSim : data.baseDir
 	) as string;
 
-	let showDialog: boolean = $state(false);
-	let form: HTMLFormElement | undefined = $state();
-	let selectedPath: string = $state(baseDirInitValue);
-	let currentDirectory: string = $state(baseDirInitValue);
+	// baseDirSim related
+	let showDirSimDialog: boolean = $state(false);
+	let selectedDirSim: string = $state(baseDirInitValue);
+	let dirSimDirectory: string = $state(baseDirInitValue);
+
+	// Config file related
+	let showConfigDialog: boolean = $state(false);
+	let selectedConfigFile: string | null = $state(null);
 
 	let files: FileList | null = $state(null);
+	let form: HTMLFormElement | undefined = $state();
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
 	$effect(() => {
-		parameters.value['baseDirSim'] = selectedPath;
+		parameters.value['baseDirSim'] = selectedDirSim;
 	});
 
 	onMount(() => {
@@ -82,7 +87,7 @@
 
 					if (Object.keys(data).every((element) => fieldNames.includes(element))) {
 						parameters.value = data;
-						selectedPath = data.baseDirSim as string;
+						selectedDirSim = data.baseDirSim as string;
 						toast.success('Configuración cargada correctamente');
 					} else {
 						toast.error('Archivo de configuración inválido');
@@ -150,11 +155,11 @@
 		const baseDirSim = document.querySelector('input[name="baseDirSim"]') as HTMLInputElement;
 
 		const onClick = on(baseDirSim, 'click', () => {
-			showDialog = true;
+			showDirSimDialog = true;
 		});
 
 		const onFocus = on(baseDirSim, 'focus', () => {
-			showDialog = true;
+			showDirSimDialog = true;
 		});
 
 		return () => {
@@ -163,8 +168,13 @@
 		};
 	}
 
-	function onPathSelected() {
-		showDialog = false;
+	function onDirSimSelected() {
+		showDirSimDialog = false;
+	}
+
+	function onConfigSelected() {
+		showConfigDialog = false;
+		console.log(selectedConfigFile);
 	}
 </script>
 
@@ -173,12 +183,22 @@
 	<meta name="description" content="Configuración de parámetros" />
 </svelte:head>
 
-<Dialog bind:show={showDialog}>
+<Dialog bind:show={showDirSimDialog}>
 	<Explorer
-		bind:directory={currentDirectory}
-		bind:selected={selectedPath}
-		onSelected={onPathSelected}
+		bind:directory={dirSimDirectory}
+		bind:selected={selectedDirSim}
+		onSelected={onDirSimSelected}
 		includeFiles={false}
+	/>
+</Dialog>
+
+<Dialog bind:show={showConfigDialog}>
+	<Explorer
+		bind:directory={dirSimDirectory}
+		bind:selected={selectedConfigFile}
+		onSelected={onConfigSelected}
+		extensions={['.config']}
+		includeFolders={false}
 	/>
 </Dialog>
 
@@ -245,6 +265,7 @@
 					variant="outline"
 					aria-label="Cargar archivo de configuración del servidor"
 					title="Cargar archivo de configuración del servidor"
+					onclick={() => (showConfigDialog = true)}
 				>
 					<Database class="mr-2 size-5" />
 					<span class="text-base">Cargar archivo</span>
