@@ -9,9 +9,9 @@
 	import { toast } from 'svelte-sonner';
 	import { parameters } from '$lib/states';
 	import { onDestroy, onMount } from 'svelte';
-	import { Download, Upload } from 'lucide-svelte';
 	import { parametersFormFields } from '$lib/config';
 	import { Explorer } from '$lib/components/file-explorer';
+	import { CloudUpload, Database, Download } from 'lucide-svelte';
 	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
 
@@ -182,8 +182,10 @@
 	/>
 </Dialog>
 
-<section class="grid grid-cols-[20rem_1fr] divide-x divide-slate-300">
-	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-1 flex-col justify-between p-10">
+<section class="grid grid-cols-[20rem_1fr_20rem] divide-x divide-slate-300">
+	<aside
+		class="sticky top-16 flex h-[calc(100vh-4rem)] flex-1 flex-col justify-between p-10 *:overflow-hidden"
+	>
 		<div>
 			<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">
 				Parámetros
@@ -194,17 +196,36 @@
 				</ul>
 			</nav>
 		</div>
-		<div class="flex gap-3">
+	</aside>
+	<form
+		id="parameters-form"
+		class="grid min-w-[32rem] grid-cols-2 gap-4 py-8 px-12"
+		bind:this={form}
+		method="POST"
+		action="?/download"
+		use:enhance={handleSubmit}
+		data-sveltekit-keepfocus
+	>
+		{@render parametersForm(parametersFormFields, false)}
+	</form>
+	<aside class="sticky top-16 flex h-[calc(100vh-4rem)] flex-col gap-y-4 p-10">
+		<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">
+			Hola mundo!
+		</h2>
+
+		<div class="flex-1 space-y-3">
 			<Button
 				class="w-full p-0"
-				aria-label="Cargar archivo de configuración"
-				title="Cargar configuración"
+				variant="outline"
+				aria-label="Cargar archivo de configuración local"
+				title="Cargar archivo de configuración local"
 			>
 				<label
 					class="flex size-full w-full cursor-pointer items-center justify-center p-1.5"
 					for="fileUpload"
 				>
-					<Upload class="size-5" />
+					<CloudUpload class="mr-2 size-5" />
+					<span class="text-base">Subir archivo</span>
 				</label>
 
 				<input
@@ -218,26 +239,36 @@
 			</Button>
 
 			<Button
+				class="w-full p-0"
+				variant="outline"
+				aria-label="Cargar archivo de configuración del servidor"
+				title="Cargar archivo de configuración del servidor"
+			>
+				<Database class="mr-2 size-5" />
+				<span class="text-base">Cargar archivo</span>
+			</Button>
+
+			<Button
 				type="submit"
 				class="w-full p-0"
+				variant="outline"
 				form="parameters-form"
-				title="Descargar configuración"
+				aria-label="Descargar archivo de configuración actual"
+				title="Descargar archivo de configuración actual"
 			>
-				<Download class="size-5" />
+				<Download class="mr-2 size-5" />
+				<span class="text-base">Descargar archivo</span>
 			</Button>
 		</div>
+
+		<div class="*:mt-2">
+			<Label for="config-name">Guardar como:</Label>
+			<Input id="config-name" name="config-name" placeholder="Nombre archivo de configuración" />
+			<Description>
+				El archivo de configuración se guardará con este nombre y la extensión .config.
+			</Description>
+		</div>
 	</aside>
-	<form
-		id="parameters-form"
-		class="grid grid-cols-2 gap-4 py-8 px-12"
-		bind:this={form}
-		method="POST"
-		action="?/download"
-		use:enhance={handleSubmit}
-		data-sveltekit-keepfocus
-	>
-		{@render parametersForm(parametersFormFields, false)}
-	</form>
 </section>
 
 {#snippet navItems(items: FormSchema, isNested: boolean)}
