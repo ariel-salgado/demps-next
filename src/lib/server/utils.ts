@@ -1,7 +1,7 @@
 import type { FetchDirectoryOptions } from '$lib/types';
 
 import { extname, join } from 'node:path';
-import { existsSync, mkdirSync, readdirSync, rm, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rm, statSync } from 'node:fs';
 
 export function isDirectory(path: string) {
 	return existsSync(path) && statSync(path).isDirectory();
@@ -78,4 +78,13 @@ export function deleteDirectory(path: string) {
 	});
 
 	return true;
+}
+
+export function readFileContent(path: string) {
+	try {
+		const data = readFileSync(path, 'utf8');
+		return data;
+	} catch {
+		return null;
+	}
 }
