@@ -11,7 +11,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { parametersFormFields } from '$lib/config';
 	import { Explorer } from '$lib/components/file-explorer';
-	import { CloudUpload, Database, Download } from 'lucide-svelte';
+	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
 	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
 
@@ -31,6 +31,7 @@
 	let dirSimDirectory: string = $state(baseDirInitValue);
 
 	// Config file related
+	let configFileName: string | null = $state(null);
 	let showConfigDialog: boolean = $state(false);
 	let selectedConfigFile: string | null = $state(null);
 
@@ -106,8 +107,8 @@
 		}
 	}
 
-	const handleDownload: SubmitFunction = async () => {
-		return async ({ result }) => {
+	const handleFormVerification: SubmitFunction = async () => {
+		return async ({ result, action }) => {
 			if (result.type !== 'success' || !result.data) {
 				toast.error('Error al descargar configuración', {
 					description: 'Ocurrió un error al generar el archivo de configuración.'
@@ -130,18 +131,57 @@
 			const parsedData = deflattenJSON(result.data) as ParametersSchema;
 			const data = JSON.stringify(addInputOutputPrefixes(parsedData), null, '\t');
 
-			const blob = new Blob([data], { type: 'application/json' });
-			const url = URL.createObjectURL(blob);
+			if (action.search.includes('download')) {
+				const blob = new Blob([data], { type: 'application/json' });
+				const url = URL.createObjectURL(blob);
 
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = 'parameters.config';
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = 'parameters.config';
 
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
 
-			URL.revokeObjectURL(url);
+				URL.revokeObjectURL(url);
+				return;
+			}
+
+			if (action.search.includes('verify')) {
+				if (!configFileName) {
+					toast.error('Error al guardar configuración', {
+						description: 'Ingrese un nombre para el archivo de configuración.'
+					});
+					return;
+				}
+
+				const response = await fetch('/api/file/create', {
+					method: 'POST',
+					body: JSON.stringify({
+						data,
+						fileName: `${configFileName}.config`,
+						path: parameters.value['baseDirSim']
+					}),
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+
+				const { error, path, fileName } = await response.json();
+
+				if (error) {
+					toast.error('Error al guardar configuración', {
+						description: error.message
+					});
+					return;
+				}
+
+				toast.success('Configuración guardada correctamente', {
+					description: `El archivo ${fileName} se guardó en ${path}`
+				});
+
+				return;
+			}
 		};
 	};
 
@@ -258,8 +298,7 @@
 		class="grid min-w-[32rem] grid-cols-2 gap-4 py-8 px-12"
 		bind:this={form}
 		method="POST"
-		action="?/download"
-		use:enhance={handleDownload}
+		use:enhance={handleFormVerification}
 		data-sveltekit-keepfocus
 	>
 		{@render parametersForm(parametersFormFields, false)}
@@ -315,6 +354,7 @@
 					class="w-full p-0"
 					variant="outline"
 					form="parameters-form"
+					formaction="?/download"
 					aria-label="Descargar archivo de configuración actual"
 					title="Descargar archivo de configuración actual"
 				>
@@ -327,7 +367,23 @@
 
 		<div class="*:mt-2">
 			<Label for="config-name">Guardar como:</Label>
-			<Input id="config-name" name="config-name" placeholder="Nombre archivo de configuración" />
+			<div class="flex gap-x-1.5">
+				<Input
+					id="config-name"
+					name="config-name"
+					placeholder="Nombre archivo de configuración"
+					bind:value={configFileName}
+				/>
+				<Button
+					type="submit"
+					class="size-9"
+					size="icon"
+					form="parameters-form"
+					formaction="?/verify"
+				>
+					<Save class="size-5" />
+				</Button>
+			</div>
 			<Description>
 				El archivo de configuración se guardará con este nombre y la extensión .config.
 			</Description>
