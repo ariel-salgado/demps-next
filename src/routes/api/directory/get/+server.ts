@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 
 import { json } from '@sveltejs/kit';
-import { isDirectory, getDirectoryContents } from '$lib/server/utils';
+import { isDirectory, readDirectory } from '$lib/server/utils';
 
 export const POST = (async ({ request }) => {
 	const { path, options } = await request.json();
@@ -25,6 +25,6 @@ export const POST = (async ({ request }) => {
 	}
 
 	return json({
-		contents: getDirectoryContents(path, { ...options, includeFolders: true })
+		contents: readDirectory(path, { ...options, includeFolders: true })
 	});
 }) satisfies RequestHandler;

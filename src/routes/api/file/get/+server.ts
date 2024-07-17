@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 
 import { json } from '@sveltejs/kit';
-import { isFile, readFileContent } from '$lib/server/utils';
+import { isFile, readFile } from '$lib/server/utils';
 
 export const POST = (async ({ request }) => {
 	let { path } = await request.json();
@@ -27,6 +27,6 @@ export const POST = (async ({ request }) => {
 	}
 
 	return json({
-		data: readFileContent(path)
+		data: readFile(path)
 	});
 }) satisfies RequestHandler;
