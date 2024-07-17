@@ -1,7 +1,15 @@
 import type { FetchDirectoryOptions } from '$lib/types';
 
 import { extname, join } from 'node:path';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rm, statSync } from 'node:fs';
+import {
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	rm,
+	statSync,
+	writeFileSync
+} from 'node:fs';
 
 export function isDirectory(path: string) {
 	return existsSync(path) && statSync(path).isDirectory();
@@ -11,7 +19,16 @@ export function isFile(path: string) {
 	return existsSync(path) && statSync(path).isFile();
 }
 
-export function getDirectoryContents(
+export function readFile(path: string) {
+	try {
+		const data = readFileSync(path, 'utf8');
+		return data;
+	} catch {
+		return null;
+	}
+}
+
+export function readDirectory(
 	path: string,
 	options: FetchDirectoryOptions = { extensions: null, includeFiles: true, includeFolders: true }
 ) {
@@ -50,17 +67,24 @@ export function createDirectory(path: string) {
 	return existsSync(path) || mkdirSync(path);
 }
 
-export function deleteFile(path: string) {
-	if (!isFile(path)) {
+export function createFile(path: string, fileName: string, data: string) {
+	if (!isDirectory(path)) {
 		return false;
 	}
 
-	rm(path, { recursive: false, force: false }, (error) => {
-		if (error) {
-			console.error(error);
-			return false;
-		}
+	const fullPath = join(path, fileName);
+
+	if (isFile(fullPath)) {
+		return false;
+	}
+
+	writeFileSync(fullPath, data, {
+		encoding: 'utf8'
 	});
+
+	if (!isFile(fullPath)) {
+		return false;
+	}
 
 	return true;
 }
@@ -80,11 +104,17 @@ export function deleteDirectory(path: string) {
 	return true;
 }
 
-export function readFileContent(path: string) {
-	try {
-		const data = readFileSync(path, 'utf8');
-		return data;
-	} catch {
-		return null;
+export function deleteFile(path: string) {
+	if (!isFile(path)) {
+		return false;
 	}
+
+	rm(path, { recursive: false, force: false }, (error) => {
+		if (error) {
+			console.error(error);
+			return false;
+		}
+	});
+
+	return true;
 }
