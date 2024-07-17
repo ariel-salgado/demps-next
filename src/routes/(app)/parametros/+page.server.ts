@@ -25,5 +25,20 @@ export const actions = {
 		}
 
 		return formData;
+	},
+	verify: async ({ request }) => {
+		const formData = Object.fromEntries(await request.formData());
+
+		const schema = getValidationSchema();
+
+		const result = schema.safeParse(formData);
+
+		if (!result.success) {
+			return {
+				errors: result.error.flatten().fieldErrors
+			};
+		}
+
+		return formData;
 	}
 } satisfies Actions;
