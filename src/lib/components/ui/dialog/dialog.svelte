@@ -15,12 +15,18 @@
 
 	let { show = $bindable(false), children, onClose, class: className, ...props }: Props = $props();
 
+	let displayed: boolean = $state(false);
+
 	$effect(() => {
 		if (show) {
 			document.body.style.overflow = 'hidden';
+			displayed = true;
 		} else {
 			document.body.style.overflow = '';
-			if (onClose) onClose();
+			if (onClose && displayed) {
+				displayed = false;
+				onClose();
+			}
 		}
 	});
 </script>
