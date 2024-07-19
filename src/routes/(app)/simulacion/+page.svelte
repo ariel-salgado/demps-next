@@ -1,12 +1,30 @@
 <script lang="ts">
+	import type { PageData } from './$types';
 	import type { Readable } from 'svelte/store';
 
 	import { toast } from 'svelte-sonner';
 	import { source } from 'sveltekit-sse';
-	import { Button } from '$lib/components/ui';
+	import { Explorer } from '$lib/components/file-explorer';
+	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
+	import { Button, Label, Select, Dialog } from '$lib/components/ui';
+
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
+
+	const parametersOptions = $state([
+		{ value: 'default', label: 'Usar por defecto' },
+		{ value: 'custom', label: 'Cargar configuración' }
+	]);
+
+	let parametersDir: string = $state(data.baseDir);
 
 	let onProgress: boolean = $state(false);
+	let showParametersDialog: boolean = $state(false);
+	let selectedParameterConfig: string = $state('default');
 
 	// SSE Connection
 	let connection: ReturnType<typeof source> | undefined = $state();
@@ -14,6 +32,12 @@
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
 	let coordinates: Readable<[number, number][]> | undefined = $state();
+
+	$effect(() => {
+		if (selectedParameterConfig === 'custom') {
+			showParametersDialog = true;
+		}
+	});
 
 	$effect(() => {
 		// When the simulation is ready
@@ -74,42 +98,69 @@
 	function stopSimulation() {
 		connection?.close();
 	}
+
+	function handleSelectedParameterConfig() {
+		if (parametersOptions.length > 2) {
+			parametersOptions.pop();
+		}
+
+		parametersOptions.push({
+			value: selectedParameterConfig,
+			label: selectedParameterConfig.split('/').at(-1)!
+		});
+
+		showParametersDialog = false;
+	}
 </script>
 
-<section class="size-full">
-	<div>
-		<Button onclick={startSimulation} disabled={onProgress}>
-			{#if onProgress}
-				<LoaderCircle class="mr-1.5 size-4 animate-spin" />
-				<span>En progreso...</span>
-			{:else}
-				<Play class="mr-1.5 size-4" />
-				<span>Iniciar</span>
+<Dialog
+	bind:show={showParametersDialog}
+	onClose={() => {
+		if (selectedParameterConfig === 'custom') selectedParameterConfig = 'default';
+	}}
+>
+	<Explorer
+		bind:directory={parametersDir}
+		bind:selected={selectedParameterConfig}
+		includeFolders={false}
+		extensions={['.config']}
+		onSelected={handleSelectedParameterConfig}
+	/>
+</Dialog>
+
+<section class="flex size-full divide-x divide-slate-300">
+	<div class="size-full">
+		<Map>
+			{#if $coordinates}
+				<MaskCanvas coordinates={$coordinates} color={'#7E4BB9'} lineColor={'#6A3D9E'} />
 			{/if}
-		</Button>
-
-		<Button onclick={stopSimulation} disabled={!onProgress}>
-			<Square class="mr-1.5 size-4" />
-			<span>Detener</span>
-		</Button>
+		</Map>
 	</div>
+	<aside class="flex w-[24rem] flex-col gap-y-4 py-8 px-10">
+		<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">Simulación</h2>
 
-	{#if onProgress}
-		<div class="size-full">
-			{#await import('$lib/components/leaflet/map/map.svelte') then Map}
-				{#await import('$lib/components/leaflet/mask-canvas/mask-canvas.svelte') then Canvas}
-					<svelte:component this={Map.default}>
-						{#if $coordinates}
-							<svelte:component
-								this={Canvas.default}
-								coordinates={$coordinates}
-								color={'#7E4BB9'}
-								lineColor={'#6A3D9E'}
-							/>
-						{/if}
-					</svelte:component>
-				{/await}
-			{/await}
+		<div class="space-y-2 py-4 *:w-full">
+			<Button onclick={startSimulation} disabled={onProgress}>
+				{#if onProgress}
+					<LoaderCircle class="mr-1.5 size-4 animate-spin" />
+					<span>En progreso...</span>
+				{:else}
+					<Play class="mr-1.5 size-4" />
+					<span>Iniciar</span>
+				{/if}
+			</Button>
+
+			<Button onclick={stopSimulation} disabled={!onProgress}>
+				<Square class="mr-1.5 size-4" />
+				<span>Detener</span>
+			</Button>
 		</div>
-	{/if}
+
+		<h3 class="border-b border-slate-300 pb-1 text-xl font-semibold tracking-tight">Parámetros</h3>
+
+		<div class="*:mt-2">
+			<Label>Archivo de configuración</Label>
+			<Select options={parametersOptions} bind:value={selectedParameterConfig} />
+		</div>
+	</aside>
 </section>
