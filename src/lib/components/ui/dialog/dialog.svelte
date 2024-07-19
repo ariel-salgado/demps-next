@@ -10,15 +10,17 @@
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		show: boolean;
 		children: Snippet;
+		onClose?: () => void;
 	}
 
-	let { show = $bindable(false), children, class: className, ...props }: Props = $props();
+	let { show = $bindable(false), children, onClose, class: className, ...props }: Props = $props();
 
 	$effect(() => {
 		if (show) {
 			document.body.style.overflow = 'hidden';
 		} else {
 			document.body.style.overflow = '';
+			if (onClose) onClose();
 		}
 	});
 </script>
