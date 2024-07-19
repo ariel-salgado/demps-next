@@ -310,7 +310,6 @@
 			<div class="space-y-2">
 				<Button
 					class="w-full p-0"
-					variant="outline"
 					aria-label="Cargar archivo de configuración local"
 					title="Cargar archivo de configuración local"
 				>
@@ -337,7 +336,6 @@
 			<div class="space-y-2">
 				<Button
 					class="w-full p-0"
-					variant="outline"
 					aria-label="Cargar archivo de configuración del servidor"
 					title="Cargar archivo de configuración del servidor"
 					onclick={() => (showConfigDialog = true)}
@@ -352,7 +350,6 @@
 				<Button
 					type="submit"
 					class="w-full p-0"
-					variant="outline"
 					form="parameters-form"
 					formaction="?/download"
 					aria-label="Descargar archivo de configuración actual"
