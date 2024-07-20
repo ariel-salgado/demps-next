@@ -1,26 +1,20 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import type { Readable } from 'svelte/store';
 
 	import { toast } from 'svelte-sonner';
 	import { source } from 'sveltekit-sse';
+	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
-
-	interface Props {
-		data: PageData;
-	}
-
-	let { data }: Props = $props();
 
 	const parametersOptions = $state([
 		{ value: 'default', label: 'Usar por defecto' },
 		{ value: 'custom', label: 'Cargar configuración' }
 	]);
 
-	let parametersDir: string = $state(data.baseDir);
+	let parametersDir: string = $state(PUBLIC_DEMPS_DIR);
 
 	let onProgress: boolean = $state(false);
 	let showParametersDialog: boolean = $state(false);
@@ -77,8 +71,21 @@
 		}
 	});
 
+	function handleSelectedParameterConfig() {
+		if (parametersOptions.length > 2) {
+			parametersOptions.pop();
+		}
+
+		parametersOptions.push({
+			value: selectedParameterConfig,
+			label: selectedParameterConfig.split('/').at(-1)!
+		});
+
+		showParametersDialog = false;
+	}
+
 	function createConnection() {
-		return source('/api/simulation', {
+		return source('/api/simulator/run', {
 			close: () => {
 				onProgress = false;
 			},
@@ -97,19 +104,6 @@
 
 	function stopSimulation() {
 		connection?.close();
-	}
-
-	function handleSelectedParameterConfig() {
-		if (parametersOptions.length > 2) {
-			parametersOptions.pop();
-		}
-
-		parametersOptions.push({
-			value: selectedParameterConfig,
-			label: selectedParameterConfig.split('/').at(-1)!
-		});
-
-		showParametersDialog = false;
 	}
 </script>
 

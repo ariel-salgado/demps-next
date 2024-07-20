@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { FormField, FormSchema, ParametersSchema } from '$lib/types';
 
@@ -10,19 +9,16 @@
 	import { parameters } from '$lib/states';
 	import { onDestroy, onMount } from 'svelte';
 	import { parametersFormFields } from '$lib/config';
+	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
 	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
 
-	interface Props {
-		data: PageData;
-	}
-
-	let { data }: Props = $props();
-
 	const baseDirInitValue = (
-		data.baseDir !== parameters.value.baseDirSim ? parameters.value.baseDirSim : data.baseDir
+		PUBLIC_DEMPS_DIR !== parameters.value.baseDirSim
+			? parameters.value.baseDirSim
+			: PUBLIC_DEMPS_DIR
 	) as string;
 
 	// baseDirSim related
