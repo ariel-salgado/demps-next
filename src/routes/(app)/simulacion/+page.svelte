@@ -136,31 +136,39 @@
 			{/if}
 		</Map>
 	</div>
-	<aside class="flex w-[24rem] flex-col gap-y-4 py-8 px-10">
-		<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">Simulación</h2>
+	<aside class="flex w-[24rem] flex-col gap-y-6 py-8 px-10">
+		<div class="space-y-4">
+			<h2 class="border-b border-slate-300 pb-2 text-2xl font-semibold tracking-tight">
+				Simulación
+			</h2>
 
-		<div class="space-y-2 py-4 *:w-full">
-			<Button onclick={startSimulation} disabled={onProgress}>
-				{#if onProgress}
-					<LoaderCircle class="mr-1.5 size-4 animate-spin" />
-					<span>En progreso...</span>
-				{:else}
-					<Play class="mr-1.5 size-4" />
-					<span>Iniciar</span>
-				{/if}
-			</Button>
+			<div class="space-y-2 *:w-full">
+				<Button onclick={startSimulation} disabled={onProgress}>
+					{#if onProgress}
+						<LoaderCircle class="mr-1.5 size-4 animate-spin" />
+						<span>En progreso...</span>
+					{:else}
+						<Play class="mr-1.5 size-4" />
+						<span>Iniciar</span>
+					{/if}
+				</Button>
 
-			<Button onclick={stopSimulation} disabled={!onProgress}>
-				<Square class="mr-1.5 size-4" />
-				<span>Detener</span>
-			</Button>
+				<Button onclick={stopSimulation} disabled={!onProgress}>
+					<Square class="mr-1.5 size-4" />
+					<span>Detener</span>
+				</Button>
+			</div>
 		</div>
 
-		<h3 class="border-b border-slate-300 pb-1 text-xl font-semibold tracking-tight">Parámetros</h3>
+		<div class="space-y-4">
+			<h3 class="border-b border-slate-300 pb-1 text-xl font-semibold tracking-tight">
+				Parámetros
+			</h3>
 
-		<div class="*:mt-2">
-			<Label>Archivo de configuración</Label>
-			<Select options={parametersOptions} bind:value={selectedParameterConfig} />
+			<div class="*:mt-2">
+				<Label>Archivo de configuración</Label>
+				<Select options={parametersOptions} bind:value={selectedParameterConfig} />
+			</div>
 		</div>
 	</aside>
 </section>
