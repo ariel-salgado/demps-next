@@ -3,6 +3,7 @@
 
 	import { toast } from 'svelte-sonner';
 	import { source } from 'sveltekit-sse';
+	import { parameters } from '$lib/states';
 	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
@@ -84,6 +85,37 @@
 		showParametersDialog = false;
 	}
 
+	async function setupSimulation() {
+		toast.loading('Preparando simulación', {
+			description: 'Verificando configuración de los parámetros.'
+		});
+
+		const type = selectedParameterConfig === 'default' ? 'local' : 'server';
+
+		const config = type === 'local' ? $state.snapshot(parameters.value) : selectedParameterConfig;
+
+		const response = await fetch('/api/simulator/setup', {
+			method: 'POST',
+			body: JSON.stringify({ type, config }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { error } = await response.json();
+
+		if (error) {
+			toast.error('Error en la configuración.', {
+				description: error.message
+			});
+			return;
+		}
+
+		toast.success('Configuración valida.', {
+			description: 'Iniciando simulación.'
+		});
+	}
+
 	function createConnection() {
 		return source('/api/simulator/run', {
 			close: () => {
@@ -137,7 +169,7 @@
 			</h2>
 
 			<div class="space-y-2 *:w-full">
-				<Button onclick={startSimulation} disabled={onProgress}>
+				<Button onclick={setupSimulation} disabled={onProgress}>
 					{#if onProgress}
 						<LoaderCircle class="mr-1.5 size-4 animate-spin" />
 						<span>En progreso...</span>
