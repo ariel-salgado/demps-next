@@ -1,9 +1,10 @@
 import type { ClassValue } from 'clsx';
 import type { Action } from 'svelte/action';
-import type { FormField, FormSchema, G, SelectOptions } from '$lib/types';
 import type { Feature, FeatureCollection } from 'geojson';
+import type { FormField, FormSchema, G, ParametersSchema, SelectOptions } from '$lib/types';
 
 // Others
+import { z } from 'zod';
 import { clsx } from 'clsx';
 import { on } from 'svelte/events';
 import { twMerge } from 'tailwind-merge';
@@ -240,4 +241,26 @@ export function extractDefaultValues(schema: FormSchema): Record<string, any> {
 	Object.values(schema).forEach((fields) => processFields(fields));
 
 	return defaultValues;
+}
+
+export const nonEmpty = z.any().refine((val) => val !== undefined && val !== null && val !== '', {
+	message: 'El campo no puede estar vacío'
+});
+
+export function preprocessParametersData(parameters: ParametersSchema) {
+	// Add prefixes to input and output directories
+	parameters.input.directory = `input/${parameters.input.directory || ''}`;
+	parameters.output.directory = `output/${parameters.output.directory || ''}`;
+
+	// Set default value for zones field
+	if (!parameters.input.zones) {
+		parameters.input.zones = 'zones.geojson';
+	}
+
+	// Add .geojson extension to zones field if it doesn't have it
+	parameters.input.zones = parameters.input.zones.endsWith('.geojson')
+		? parameters.input.zones
+		: `${parameters.input.zones}.geojson`;
+
+	return parameters;
 }

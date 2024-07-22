@@ -12,8 +12,8 @@
 	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
-	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
 	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
+	import { deflattenJSON, flattenJSON, preprocessParametersData, splitCamelCase } from '$lib/utils';
 
 	const baseDirInitValue = (
 		PUBLIC_DEMPS_DIR !== parameters.value.baseDirSim
@@ -125,7 +125,7 @@
 			}
 
 			const parsedData = deflattenJSON(result.data) as ParametersSchema;
-			const data = JSON.stringify(addInputOutputPrefixes(parsedData), null, '\t');
+			const data = JSON.stringify(preprocessParametersData(parsedData), null, '\t');
 
 			if (action.search.includes('download')) {
 				const blob = new Blob([data], { type: 'application/json' });
@@ -180,12 +180,6 @@
 			}
 		};
 	};
-
-	function addInputOutputPrefixes(data: ParametersSchema) {
-		data.input.directory = `input/${data.input.directory}`;
-		data.output.directory = `output/${data.output.directory}`;
-		return data;
-	}
 
 	function attachDialog() {
 		const baseDirSim = document.querySelector('input[name="baseDirSim"]') as HTMLInputElement;
@@ -354,7 +348,7 @@
 					<Download class="mr-2 size-5" />
 					<span class="text-base">Descargar archivo</span>
 				</Button>
-				<Description>Descargar la configuración actual.</Description>
+				<Description>Validar la configuración actual y descargar.</Description>
 			</div>
 		</div>
 
