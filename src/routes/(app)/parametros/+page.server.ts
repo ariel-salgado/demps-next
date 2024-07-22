@@ -1,6 +1,7 @@
 import type { Actions } from '@sveltejs/kit';
 
-import { getValidationSchema } from '$lib/config';
+import { getValidationSchema } from '$lib/utils';
+import { parametersFormFields } from '$lib/config';
 
 export const prerender = false;
 
@@ -9,7 +10,7 @@ export const actions = {
 	download: async ({ request }) => {
 		const formData = Object.fromEntries(await request.formData());
 
-		const schema = getValidationSchema();
+		const schema = getValidationSchema(parametersFormFields);
 
 		const result = schema.safeParse(formData);
 
@@ -24,7 +25,7 @@ export const actions = {
 	verify: async ({ request }) => {
 		const formData = Object.fromEntries(await request.formData());
 
-		const schema = getValidationSchema();
+		const schema = getValidationSchema(parametersFormFields);
 
 		const result = schema.safeParse(formData);
 

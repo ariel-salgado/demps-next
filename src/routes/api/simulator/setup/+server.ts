@@ -4,8 +4,13 @@ import type { ParametersSchema } from '$lib/types';
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
 import { createFile } from '$lib/server/utils';
-import { getValidationSchema } from '$lib/config';
-import { deflattenJSON, preprocessParametersData, stringifyZodFieldErrors } from '$lib/utils';
+import { parametersFormFields } from '$lib/config';
+import {
+	deflattenJSON,
+	getValidationSchema,
+	stringifyZodFieldErrors,
+	preprocessParametersData
+} from '$lib/utils';
 
 export const POST = (async ({ request }) => {
 	const { type, config } = await request.json();
@@ -89,7 +94,7 @@ export const POST = (async ({ request }) => {
 }) satisfies RequestHandler;
 
 function verifyIntegrity(config: Record<string, unknown>) {
-	const schema = getValidationSchema();
+	const schema = getValidationSchema(parametersFormFields);
 	const { success, error } = schema.safeParse(config);
 	const errors = error?.flatten().fieldErrors;
 	return { success, errors };
