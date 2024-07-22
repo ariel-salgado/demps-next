@@ -2,6 +2,7 @@ import type { ZodType } from 'zod';
 import type { FormSchema, PopupFields } from './types';
 
 import { z } from 'zod';
+import { nonEmpty } from './utils';
 
 export const popupFields = {
 	id: {
@@ -110,7 +111,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 3600,
 				placeholder: 'Ingrese la duración de la simulación'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Calibration',
@@ -121,7 +123,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 50,
 				placeholder: 'Ingrese la calibración de la simulación'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Quad Size',
@@ -132,7 +135,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 10,
 				placeholder: 'Ingrese el tamaño de los cuadrantes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Close Enough',
@@ -143,7 +147,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 50,
 				placeholder: 'Ingrese la distancia de cercanía'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Random Walkway Radius',
@@ -154,7 +159,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 100,
 				placeholder: 'Ingrese el radio de la caminata aleatoria'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Attraction Radius',
@@ -165,7 +171,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 5,
 				placeholder: 'Ingrese el radio de atracción'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Delta T',
@@ -176,7 +183,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 1.0,
 				placeholder: 'Ingrese el delta T'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Threads',
@@ -187,7 +195,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 4,
 				placeholder: 'Ingrese la cantidad de hilos'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Flood Model Enable',
@@ -207,7 +216,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodModelEnable'
 				// placeholder: 'Seleccione el modelo de inundación'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Density Model Enable',
@@ -227,7 +237,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'densityModelEnable'
 				// placeholder: 'Seleccione el modelo de densidad'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Panic Model Enable',
@@ -247,7 +258,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'panicModelEnable'
 				// placeholder: 'Seleccione el modelo de pánico'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Elevation Model Enable',
@@ -267,7 +279,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'elevationModelEnable'
 				// placeholder: 'Seleccione el modelo de elevación'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Debris Model Enable',
@@ -287,7 +300,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'debrisModelEnable'
 				// placeholder: 'Seleccione el modelo de escombros'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'City',
@@ -297,7 +311,8 @@ export const parametersFormFields = {
 				name: 'city',
 				type: 'text',
 				placeholder: 'Ingrese la ciudad'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Description',
@@ -318,7 +333,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 100,
 				placeholder: 'Ingrese el intervalo de muestreo'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Base Dir Sim',
@@ -329,7 +345,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: '/home/demps-user/sim/',
 				placeholder: 'Ingrese el directorio base de la simulación'
-			}
+			},
+			validation: nonEmpty
 		}
 	],
 	input: [
@@ -352,7 +369,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'map.osrm',
 				placeholder: 'Ingrese el mapa'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Zones',
@@ -384,7 +402,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.progressBar'
 				// placeholder: 'Seleccione la barra de progreso'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Interval',
@@ -395,7 +414,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 10,
 				placeholder: 'Ingrese el intervalo'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Directory',
@@ -425,7 +445,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.agents-out'
 				// placeholder: 'Seleccione la salida de agentes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Agents Path',
@@ -436,7 +457,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'agents/',
 				placeholder: 'Ingrese el directorio de agentes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Agents Precision',
@@ -447,7 +469,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 8,
 				placeholder: 'Ingrese la precisión de agentes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Agents Sufix',
@@ -458,7 +481,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'txt',
 				placeholder: 'Ingrese el sufijo de agentes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Stats Out',
@@ -478,7 +502,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.stats-out'
 				// placeholder: 'Seleccione la salida de estadísticas'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Stats Interval',
@@ -487,8 +512,10 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.stats-interval',
 				type: 'number',
-				placeholder: 'Ingrese el intervalo de estadísticas'
-			}
+				placeholder: 'Ingrese el intervalo de estadísticas',
+				value: 10
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Stats Path',
@@ -499,7 +526,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'stats/',
 				placeholder: 'Ingrese el directorio de estadísticas'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Anim Config',
@@ -510,7 +538,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'animacion.config.json',
 				placeholder: 'Ingrese nombre de archivo de configuración de animación'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Heat Map Out',
@@ -530,7 +559,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'output.heatMap-out'
 				// placeholder: 'Seleccione la salida de mapa de calor'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Heat Map Size',
@@ -541,7 +571,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 2,
 				placeholder: 'Ingrese el tamaño del mapa de calor'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Heat Map Interval',
@@ -552,7 +583,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 120,
 				placeholder: 'Ingrese el intervalo del mapa de calor'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Heat Map Path',
@@ -563,7 +595,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'heatMaps/',
 				placeholder: 'Ingrese el directorio del mapa de calor'
-			}
+			},
+			validation: nonEmpty
 		}
 	],
 	floodParams: [
@@ -576,7 +609,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'N->S;W->E',
 				placeholder: 'Ingrese la dirección'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Sample State Interval',
@@ -587,7 +621,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 10,
 				placeholder: 'Ingrese el intervalo de muestreo de estado'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Arrival Time',
@@ -598,7 +633,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: -1550,
 				placeholder: 'Ingrese el tiempo de llegada'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Speed Water Prop',
@@ -609,7 +645,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 0.75,
 				placeholder: 'Ingrese la velocidad del agua proporcional'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Speed Water Level',
@@ -620,7 +657,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 0.000165,
 				placeholder: 'Ingrese la velocidad del agua nivel'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Critical Level',
@@ -631,7 +669,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 0.1,
 				placeholder: 'Ingrese el nivel crítico'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Min Speed Factor',
@@ -642,7 +681,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 0.1,
 				placeholder: 'Ingrese el factor de velocidad mínimo'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Images Enable',
@@ -662,7 +702,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.imagesEnable'
 				// placeholder: 'Seleccione la habilitación de imágenes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Images Dir',
@@ -673,7 +714,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'floodImgs/',
 				placeholder: 'Ingrese el directorio de imágenes'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'State Enable',
@@ -693,7 +735,8 @@ export const parametersFormFields = {
 			attributes: {
 				name: 'floodParams.stateEnable'
 				// placeholder: 'Seleccione la habilitación de estado'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'State Dir',
@@ -704,7 +747,8 @@ export const parametersFormFields = {
 				type: 'text',
 				value: 'floodState/',
 				placeholder: 'Ingrese el directorio de estado'
-			}
+			},
+			validation: nonEmpty
 		}
 	],
 	densityParams: [
@@ -717,7 +761,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 0.3,
 				placeholder: 'Ingrese la densidad mínima'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Max Density',
@@ -728,7 +773,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 6.0,
 				placeholder: 'Ingrese la densidad máxima'
-			}
+			},
+			validation: nonEmpty
 		},
 		{
 			label: 'Min Velocity',
@@ -739,7 +785,8 @@ export const parametersFormFields = {
 				type: 'number',
 				value: 0.2,
 				placeholder: 'Ingrese la velocidad mínima'
-			}
+			},
+			validation: nonEmpty
 		}
 	],
 	agents: {
