@@ -2,6 +2,8 @@ import type { FormSchema, PopupFields } from './types';
 
 import { nonEmpty } from './utils';
 
+export const defaultParametersConfigFilename = 'parameters.config';
+
 export const popupFields = {
 	id: {
 		type: 'text',

@@ -8,10 +8,10 @@
 	import { toast } from 'svelte-sonner';
 	import { parameters } from '$lib/states';
 	import { onDestroy, onMount } from 'svelte';
-	import { parametersFormFields } from '$lib/config';
 	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
+	import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
 	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
 	import { deflattenJSON, flattenJSON, preprocessParametersData, splitCamelCase } from '$lib/utils';
 
@@ -133,7 +133,7 @@
 
 				const a = document.createElement('a');
 				a.href = url;
-				a.download = 'parameters.config';
+				a.download = defaultParametersConfigFilename;
 
 				document.body.appendChild(a);
 				a.click();

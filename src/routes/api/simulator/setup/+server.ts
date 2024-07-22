@@ -4,7 +4,7 @@ import type { ParametersSchema } from '$lib/types';
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
 import { createFile } from '$lib/server/utils';
-import { parametersFormFields } from '$lib/config';
+import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
 import {
 	deflattenJSON,
 	getValidationSchema,
@@ -72,7 +72,7 @@ export const POST = (async ({ request }) => {
 		// Create simulator config file
 		const configFileCreated = createFile(
 			baseDirSim,
-			'parameters.config',
+			defaultParametersConfigFilename,
 			JSON.stringify(parameters, null, '\t')
 		);
 
