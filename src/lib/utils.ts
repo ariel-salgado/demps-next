@@ -243,9 +243,10 @@ export function extractDefaultValues(schema: FormSchema): Record<string, any> {
 	return defaultValues;
 }
 
-export const nonEmpty = z.any().refine((val) => val !== undefined && val !== null && val !== '', {
-	message: 'El campo no puede estar vacío'
-});
+export const nonEmpty = (message?: string) =>
+	z.any().refine((val) => val !== undefined && val !== null && val !== '', {
+		message: message ?? 'El campo es requerido.'
+	});
 
 export function preprocessParametersData(parameters: ParametersSchema) {
 	// Add prefixes to input and output directories
