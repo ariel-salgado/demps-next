@@ -265,3 +265,15 @@ export function preprocessParametersData(parameters: ParametersSchema) {
 
 	return parameters;
 }
+
+export function stringifyZodFieldErrors(fieldErrors: { [x: string]: string[] | undefined }) {
+	const entries = Object.entries(fieldErrors);
+
+	if (entries.length === 0) return '';
+
+	const [key, value] = entries[0];
+	const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+	const message = value?.[0] ?? 'Error desconocido';
+
+	return `${capitalizedKey}: ${message}`;
+}
