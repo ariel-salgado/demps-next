@@ -9,6 +9,8 @@
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
+	import { defaultParametersConfigFilename } from '$lib/config';
+	import { joinPath } from '$lib/utils';
 
 	const parametersOptions = $state([
 		{ value: 'default', label: 'Usar por defecto' },
@@ -91,8 +93,13 @@
 		});
 
 		const type = selectedParameterConfig === 'default' ? 'local' : 'server';
-
 		const config = type === 'local' ? $state.snapshot(parameters.value) : selectedParameterConfig;
+
+		if (type === 'local') {
+			const abort = await handleExistingConfigFile();
+
+			if (abort) return;
+		}
 
 		const response = await fetch('/api/simulator/setup', {
 			method: 'POST',
@@ -114,6 +121,55 @@
 		toast.success('Configuración valida.', {
 			description: 'Iniciando simulación.'
 		});
+	}
+
+	async function handleExistingConfigFile() {
+		const path = joinPath(parameters.value.baseDirSim!, defaultParametersConfigFilename);
+
+		const fileExistsResponse = await fetch('/api/file/get', {
+			method: 'POST',
+			body: JSON.stringify({ path }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { data: fileExists } = await fileExistsResponse.json();
+
+		if (!fileExists) {
+			return false;
+		}
+
+		const wantToOverwrite = confirm(
+			'El archivo de configuración creado a partir del formulario ya existe. ¿Desea sobreescribirlo?'
+		);
+
+		if (!wantToOverwrite) {
+			return true;
+		}
+		const fileDeleteResponse = await fetch('/api/file/delete', {
+			method: 'DELETE',
+			body: JSON.stringify({ path }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { error } = await fileDeleteResponse.json();
+
+		if (error) {
+			toast.error('Error al sobreescribir el archivo de configuración.', {
+				description: error.message
+			});
+
+			return true;
+		}
+
+		toast.info('Sobreescribir archivo.', {
+			description: 'El archivo de configuración será sobreescribido.'
+		});
+
+		return false;
 	}
 
 	function createConnection() {
