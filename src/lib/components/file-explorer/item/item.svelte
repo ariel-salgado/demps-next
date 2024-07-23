@@ -42,16 +42,18 @@
 		}
 	}
 
-	async function handleDelete() {
+	async function handleDelete(type: 'folder' | 'file') {
 		const deleteConfirmation = confirm(
-			`¿Está seguro de eliminar este ${folders ? 'directorio' : 'archivo'}?`
+			`¿Está seguro de eliminar este ${type === 'folder' ? 'directorio' : 'archivo'}?`
 		);
 
 		if (!deleteConfirmation) return;
 
 		const deletePath = joinPath(directory, path);
 
-		const response = await fetch('/api/directory/delete', {
+		const fetchURL = type === 'folder' ? '/api/directory/delete' : '/api/file/delete';
+
+		const response = await fetch(fetchURL, {
 			method: 'DELETE',
 			body: JSON.stringify({ path: deletePath }),
 			headers: {
@@ -68,11 +70,14 @@
 			return;
 		}
 
-		if (folders) {
-			folders.filter((folder) => folder !== path);
-		} else if (files) {
-			files.filter((file) => file !== path);
+		if (type === 'folder' && folders) {
+			folders = folders.filter((folder) => folder !== path);
 		}
+
+		if (type === 'file' && files) {
+			files = files.filter((file) => file !== path);
+		}
+
 		toast.success('Eliminado', {
 			description: `El ${folders ? 'directorio' : 'archivo'} ${deleted} ha sido eliminado`
 		});
@@ -94,7 +99,7 @@
 			<span>{path}</span>
 		</button>
 		{#if includeFolders}
-			{@render actions()}
+			{@render actions('folder')}
 		{/if}
 	{:else if files}
 		<button class="inline-flex cursor-pointer items-center gap-x-1.5 px-4">
@@ -102,12 +107,12 @@
 			<span>{path}</span>
 		</button>
 		{#if includeFiles}
-			{@render actions()}
+			{@render actions('file')}
 		{/if}
 	{/if}
 </div>
 
-{#snippet actions()}
+{#snippet actions(type: 'folder' | 'file')}
 	<div
 		class="flex items-center gap-x-2 px-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 	>
@@ -121,7 +126,7 @@
 			{/if}
 		</Button>
 
-		<Button size="sm" onclick={handleDelete}>
+		<Button size="sm" onclick={() => handleDelete(type)}>
 			<Trash2 class="mr-1.5 size-4" />
 			<span>Eliminar</span>
 		</Button>
