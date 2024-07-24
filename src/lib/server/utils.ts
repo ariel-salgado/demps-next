@@ -1,6 +1,7 @@
 import type { FetchDirectoryOptions } from '$lib/types';
 
-import { extname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname, extname, join } from 'node:path';
 import {
 	existsSync,
 	mkdirSync,
@@ -10,6 +11,10 @@ import {
 	statSync,
 	writeFileSync
 } from 'node:fs';
+
+export const basePath = dirname(fileURLToPath(import.meta.url))
+	.split('src')
+	.at(0) as string;
 
 export function isDirectory(path: string) {
 	return existsSync(path) && statSync(path).isDirectory();
