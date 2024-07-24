@@ -2,15 +2,15 @@
 	import type { Readable } from 'svelte/store';
 
 	import { toast } from 'svelte-sonner';
+	import { joinPath } from '$lib/utils';
 	import { source } from 'sveltekit-sse';
 	import { parameters } from '$lib/states';
 	import { PUBLIC_BASE_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
-	import { Button, Label, Select, Dialog } from '$lib/components/ui';
 	import { defaultParametersConfigFilename } from '$lib/config';
-	import { joinPath } from '$lib/utils';
+	import { Button, Label, Select, Dialog } from '$lib/components/ui';
 
 	const parametersOptions = $state([
 		{ value: 'default', label: 'Usar por defecto' },
@@ -118,7 +118,7 @@
 			return;
 		}
 
-		// startSimulation();
+		startSimulation();
 	}
 
 	async function handleExistingConfigFile() {
