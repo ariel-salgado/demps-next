@@ -3,8 +3,8 @@ import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
-import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
 import { basePath, createFile, isFile, readFile } from '$lib/server/utils';
+import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
 import {
 	deflattenJSON,
 	getValidationSchema,
@@ -92,16 +92,16 @@ export const POST = (async ({ request }) => {
 		floodParams: { stateEnable, stateDir }
 	} = parameters;
 
-	const fullInputDirectory = join(baseDirSim, inputDirectory);
-	const fullOutputDirectory = join(baseDirSim, outputDirectory);
+	const fullInputDirectory = addTrailingSlash(join(baseDirSim, inputDirectory));
+	const fullOutputDirectory = addTrailingSlash(join(baseDirSim, outputDirectory));
 	const enableFloodWatcher = floodModelEnable && stateEnable;
-	const floodDir = join(fullOutputDirectory, stateDir);
-	const agentsDir = join(fullOutputDirectory, agentsPath);
-	const configFile = type === 'local' ? defaultParametersConfigFilename : config;
+	const floodDir = addTrailingSlash(join(fullOutputDirectory, stateDir));
+	const agentsDir = addTrailingSlash(join(fullOutputDirectory, agentsPath));
+	const configFile = type === 'local' ? defaultParametersConfigFilename : config.split('/').at(-1);
 
 	const simulatorDirectives: SimulatorDirectives = {
 		configFile,
-		baseDirSim,
+		baseDirSim: addTrailingSlash(baseDirSim),
 		zones,
 		floodEnabled: enableFloodWatcher,
 		inputDirectory: fullInputDirectory,
@@ -151,6 +151,12 @@ function verifyIntegrity(config: Record<string, unknown>) {
 	const { success, error } = schema.safeParse(config);
 	const errors = error?.flatten().fieldErrors;
 	return { success, errors };
+}
+
+function addTrailingSlash(path: string) {
+	if (path.endsWith('/')) return path;
+
+	return path + '/';
 }
 
 /**
