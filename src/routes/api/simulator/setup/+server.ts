@@ -1,9 +1,10 @@
 import type { RequestHandler } from './$types';
 import type { ParametersSchema } from '$lib/types';
 
-import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
-import { createFile } from '$lib/server/utils';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, sep } from 'node:path';
+import { createFile, deleteFile, isFile } from '$lib/server/utils';
 import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
 import {
 	deflattenJSON,
@@ -69,6 +70,17 @@ export const POST = (async ({ request }) => {
 			floodDir
 		};
 
+		const iniFileCreated = createSimulatorLaunchFile(simulatorDirectives);
+
+		if (!iniFileCreated) {
+			return json({
+				error: {
+					code: 500,
+					message: 'No se pudo crear el archivo para iniciar el simulador.'
+				}
+			});
+		}
+
 		// Create simulator config file
 		const configFileCreated = createFile(
 			baseDirSim,
@@ -98,4 +110,30 @@ function verifyIntegrity(config: Record<string, unknown>) {
 	const { success, error } = schema.safeParse(config);
 	const errors = error?.flatten().fieldErrors;
 	return { success, errors };
+}
+
+/**
+ * *: This function is used to create a .ini file in the root directory of the app.
+ * *: It sets the required values to launch correctle the simulator as children process.
+ */
+function createSimulatorLaunchFile(data: Record<string, unknown>) {
+	const currentPath = dirname(fileURLToPath(import.meta.url));
+	const parts = currentPath.split(sep);
+	const rootPath = join(sep, ...parts.slice(0, parts.indexOf('demps-user') + 2), sep);
+	const iniFilename = 'sim.ini';
+	const iniFilePath = join(rootPath, iniFilename);
+
+	if (isFile(iniFilePath)) {
+		const iniFileDeleted = deleteFile(iniFilePath);
+
+		if (!iniFileDeleted) return false;
+	}
+
+	const iniFileData = Object.entries(data)
+		.map(([key, value]) => `${key}=${value}`)
+		.join('\n');
+
+	const iniFileCreated = createFile(rootPath, iniFilename, iniFileData, true);
+
+	return iniFileCreated;
 }
