@@ -21,8 +21,7 @@ export function isFile(path: string) {
 
 export function readFile(path: string) {
 	try {
-		const data = readFileSync(path, 'utf8');
-		return data;
+		return readFileSync(path, 'utf8');
 	} catch {
 		return null;
 	}
