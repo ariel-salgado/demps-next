@@ -67,7 +67,7 @@ export function createDirectory(path: string) {
 	return existsSync(path) || mkdirSync(path);
 }
 
-export function createFile(path: string, fileName: string, data: string) {
+export function createFile(path: string, fileName: string, data: string, force?: boolean) {
 	if (!isDirectory(path)) {
 		return false;
 	}
@@ -75,7 +75,11 @@ export function createFile(path: string, fileName: string, data: string) {
 	const fullPath = join(path, fileName);
 
 	if (isFile(fullPath)) {
-		return false;
+		if (!force) return false;
+
+		const fileDeleted = deleteFile(fullPath);
+
+		if (!fileDeleted) return false;
 	}
 
 	writeFileSync(fullPath, data, {
