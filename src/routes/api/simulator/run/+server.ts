@@ -7,6 +7,7 @@ import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/ser
 
 const fileWatchers: Watcher[] = [];
 
+// TODO: Make simulation run with the selected config file.
 export const POST = (async () => {
 	const dempsProcess = createDempsProcess();
 
