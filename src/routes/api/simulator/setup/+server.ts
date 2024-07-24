@@ -4,7 +4,7 @@ import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
 import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
-import { basePath, createFile, deleteFile, isFile, readFile } from '$lib/server/utils';
+import { basePath, createFile, isFile, readFile } from '$lib/server/utils';
 import {
 	deflattenJSON,
 	getValidationSchema,
@@ -159,13 +159,6 @@ function verifyIntegrity(config: Record<string, unknown>) {
  */
 function createSimulatorLaunchFile(data: Record<string, unknown>) {
 	const iniFilename = 'sim.ini';
-	const iniFilePath = join(basePath, iniFilename);
-
-	if (isFile(iniFilePath)) {
-		const iniFileDeleted = deleteFile(iniFilePath);
-
-		if (!iniFileDeleted) return false;
-	}
 
 	const iniFileData = Object.entries(data)
 		.map(([key, value]) => `${key}=${value}`)
