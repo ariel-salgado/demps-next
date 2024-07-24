@@ -164,7 +164,7 @@
 		}
 
 		toast.info('Sobreescribir archivo.', {
-			description: 'El archivo de configuración será sobreescribido.'
+			description: 'El archivo de configuración será modificado.'
 		});
 
 		return false;
