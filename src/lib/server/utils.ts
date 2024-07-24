@@ -9,6 +9,7 @@ import {
 	readFileSync,
 	rm,
 	statSync,
+	unlinkSync,
 	writeFileSync
 } from 'node:fs';
 
@@ -117,12 +118,12 @@ export function deleteFile(path: string) {
 		return false;
 	}
 
-	rm(path, { recursive: false, force: false }, (error) => {
-		if (error) {
-			console.error(error);
-			return false;
-		}
-	});
+	try {
+		unlinkSync(path);
+	} catch (error) {
+		console.error(`Failed to delete existing file: ${error}`);
+		return false;
+	}
 
 	return true;
 }
