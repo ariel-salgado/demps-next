@@ -1,11 +1,10 @@
 import type { RequestHandler } from './$types';
-import type { ParametersSchema } from '$lib/types';
+import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 
+import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
-import { fileURLToPath } from 'node:url';
-import { dirname, join, sep } from 'node:path';
-import { createFile, deleteFile, isFile, readFile } from '$lib/server/utils';
 import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
+import { basePath, createFile, deleteFile, isFile, readFile } from '$lib/server/utils';
 import {
 	deflattenJSON,
 	getValidationSchema,
@@ -100,7 +99,7 @@ export const POST = (async ({ request }) => {
 	const agentsDir = join(fullOutputDirectory, agentsPath);
 	const configFile = type === 'local' ? defaultParametersConfigFilename : config;
 
-	const simulatorDirectives = {
+	const simulatorDirectives: SimulatorDirectives = {
 		configFile,
 		baseDirSim,
 		zones,
@@ -159,11 +158,8 @@ function verifyIntegrity(config: Record<string, unknown>) {
  * *: It sets the required values to launch correctle the simulator as children process.
  */
 function createSimulatorLaunchFile(data: Record<string, unknown>) {
-	const currentPath = dirname(fileURLToPath(import.meta.url));
-	const parts = currentPath.split(sep);
-	const rootPath = join(sep, ...parts.slice(0, parts.indexOf('demps-user') + 2), sep);
 	const iniFilename = 'sim.ini';
-	const iniFilePath = join(rootPath, iniFilename);
+	const iniFilePath = join(basePath, iniFilename);
 
 	if (isFile(iniFilePath)) {
 		const iniFileDeleted = deleteFile(iniFilePath);
@@ -175,7 +171,7 @@ function createSimulatorLaunchFile(data: Record<string, unknown>) {
 		.map(([key, value]) => `${key}=${value}`)
 		.join('\n');
 
-	const iniFileCreated = createFile(rootPath, iniFilename, iniFileData, true);
+	const iniFileCreated = createFile(basePath, iniFilename, iniFileData, true);
 
 	return iniFileCreated;
 }
