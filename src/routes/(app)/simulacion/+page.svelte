@@ -4,7 +4,7 @@
 	import { toast } from 'svelte-sonner';
 	import { source } from 'sveltekit-sse';
 	import { parameters } from '$lib/states';
-	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
+	import { PUBLIC_BASE_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
@@ -17,7 +17,7 @@
 		{ value: 'custom', label: 'Cargar configuración' }
 	]);
 
-	let parametersDir: string = $state(PUBLIC_DEMPS_DIR);
+	let parametersDir: string = $state(PUBLIC_BASE_DIR);
 
 	let onProgress: boolean = $state(false);
 	let showParametersDialog: boolean = $state(false);
@@ -118,9 +118,7 @@
 			return;
 		}
 
-		toast.success('Configuración valida.', {
-			description: 'Iniciando simulación.'
-		});
+		// startSimulation();
 	}
 
 	async function handleExistingConfigFile() {

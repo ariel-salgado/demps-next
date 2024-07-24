@@ -8,7 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	import { parameters } from '$lib/states';
 	import { onDestroy, onMount } from 'svelte';
-	import { PUBLIC_DEMPS_DIR } from '$env/static/public';
+	import { PUBLIC_BASE_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
 	import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
@@ -16,9 +16,9 @@
 	import { deflattenJSON, flattenJSON, preprocessParametersData, splitCamelCase } from '$lib/utils';
 
 	const baseDirInitValue = (
-		PUBLIC_DEMPS_DIR !== parameters.value.baseDirSim
+		PUBLIC_BASE_DIR!== parameters.value.baseDirSim
 			? parameters.value.baseDirSim
-			: PUBLIC_DEMPS_DIR
+			: PUBLIC_BASE_DIR
 	) as string;
 
 	// baseDirSim related
