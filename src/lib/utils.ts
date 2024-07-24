@@ -253,25 +253,15 @@ export function preprocessParametersData(parameters: ParametersSchema) {
 	// Set default values if they doesnt exist
 	parameters.input.directory ??= 'input/';
 	parameters.output.directory ??= 'output/';
+	parameters.input.zones ??= 'zones.geojson';
 
 	// Add prefixes to input and output directories
-	if (
-		!parameters.input.directory.startsWith('input/') ||
-		!parameters.input.directory.startsWith('/input/')
-	) {
+	if (parameters.input.directory.split('/').at(0) !== 'input') {
 		parameters.input.directory = joinPath('input/', parameters.input.directory || '');
 	}
 
-	if (
-		!parameters.output.directory.startsWith('output/') ||
-		!parameters.output.directory.startsWith('/output/')
-	) {
+	if (parameters.output.directory.split('/').at(0) !== 'output') {
 		parameters.output.directory = joinPath('output/', parameters.output.directory || '');
-	}
-
-	// Set default value for zones field
-	if (!parameters.input.zones) {
-		parameters.input.zones = 'zones.geojson';
 	}
 
 	// Add .geojson extension to zones field if it doesn't have it
