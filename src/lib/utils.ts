@@ -1,10 +1,11 @@
+import type { ZodType } from 'zod';
 import type { ClassValue } from 'clsx';
 import type { Action } from 'svelte/action';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { FormField, FormSchema, G, ParametersSchema, SelectOptions } from '$lib/types';
 
 // Others
-import { z, ZodType } from 'zod';
+import { z } from 'zod';
 import { clsx } from 'clsx';
 import { on } from 'svelte/events';
 import { twMerge } from 'tailwind-merge';
@@ -249,9 +250,24 @@ export const nonEmpty = (message?: string) =>
 	});
 
 export function preprocessParametersData(parameters: ParametersSchema) {
+	// Set default values if they doesnt exist
+	parameters.input.directory ??= 'input/';
+	parameters.output.directory ??= 'output/';
+
 	// Add prefixes to input and output directories
-	parameters.input.directory = `input/${parameters.input.directory || ''}`;
-	parameters.output.directory = `output/${parameters.output.directory || ''}`;
+	if (
+		!parameters.input.directory.startsWith('input/') ||
+		!parameters.input.directory.startsWith('/input/')
+	) {
+		parameters.input.directory = joinPath('input/', parameters.input.directory || '');
+	}
+
+	if (
+		!parameters.output.directory.startsWith('output/') ||
+		!parameters.output.directory.startsWith('/output/')
+	) {
+		parameters.output.directory = joinPath('output/', parameters.output.directory || '');
+	}
 
 	// Set default value for zones field
 	if (!parameters.input.zones) {
