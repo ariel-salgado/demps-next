@@ -12,6 +12,19 @@ export type FetchDirectoryOptions = Partial<{
 	includeFolders: boolean;
 }>;
 
+export type SimulatorDirectives = {
+	configFile: any;
+	baseDirSim: string;
+	zones: string;
+	floodEnabled: boolean;
+	inputDirectory: string;
+	outputDirectory: string;
+	agentsOut: boolean;
+	agentsDir: string;
+	agentsSufix: string;
+	floodDir: string;
+};
+
 export type G = Exclude<Geometry, GeometryCollection>;
 
 export type SelectOptions = {
