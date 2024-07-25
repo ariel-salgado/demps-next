@@ -6,7 +6,8 @@ import { uniquePool } from '$lib/states';
 export function createWatcher(id: string, path: string) {
 	const watcher = $state(
 		watch(path, {
-			ignoreInitial: true
+			ignoreInitial: true,
+			usePolling: true
 		})
 	);
 
