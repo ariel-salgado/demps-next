@@ -1,19 +1,16 @@
-import type { Watcher } from '$lib/server';
 import type { RequestHandler } from './$types';
+import type { SimulatorDirectives } from '$lib/types';
+import type { DempsProcess, Watcher } from '$lib/server';
 
+import { join } from 'node:path';
 import { produce } from 'sveltekit-sse';
-import { DEMPS_SIM_DIR } from '$env/static/private';
+import { basePath, isFile, readFile } from '$lib/server/utils';
 import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/server';
 
 const fileWatchers: Watcher[] = [];
+const childProcesses: DempsProcess[] = [];
 
-// TODO: Make simulation run with the selected config file.
 export const POST = (async () => {
-	const dempsProcess = createDempsProcess();
-
-	const dirWatcher = createWatcher('dirWatcher', DEMPS_SIM_DIR);
-	fileWatchers.push(dirWatcher);
-
 	return produce(
 		async function start({ emit }) {
 			const { error } = emit('status', 'init');
@@ -23,7 +20,26 @@ export const POST = (async () => {
 				return;
 			}
 
-			dirWatcher.on('ready', async () => {
+			const directives = getSimulationDirectives();
+
+			if (!directives) {
+				emit('status', 'error');
+				return;
+			}
+
+			const { baseDirSim, configFile, agentsDir } = directives;
+
+			console.log('agentsDir:', agentsDir);
+
+			const dempsProcess = createDempsProcess(baseDirSim, configFile);
+			childProcesses.push(dempsProcess);
+
+			const agentWatcher = createWatcher('agentWatcher', agentsDir);
+			fileWatchers.push(agentWatcher);
+
+			agentWatcher.on('ready', async () => {
+				emit('status', 'ready');
+
 				try {
 					await dempsProcess.run();
 					emit('status', 'finished');
@@ -36,35 +52,56 @@ export const POST = (async () => {
 				}
 			});
 
-			dirWatcher.on('addDir', (path) => {
-				if (path.includes('agents')) {
-					const fileProcessor = createFileProcessor((data) => {
-						emit('agents', data);
-					});
+			const fileProcessor = createFileProcessor((data) => {
+				emit('agents', data);
+			});
 
-					const fileWatcher = createWatcher('fileWatcher', path);
-					fileWatchers.push(fileWatcher);
-
-					fileWatcher.on('ready', () => {
-						emit('status', 'ready');
-					});
-
-					fileWatcher.on('add', (path) => {
-						fileProcessor.push(path);
-					});
-				}
+			agentWatcher.on('add', (path) => {
+				fileProcessor.push(path);
 			});
 		},
 		{
 			ping: 10000,
 			async stop() {
 				fileWatchers.forEach((watcher) => watcher.close());
-				if (dempsProcess.isRunning) {
-					await dempsProcess.kill();
-				}
+				childProcesses.forEach(async (childProcess) => {
+					if (childProcess.isRunning) {
+						await childProcess.kill();
+					}
+				});
 
 				console.log('Connection closed');
 			}
 		}
 	);
 }) satisfies RequestHandler;
+
+function getSimulationDirectives() {
+	const iniFilePath = join(basePath, 'sim.ini');
+
+	if (!isFile(iniFilePath)) {
+		return null;
+	}
+
+	try {
+		const data = readFile(iniFilePath);
+
+		const directives = {} as SimulatorDirectives;
+
+		for (const line of data!.split('\n')) {
+			const trimmedLine = line.trim();
+			if (trimmedLine) {
+				const [key, value] = trimmedLine.split('=');
+
+				if (key && value) {
+					// @ts-expect-error - key.trim() is a key of SimulatorDirectives
+					directives[key.trim()] = value.trim();
+				}
+			}
+		}
+
+		return directives;
+	} catch {
+		return null;
+	}
+}

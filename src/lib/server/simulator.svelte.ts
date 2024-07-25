@@ -2,14 +2,13 @@ import type { DempsProcess } from '.';
 import type { ChildProcess } from 'child_process';
 
 import { join } from 'node:path';
+import { isDirectory } from './utils';
 import { execFile } from 'child_process';
 import { uniquePool } from '$lib/states';
-import { isDirectory } from './utils';
-import { DEMPS_SIM_DIR } from '$env/static/private';
 
 import treeKill from 'tree-kill';
 
-export function createDempsProcess() {
+export function createDempsProcess(path: string, filename: string) {
 	let isRunning: boolean = $state(false);
 	let dempsProcess: ChildProcess | undefined = $state();
 
@@ -17,22 +16,17 @@ export function createDempsProcess() {
 
 	async function run(): Promise<void> {
 		return new Promise((resolve, reject) => {
-			if (!isDirectory(DEMPS_SIM_DIR)) {
+			if (!isDirectory(path)) {
 				reject(new Error('Simulator directory does not exist'));
 			}
 
 			try {
-				dempsProcess = execFile(
-					'./run.sh',
-					['--config', 'vdm-pob-vergara.config', '--outdir', 'output/vdm-pob-vergara'],
-					{ cwd: DEMPS_SIM_DIR },
-					(error) => {
-						if (error && error.code === 'ENOENT') {
-							console.error(`File not found: ${join(DEMPS_SIM_DIR, './run.sh')}.`);
-							reject(error);
-						}
+				dempsProcess = execFile('./run.sh', ['--config', filename], { cwd: path }, (error) => {
+					if (error && error.code === 'ENOENT') {
+						console.error(`File not found: ${join(path, './run.sh')}.`);
+						reject(error);
 					}
-				);
+				});
 
 				dempsProcess.on('spawn', () => {
 					isRunning = true;
