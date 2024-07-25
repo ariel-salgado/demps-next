@@ -54,8 +54,12 @@
 
 <input
 	{...rest}
-	class={cn(baseStyle, className)}
 	class:error={validationError}
+	class={cn(
+		baseStyle,
+		`${validationError ? 'border-2 border-red-600 focus-within:ring-red-600' : ''}`,
+		className
+	)}
 	onchange={validation ? validateField : undefined}
 	use:initInput
 	bind:value
@@ -64,9 +68,3 @@
 {#if validationError}
 	<small class="text-red-600">{inputError}</small>
 {/if}
-
-<style lang="postcss">
-	.error {
-		@apply border-2 border-red-600 focus-within:ring-red-600;
-	}
-</style>
