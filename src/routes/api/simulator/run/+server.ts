@@ -27,9 +27,7 @@ export const POST = (async () => {
 				return;
 			}
 
-			const { baseDirSim, configFile, agentsDir } = directives;
-
-			console.log('agentsDir:', agentsDir);
+			const { baseDirSim, configFile, agentsDir, floodEnabled, floodDir } = directives;
 
 			const dempsProcess = createDempsProcess(baseDirSim, configFile);
 			childProcesses.push(dempsProcess);
@@ -52,13 +50,27 @@ export const POST = (async () => {
 				}
 			});
 
-			const fileProcessor = createFileProcessor((data) => {
+			const agentProcessor = createFileProcessor((data) => {
 				emit('agents', data);
 			});
 
 			agentWatcher.on('add', (path) => {
-				fileProcessor.push(path);
+				agentProcessor.push(path);
 			});
+
+			if (floodEnabled) {
+				const floodWatcher = createWatcher('floodWatcher', floodDir);
+				fileWatchers.push(floodWatcher);
+
+				// TODO: Make data process generic passing a callback function
+				const floodProcessor = createFileProcessor((data) => {
+					emit('agents', data);
+				});
+
+				floodWatcher.on('add', (path) => {
+					floodProcessor.push(path);
+				});
+			}
 		},
 		{
 			ping: 10000,
