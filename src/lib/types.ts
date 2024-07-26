@@ -1,10 +1,13 @@
 import type { ZodType } from 'zod';
+import type { ComponentProps } from 'svelte';
 import type { Geometry, GeometryCollection } from 'geojson';
 import type {
 	HTMLInputAttributes,
 	HTMLInputTypeAttribute,
 	HTMLSelectAttributes
 } from 'svelte/elements';
+
+import { PathPicker } from './components/ui';
 
 export type FetchDirectoryOptions = Partial<{
 	extensions: string[] | null;
@@ -33,15 +36,16 @@ export type SelectOptions = {
 	selected?: boolean | undefined;
 }[];
 
-export type InputOrSelectProps =
+export type FormFieldProps =
 	| { type: 'input'; attributes: HTMLInputAttributes & { type: 'text' | 'number' } }
-	| { type: 'select'; attributes: HTMLSelectAttributes; options: SelectOptions };
+	| { type: 'select'; attributes: HTMLSelectAttributes; options: SelectOptions }
+	| { type: 'explorer'; attributes: HTMLInputAttributes; props: ComponentProps<PathPicker> };
 
 export type FormField = {
 	label: string;
 	description?: string;
 	validation?: ZodType;
-} & InputOrSelectProps;
+} & FormFieldProps;
 
 export type FormSchema = Record<string, FormField[] | Record<string, FormField[]>>;
 
