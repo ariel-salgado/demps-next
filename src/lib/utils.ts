@@ -220,7 +220,7 @@ export function extractDefaultValues(schema: FormSchema): Record<string, any> {
 		const name = 'name' in field.attributes ? field.attributes.name : undefined;
 		if (!name) return;
 
-		if (field.type === 'input' && 'value' in field.attributes) {
+		if ((field.type === 'input' || field.type === 'explorer') && 'value' in field.attributes) {
 			defaultValues[name] = field.attributes.value;
 		} else if (field.type === 'select') {
 			const selectedOption = field.options.find((option) => option.selected);
