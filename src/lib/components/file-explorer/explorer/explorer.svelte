@@ -10,12 +10,14 @@
 	type Props = {
 		directory: string;
 		selected: string | null;
+		isFile?: boolean | null;
 		onSelected?: () => void;
 	} & FetchDirectoryOptions;
 
 	let {
 		directory = $bindable(),
 		selected = $bindable(),
+		isFile = $bindable(null),
 		onSelected,
 		includeFiles = true,
 		includeFolders = true,
@@ -89,6 +91,7 @@
 
 		folders.push(directoryToCreate);
 		directoryToCreate = null;
+
 		toast.success('Creado', {
 			description: `El directorio ${created} ha sido creado`
 		});
@@ -117,6 +120,7 @@
 				bind:directory
 				bind:folders
 				bind:selected
+				bind:isFile
 				path={folder}
 				{onSelected}
 				{includeFolders}
@@ -129,6 +133,7 @@
 				bind:directory
 				bind:files
 				bind:selected
+				bind:isFile
 				path={file}
 				{onSelected}
 				{includeFolders}

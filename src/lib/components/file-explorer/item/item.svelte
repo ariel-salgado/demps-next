@@ -10,6 +10,7 @@
 		folders?: string[];
 		directory: string;
 		selected?: string | null;
+		isFile?: boolean | null;
 		includeFiles?: boolean;
 		includeFolders?: boolean;
 		onSelected?: () => void;
@@ -21,6 +22,7 @@
 		folders = $bindable(),
 		directory = $bindable(),
 		selected = $bindable(),
+		isFile = $bindable(),
 		includeFiles = true,
 		includeFolders = true,
 		onSelected
@@ -30,12 +32,14 @@
 		directory = joinPath(directory, path);
 	}
 
-	function handleSelected() {
+	function handleSelected(type: 'folder' | 'file') {
 		selected = joinPath(directory, path);
 
 		if (folders) {
 			directory = joinPath(directory, path);
 		}
+
+		isFile = type === 'file';
 
 		if (onSelected) {
 			onSelected();
@@ -116,7 +120,7 @@
 	<div
 		class="flex items-center gap-x-2 px-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 	>
-		<Button variant="outline" size="sm" onclick={handleSelected}>
+		<Button variant="outline" size="sm" onclick={() => handleSelected(type)}>
 			{#if selected === joinPath(directory, path)}
 				<CircleCheckBig class="mr-1.5 size-4" />
 				<span>Seleccionado</span>
