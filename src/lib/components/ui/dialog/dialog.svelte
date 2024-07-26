@@ -43,7 +43,10 @@
 			use:clickOutside={() => (show = false)}
 		>
 			<button
+				type="button"
 				class="absolute top-3 right-3 size-8 cursor-pointer content-center rounded-full hover:bg-slate-100"
+				aria-label="Cerrar"
+				title="Cerrar"
 				onclick={() => (show = false)}
 			>
 				<X class="mx-auto size-6" />
