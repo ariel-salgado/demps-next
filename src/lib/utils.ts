@@ -191,6 +191,7 @@ export function joinPath(path1: string, path2: string) {
 
 	const path = '/' + segments1.join('/');
 
+	// TODO: Check for folders, as folders can have dots too
 	if (!path.split('/').at(-1)?.includes('.')) {
 		return path + (path.endsWith('/') ? '' : '/');
 	}
