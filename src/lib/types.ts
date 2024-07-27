@@ -35,9 +35,11 @@ export type SelectOptions = {
 
 export type PathPickerProps = {
 	isFile?: boolean;
+	basePath?: string;
 	initialPath?: string;
 	validation?: ZodType;
 	onSelected?: () => void;
+	disableBacktracking?: boolean;
 } & FetchDirectoryOptions;
 
 export type FormFieldProps =

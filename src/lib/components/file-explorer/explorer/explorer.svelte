@@ -8,20 +8,24 @@
 	import { Breadcrumb, Item } from '$lib/components/file-explorer';
 
 	type Props = {
+		basePath?: string;
 		directory: string;
 		selected: string | null;
 		isFile?: boolean | null;
 		onSelected?: () => void;
+		disableBacktracking?: boolean;
 	} & FetchDirectoryOptions;
 
 	let {
+		basePath,
 		directory = $bindable(),
 		selected = $bindable(),
 		isFile = $bindable(null),
 		onSelected,
 		includeFiles = true,
 		includeFolders = true,
-		extensions = null
+		extensions = null,
+		disableBacktracking = false
 	}: Props = $props();
 
 	let files: string[] = $state([]);
@@ -102,7 +106,7 @@
 	<h2 class="text-3xl font-bold">Seleccionar {`${includeFolders ? 'directorio' : 'archivo'}`}</h2>
 
 	<div class="flex w-full items-center justify-between">
-		<Breadcrumb bind:directory />
+		<Breadcrumb bind:directory {basePath} {disableBacktracking} />
 		<div class="flex gap-x-1.5">
 			<Input class="h-8" placeholder="Crear directorio" bind:value={directoryToCreate} />
 			<Button size="icon" onclick={createDirectory}>
@@ -112,7 +116,7 @@
 	</div>
 
 	<div class="divide-y divide-slate-300 overflow-scroll rounded-xl border border-slate-300">
-		{#if directory.split('/').length > 4}
+		{#if directory.split('/').length > 4 && directory.length > (basePath?.length || 0) && !disableBacktracking}
 			<Item bind:directory path={'..'} />
 		{/if}
 		{#each folders as folder}
