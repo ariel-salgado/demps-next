@@ -2,7 +2,6 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { FormField, FormSchema, ParametersSchema } from '$lib/types';
 
-	import { on } from 'svelte/events';
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -12,18 +11,23 @@
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
 	import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
-	import { FormGroup, Label, Input, Select, Description, Button, Dialog } from '$lib/components/ui';
+	import {
+		FormGroup,
+		Label,
+		Input,
+		Select,
+		Description,
+		Button,
+		Dialog,
+		PathPicker
+	} from '$lib/components/ui';
 	import { deflattenJSON, flattenJSON, preprocessParametersData, splitCamelCase } from '$lib/utils';
 
 	const baseDirInitValue = (
-		PUBLIC_BASE_DIR!== parameters.value.baseDirSim
-			? parameters.value.baseDirSim
-			: PUBLIC_BASE_DIR
+		PUBLIC_BASE_DIR !== parameters.value.baseDirSim ? parameters.value.baseDirSim : PUBLIC_BASE_DIR
 	) as string;
 
 	// baseDirSim related
-	let showDirSimDialog: boolean = $state(false);
-	let selectedDirSim: string = $state(baseDirInitValue);
 	let dirSimDirectory: string = $state(baseDirInitValue);
 
 	// Config file related
@@ -35,13 +39,7 @@
 	let form: HTMLFormElement | undefined = $state();
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
-	$effect(() => {
-		parameters.value['baseDirSim'] = selectedDirSim;
-	});
-
 	onMount(() => {
-		attachDialog();
-
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const entry of entries) {
@@ -84,7 +82,6 @@
 
 					if (Object.keys(data).every((element) => fieldNames.includes(element))) {
 						parameters.value = data;
-						selectedDirSim = data.baseDirSim as string;
 						toast.success('Configuración cargada correctamente');
 					} else {
 						toast.error('Archivo de configuración inválido');
@@ -103,6 +100,7 @@
 		}
 	}
 
+	// TODO: Handle relative paths
 	const handleFormVerification: SubmitFunction = async () => {
 		return async ({ result, action }) => {
 			if (result.type !== 'success' || !result.data) {
@@ -181,27 +179,6 @@
 		};
 	};
 
-	function attachDialog() {
-		const baseDirSim = document.querySelector('input[name="baseDirSim"]') as HTMLInputElement;
-
-		const onClick = on(baseDirSim, 'click', () => {
-			showDirSimDialog = true;
-		});
-
-		const onFocus = on(baseDirSim, 'focus', () => {
-			showDirSimDialog = true;
-		});
-
-		return () => {
-			onClick();
-			onFocus();
-		};
-	}
-
-	function onDirSimSelected() {
-		showDirSimDialog = false;
-	}
-
 	async function onConfigSelected() {
 		const response = await fetch('/api/file/get', {
 			method: 'POST',
@@ -230,7 +207,6 @@
 
 			if (Object.keys(loadedData).every((element) => fieldNames.includes(element))) {
 				parameters.value = loadedData;
-				selectedDirSim = loadedData.baseDirSim as string;
 				toast.success('Configuración cargada correctamente');
 			} else {
 				toast.error('Archivo de configuración inválido');
@@ -248,15 +224,6 @@
 	<title>DEMPS | Parametros</title>
 	<meta name="description" content="Configuración de parámetros" />
 </svelte:head>
-
-<Dialog bind:show={showDirSimDialog}>
-	<Explorer
-		bind:directory={dirSimDirectory}
-		bind:selected={selectedDirSim}
-		onSelected={onDirSimSelected}
-		includeFiles={false}
-	/>
-</Dialog>
 
 <Dialog bind:show={showConfigDialog}>
 	<Explorer
@@ -437,6 +404,14 @@
 				{...field.attributes}
 				options={field.options}
 				validation={field.validation}
+			/>
+		{:else if field.type === 'explorer'}
+			<PathPicker
+				id={field.attributes.name}
+				{...field.attributes}
+				{...field.props}
+				validation={field.validation}
+				bind:value={parameters.value[field.attributes.name! as keyof ParametersSchema]}
 			/>
 		{/if}
 		{#if field.description}
