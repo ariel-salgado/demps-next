@@ -1,6 +1,7 @@
 import type { FormSchema, PopupFields } from './types';
 
-import { nonEmpty } from './utils';
+import { joinPath, nonEmpty } from './utils';
+import { PUBLIC_BASE_DIR, PUBLIC_SIM_DIR } from '$env/static/public';
 
 export const defaultParametersConfigFilename = 'parameters.config';
 
@@ -61,6 +62,7 @@ export const popupFields = {
 	}
 } satisfies PopupFields;
 
+// TODO: Some path refinements
 export const parametersFormFields = {
 	general: [
 		{
@@ -176,7 +178,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'floodModelEnable'
-				// placeholder: 'Seleccione el modelo de inundación'
 			},
 			validation: nonEmpty()
 		},
@@ -197,7 +198,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'densityModelEnable'
-				// placeholder: 'Seleccione el modelo de densidad'
 			},
 			validation: nonEmpty()
 		},
@@ -218,7 +218,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'panicModelEnable'
-				// placeholder: 'Seleccione el modelo de pánico'
 			},
 			validation: nonEmpty()
 		},
@@ -239,7 +238,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'elevationModelEnable'
-				// placeholder: 'Seleccione el modelo de elevación'
 			},
 			validation: nonEmpty()
 		},
@@ -260,7 +258,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'debrisModelEnable'
-				// placeholder: 'Seleccione el modelo de escombros'
 			},
 			validation: nonEmpty()
 		},
@@ -300,12 +297,15 @@ export const parametersFormFields = {
 		{
 			label: 'Base Dir Sim',
 			description: 'Directorio base de la simulación',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'baseDirSim',
-				type: 'text',
-				value: '/home/demps-user/sim/',
-				placeholder: 'Ingrese el directorio base de la simulación'
+				value: PUBLIC_SIM_DIR
+			},
+			props: {
+				isFile: false,
+				includeFiles: false,
+				basePath: PUBLIC_BASE_DIR
 			},
 			validation: nonEmpty()
 		}
@@ -314,34 +314,46 @@ export const parametersFormFields = {
 		{
 			label: 'Directory',
 			description: 'Directorio',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'input.directory',
-				type: 'text',
-				placeholder: 'Ingrese el directorio'
-			}
+				value: joinPath(PUBLIC_SIM_DIR, 'input/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
+			},
+			validation: nonEmpty()
 		},
 		{
 			label: 'Map',
 			description: 'Mapa',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'input.map',
-				type: 'text',
-				value: 'map.osrm',
-				placeholder: 'Ingrese el mapa'
+				value: joinPath(PUBLIC_BASE_DIR, 'planet.openstreetmap.org/chile/map.osrm')
+			},
+			props: {
+				isFile: true,
+				includeFolders: false,
+				extensions: ['.osrm']
 			},
 			validation: nonEmpty()
 		},
 		{
 			label: 'Zones',
 			description: 'Zonas',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'input.zones',
-				type: 'text',
-				placeholder: 'Ingrese las zonas'
-			}
+				value: joinPath(PUBLIC_SIM_DIR, 'input/app-zones.geojson')
+			},
+			props: {
+				isFile: true,
+				includeFolders: false,
+				extensions: ['.geojson']
+			},
+			validation: nonEmpty()
 		}
 	],
 	output: [
@@ -362,7 +374,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'output.progressBar'
-				// placeholder: 'Seleccione la barra de progreso'
 			},
 			validation: nonEmpty()
 		},
@@ -381,12 +392,16 @@ export const parametersFormFields = {
 		{
 			label: 'Directory',
 			description: 'Directorio',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'output.directory',
-				type: 'text',
-				placeholder: 'Ingrese el directorio'
-			}
+				value: joinPath(PUBLIC_SIM_DIR, 'output/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
+			},
+			validation: nonEmpty()
 		},
 		{
 			label: 'Agents Out',
@@ -405,19 +420,20 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'output.agents-out'
-				// placeholder: 'Seleccione la salida de agentes'
 			},
 			validation: nonEmpty()
 		},
 		{
 			label: 'Agents Path',
 			description: 'Directorio de agentes',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'output.agents-path',
-				type: 'text',
-				value: 'agents/',
-				placeholder: 'Ingrese el directorio de agentes'
+				value: joinPath(PUBLIC_SIM_DIR, 'output/agents/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
 			},
 			validation: nonEmpty()
 		},
@@ -462,7 +478,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'output.stats-out'
-				// placeholder: 'Seleccione la salida de estadísticas'
 			},
 			validation: nonEmpty()
 		},
@@ -519,7 +534,6 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'output.heatMap-out'
-				// placeholder: 'Seleccione la salida de mapa de calor'
 			},
 			validation: nonEmpty()
 		},
@@ -550,12 +564,14 @@ export const parametersFormFields = {
 		{
 			label: 'Heat Map Path',
 			description: 'Directorio del mapa de calor',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'output.heatMap-path',
-				type: 'text',
-				value: 'heatMaps/',
-				placeholder: 'Ingrese el directorio del mapa de calor'
+				value: joinPath(PUBLIC_SIM_DIR, 'output/heatMaps/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
 			},
 			validation: nonEmpty()
 		}
@@ -662,19 +678,20 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'floodParams.imagesEnable'
-				// placeholder: 'Seleccione la habilitación de imágenes'
 			},
 			validation: nonEmpty()
 		},
 		{
 			label: 'Images Dir',
 			description: 'Directorio de imágenes',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'floodParams.imagesDir',
-				type: 'text',
-				value: 'floodImgs/',
-				placeholder: 'Ingrese el directorio de imágenes'
+				value: joinPath(PUBLIC_SIM_DIR, 'output/floodImgs/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
 			},
 			validation: nonEmpty()
 		},
@@ -695,19 +712,20 @@ export const parametersFormFields = {
 			],
 			attributes: {
 				name: 'floodParams.stateEnable'
-				// placeholder: 'Seleccione la habilitación de estado'
 			},
 			validation: nonEmpty()
 		},
 		{
 			label: 'State Dir',
 			description: 'Directorio de estado',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'floodParams.stateDir',
-				type: 'text',
-				value: 'floodState/',
-				placeholder: 'Ingrese el directorio de estado'
+				value: joinPath(PUBLIC_SIM_DIR, 'output/floodState/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
 			},
 			validation: nonEmpty()
 		}
