@@ -3,6 +3,7 @@ import type { FormSchema, PopupFields } from './types';
 import { joinPath, nonEmpty } from './utils';
 import { PUBLIC_BASE_DIR, PUBLIC_SIM_DIR } from '$env/static/public';
 
+export const defaultZonesFilename = 'app-zones.geojson';
 export const defaultParametersConfigFilename = 'parameters.config';
 
 export const popupFields = {
@@ -347,7 +348,7 @@ export const parametersFormFields = {
 			type: 'explorer',
 			attributes: {
 				name: 'input.zones',
-				value: joinPath(PUBLIC_SIM_DIR, 'input/app-zones.geojson')
+				value: joinPath(PUBLIC_SIM_DIR, `input/${defaultZonesFilename}`)
 			},
 			props: {
 				isFile: true,
