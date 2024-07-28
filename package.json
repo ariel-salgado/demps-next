@@ -31,7 +31,7 @@
 		"@playwright/test": "^1.45.3",
 		"@sveltejs/adapter-node": "^5.2.0",
 		"@sveltejs/kit": "^2.5.18",
-		"@sveltejs/vite-plugin-svelte": "4.0.0-next.4",
+		"@sveltejs/vite-plugin-svelte": "4.0.0-next.5",
 		"@tailwindcss/vite": "4.0.0-alpha.18",
 		"@turf/random": "7.0.0",
 		"@turf/rewind": "7.0.0",
