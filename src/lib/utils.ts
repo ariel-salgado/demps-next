@@ -217,10 +217,14 @@ export function extractDefaultValues(schema: FormSchema): Record<string, any> {
 	const defaultValues: Record<string, any> = {};
 
 	function processField(field: FormField) {
-		const name = 'name' in field.attributes ? field.attributes.name : undefined;
+		const name = field.attributes.name;
+
 		if (!name) return;
 
-		if ((field.type === 'input' || field.type === 'explorer') && 'value' in field.attributes) {
+		if (
+			(field.type === 'input' || field.type === 'explorer') &&
+			field.attributes.value !== undefined
+		) {
 			defaultValues[name] = field.attributes.value;
 		} else if (field.type === 'select') {
 			const selectedOption = field.options.find((option) => option.selected);
