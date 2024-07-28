@@ -93,13 +93,16 @@
 >
 	<button
 		type="button"
-		class="flex size-9 cursor-pointer items-center justify-center rounded-l-md bg-slate-200/80 p-2"
+		class={cn(
+			'flex size-9 cursor-pointer items-center justify-center rounded-l-md bg-slate-200/80 p-2',
+			validationError ? 'bg-red-200' : ''
+		)}
 		onclick={() => (showDialog = true)}
 	>
 		{#if isFile}
-			<File class="size-[18px]" />
+			<File class="size-[18px] {validationError ? 'stroke-red-700' : ''}" />
 		{:else}
-			<Folder class="size-[18px]" />
+			<Folder class="size-[18px] {validationError ? 'stroke-red-700' : ''}" />
 		{/if}
 	</button>
 	<input
