@@ -10,6 +10,7 @@ import { clsx } from 'clsx';
 import { on } from 'svelte/events';
 import { twMerge } from 'tailwind-merge';
 import { browser } from '$app/environment';
+import { defaultZonesFilename } from './config';
 
 // GeoJSON related
 import { rewind } from '@turf/rewind';
@@ -254,11 +255,12 @@ export const nonEmpty = (message?: string) =>
 		message: message ?? 'El campo es requerido.'
 	});
 
+// TODO: Fix all relative paths
 export function preprocessParametersData(parameters: ParametersSchema) {
 	// Set default values if they doesnt exist
 	parameters.input.directory ??= 'input/';
 	parameters.output.directory ??= 'output/';
-	parameters.input.zones ??= 'zones.geojson';
+	parameters.input.zones ??= defaultZonesFilename;
 
 	// Add prefixes to input and output directories
 	if (parameters.input.directory.split('/').at(0) !== 'input') {
