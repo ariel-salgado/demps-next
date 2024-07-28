@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { joinPath } from '$lib/utils';
 	import { Button } from '$lib/components/ui';
+	import { getRelativePath, joinPath } from '$lib/utils';
 	import { File, Folder, CornerUpLeft, Trash2, CircleCheckBig, Circle } from 'lucide-svelte';
 
 	interface Props {
@@ -32,13 +32,6 @@
 
 	function handleBrowsing() {
 		directory = joinPath(directory, path);
-	}
-
-	function getRelativePath(path: string, subPath: string) {
-		const pathParts = path.split('/').filter(Boolean);
-		const subPathParts = subPath.split('/').filter(Boolean);
-
-		return subPathParts.filter((folder) => !pathParts.includes(folder)).join('/');
 	}
 
 	function handleSelected(type: 'folder' | 'file') {

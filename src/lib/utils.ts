@@ -327,3 +327,10 @@ export function getValidationSchema(form: FormSchema) {
 
 	return schema;
 }
+
+export function getRelativePath(path: string, subPath: string) {
+	const pathParts = path.split('/').filter(Boolean);
+	const subPathParts = subPath.split('/').filter(Boolean);
+
+	return subPathParts.filter((folder) => !pathParts.includes(folder)).join('/');
+}
