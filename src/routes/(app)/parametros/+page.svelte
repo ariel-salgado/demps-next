@@ -125,6 +125,7 @@
 			const parsedData = deflattenJSON(result.data) as ParametersSchema;
 			const data = JSON.stringify(preprocessParametersData(parsedData), null, '\t');
 
+			// Download the file
 			if (action.search.includes('download')) {
 				const blob = new Blob([data], { type: 'application/json' });
 				const url = URL.createObjectURL(blob);
@@ -138,9 +139,15 @@
 				document.body.removeChild(a);
 
 				URL.revokeObjectURL(url);
+
+				toast.success('Configuración válida', {
+					description: `El archivo ${defaultParametersConfigFilename} se ha descargado con exito.`
+				});
+
 				return;
 			}
 
+			// Verify integrity
 			if (action.search.includes('verify')) {
 				if (!configFileName) {
 					toast.error('Error al guardar configuración', {
@@ -173,8 +180,6 @@
 				toast.success('Configuración guardada correctamente', {
 					description: `El archivo ${fileName} se guardó en ${path}`
 				});
-
-				return;
 			}
 		};
 	};
