@@ -331,12 +331,13 @@ export const parametersFormFields = {
 			type: 'explorer',
 			attributes: {
 				name: 'input.map',
-				value: joinPath(PUBLIC_BASE_DIR, 'planet.openstreetmap.org/chile/map.osrm')
+				placeholder: 'Ingrese ruta absoluta del archivo .osrm.'
 			},
 			props: {
 				isFile: true,
 				includeFolders: false,
-				extensions: ['.osrm']
+				extensions: ['.osrm'],
+				initialPath: joinPath(PUBLIC_BASE_DIR, 'planet.openstreetmap.org/chile/')
 			},
 			validation: nonEmpty()
 		},
