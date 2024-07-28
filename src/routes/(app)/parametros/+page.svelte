@@ -111,10 +111,17 @@
 			}
 
 			if ('errors' in result.data) {
-				Object.keys(result.data.errors).forEach((id) => {
+				Object.keys(result.data.errors).forEach((id, index) => {
 					const el = document.getElementById(id);
 					const event = new Event('change', { bubbles: true, cancelable: true });
 					el?.dispatchEvent(event);
+
+					if (index === Object.keys(result.data!.errors).length - 1) {
+						el?.scrollIntoView({
+							behavior: 'smooth',
+							block: 'center'
+						});
+					}
 				});
 				toast.error('Error al descargar configuración', {
 					description: 'Corrija los errores en el formulario antes de descargar la configuración.'
