@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Action } from 'svelte/action';
 	import type { PathPickerProps } from '$lib/types';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
@@ -64,8 +63,6 @@
 
 		return path.replace(/[^/]*$/, '').replace(/\/$/, '');
 	}
-
-	const initPathPicker: Action<HTMLInputElement> = (inputElement: HTMLInputElement) => {};
 </script>
 
 <Dialog
@@ -109,7 +106,7 @@
 		bind:this={inputElement}
 		class="w-full border-none px-3 focus-within:outline-none"
 		bind:value
-		use:initPathPicker
+		onchange={validateField}
 		{...rest}
 	/>
 </div>
