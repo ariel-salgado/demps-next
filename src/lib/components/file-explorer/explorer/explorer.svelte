@@ -59,7 +59,14 @@
 
 		if (error) {
 			toast.error('Error', {
-				description: error.message
+				description: error.message,
+				action: {
+					label: 'Crear directorio',
+					onClick: () => {
+						// TODO: Create directory from the last existing path
+						// createDirectory(directory)
+					}
+				}
 			});
 			return;
 		}
@@ -68,7 +75,7 @@
 		folders = contents.folders;
 	}
 
-	async function createDirectory() {
+	async function createDirectory(pathToCreate: string | null) {
 		if (!directoryToCreate) {
 			toast.error('Error', {
 				description: 'Por favor, ingrese un nombre para el directorio a crear'
@@ -76,7 +83,7 @@
 			return;
 		}
 
-		const path = joinPath(directory, directoryToCreate!);
+		const path = joinPath(directory, pathToCreate!);
 
 		const response = await fetch('/api/directory/create', {
 			method: 'POST',
@@ -95,8 +102,7 @@
 			return;
 		}
 
-		folders.push(directoryToCreate);
-		directoryToCreate = null;
+		folders.push(pathToCreate!);
 
 		toast.success('Creado', {
 			description: `El directorio ${created} ha sido creado`
@@ -111,7 +117,13 @@
 		<Breadcrumb bind:directory {basePath} {disableBacktracking} />
 		<div class="flex gap-x-1.5">
 			<Input class="h-8" placeholder="Crear directorio" bind:value={directoryToCreate} />
-			<Button size="icon" onclick={createDirectory}>
+			<Button
+				size="icon"
+				onclick={() => {
+					createDirectory(directoryToCreate);
+					directoryToCreate = null;
+				}}
+			>
 				<FolderPlus />
 			</Button>
 		</div>
