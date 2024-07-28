@@ -38,6 +38,7 @@ export type PathPickerProps = {
 	basePath?: string;
 	initialPath?: string;
 	validation?: ZodType;
+	isRelativeTo?: string;
 	onSelected?: () => void;
 	disableBacktracking?: boolean;
 } & FetchDirectoryOptions;

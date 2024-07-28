@@ -10,6 +10,7 @@
 	type Props = {
 		basePath?: string;
 		directory: string;
+		isRelativeTo?: string;
 		selected: string | null;
 		isFile?: boolean | null;
 		onSelected?: () => void;
@@ -25,7 +26,8 @@
 		includeFiles = true,
 		includeFolders = true,
 		extensions = null,
-		disableBacktracking = false
+		disableBacktracking = false,
+		isRelativeTo
 	}: Props = $props();
 
 	let files: string[] = $state([]);
@@ -116,7 +118,9 @@
 	</div>
 
 	<div class="divide-y divide-slate-300 overflow-scroll rounded-xl border border-slate-300">
-		{#if directory.split('/').length > 4 && directory.length > (basePath?.length || 0) && !disableBacktracking}
+		{#if directory
+			.split('/')
+			.filter(Boolean).length > 2 && directory.length > (basePath?.length || 0) && !disableBacktracking}
 			<Item bind:directory path={'..'} />
 		{/if}
 		{#each folders as folder}
@@ -127,8 +131,9 @@
 				bind:isFile
 				path={folder}
 				{onSelected}
-				{includeFolders}
+				{isRelativeTo}
 				{includeFiles}
+				{includeFolders}
 			/>
 		{/each}
 
@@ -140,8 +145,9 @@
 				bind:isFile
 				path={file}
 				{onSelected}
-				{includeFolders}
+				{isRelativeTo}
 				{includeFiles}
+				{includeFolders}
 			/>
 		{/each}
 	</div>

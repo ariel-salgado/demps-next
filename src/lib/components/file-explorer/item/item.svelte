@@ -13,6 +13,7 @@
 		isFile?: boolean | null;
 		includeFiles?: boolean;
 		includeFolders?: boolean;
+		isRelativeTo?: string;
 		onSelected?: () => void;
 	}
 
@@ -25,18 +26,36 @@
 		isFile = $bindable(),
 		includeFiles = true,
 		includeFolders = true,
-		onSelected
+		onSelected,
+		isRelativeTo
 	}: Props = $props();
 
 	function handleBrowsing() {
 		directory = joinPath(directory, path);
 	}
 
+	function getRelativePath(path: string, subPath: string) {
+		const pathParts = path.split('/').filter(Boolean);
+		const subPathParts = subPath.split('/').filter(Boolean);
+
+		return subPathParts.filter((folder) => !pathParts.includes(folder)).join('/');
+	}
+
 	function handleSelected(type: 'folder' | 'file') {
-		selected = joinPath(directory, path);
+		const fullPath = joinPath(directory, path);
+
+		if (typeof isRelativeTo === 'string') {
+			if (isRelativeTo === '/') {
+				selected = fullPath.split('/').filter(Boolean).at(-1);
+			} else {
+				selected = getRelativePath(isRelativeTo, fullPath);
+			}
+		} else {
+			selected = fullPath;
+		}
 
 		if (folders) {
-			directory = joinPath(directory, path);
+			directory = fullPath;
 		}
 
 		isFile = type === 'file';
@@ -125,11 +144,19 @@
 </div>
 
 {#snippet actions(type: 'folder' | 'file')}
+	{@const fullPath = joinPath(directory, path)}
+	{@const currentFolder = fullPath.split('/').filter(Boolean).at(-1)}
+	{@const toCompare = !isRelativeTo
+		? fullPath
+		: isRelativeTo === '/'
+			? currentFolder
+			: getRelativePath(isRelativeTo!, fullPath)}
+
 	<div
 		class="flex items-center gap-x-2 px-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 	>
 		<Button variant="outline" size="sm" onclick={() => handleSelected(type)}>
-			{#if selected === joinPath(directory, path)}
+			{#if selected === toCompare}
 				<CircleCheckBig class="mr-1.5 size-4" />
 				<span>Seleccionado</span>
 			{:else}

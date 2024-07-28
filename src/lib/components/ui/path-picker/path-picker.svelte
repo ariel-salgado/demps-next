@@ -4,7 +4,6 @@
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	import { cn } from '$lib/utils';
-	import { on } from 'svelte/events';
 	import { Dialog } from '$lib/components/ui';
 	import { File, Folder } from 'lucide-svelte';
 	import { Explorer } from '$lib/components/file-explorer';
@@ -21,7 +20,8 @@
 		includeFolders = true,
 		isFile = $bindable(false),
 		disableBacktracking = false,
-		value: value = $bindable(null),
+		isRelativeTo,
+		value: value = $bindable(),
 		class: className,
 		...rest
 	}: Props = $props();
@@ -65,21 +65,7 @@
 		return path.replace(/[^/]*$/, '').replace(/\/$/, '');
 	}
 
-	const initPathPicker: Action<HTMLInputElement> = (inputElement: HTMLInputElement) => {
-		const onFocus = on(inputElement, 'focus', () => {
-			showDialog = true;
-		});
-
-		$effect(() => {
-			inputElement.scrollLeft = inputElement.scrollWidth;
-		});
-
-		return {
-			destroy() {
-				onFocus();
-			}
-		};
-	};
+	const initPathPicker: Action<HTMLInputElement> = (inputElement: HTMLInputElement) => {};
 </script>
 
 <Dialog
@@ -96,6 +82,7 @@
 		{includeFiles}
 		onSelected={handleSelected}
 		{disableBacktracking}
+		{isRelativeTo}
 	/>
 </Dialog>
 
@@ -107,22 +94,23 @@
 		className
 	)}
 >
-	<span class="flex size-9 items-center justify-center rounded-l-md bg-slate-200/80 p-2">
+	<button
+		type="button"
+		class="flex size-9 cursor-pointer items-center justify-center rounded-l-md bg-slate-200/80 p-2"
+		onclick={() => (showDialog = true)}
+	>
 		{#if isFile}
 			<File class="size-[18px]" />
 		{:else}
 			<Folder class="size-[18px]" />
 		{/if}
-	</span>
+	</button>
 	<input
 		bind:this={inputElement}
 		class="w-full border-none px-3 focus-within:outline-none"
-		{...rest}
-		use:initPathPicker
 		bind:value
-		onkeydown={function (e) {
-			e.preventDefault();
-		}}
+		use:initPathPicker
+		{...rest}
 	/>
 </div>
 
