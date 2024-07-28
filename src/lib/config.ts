@@ -497,24 +497,28 @@ export const parametersFormFields = {
 		{
 			label: 'Stats Path',
 			description: 'Directorio de estadísticas',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'output.stats-path',
-				type: 'text',
-				value: 'stats/',
-				placeholder: 'Ingrese el directorio de estadísticas'
+				value: joinPath(PUBLIC_SIM_DIR, 'output/stats/')
+			},
+			props: {
+				isFile: false,
+				includeFiles: false
 			},
 			validation: nonEmpty()
 		},
 		{
 			label: 'Anim Config',
 			description: 'Nombre de archivo de configuración de animación',
-			type: 'input',
+			type: 'explorer',
 			attributes: {
 				name: 'output.anim-config',
-				type: 'text',
-				value: 'animacion.config.json',
-				placeholder: 'Ingrese nombre de archivo de configuración de animación'
+				value: joinPath(PUBLIC_SIM_DIR, 'output/animacion.config.json')
+			},
+			props: {
+				isFile: true,
+				includeFolders: false
 			},
 			validation: nonEmpty()
 		},
