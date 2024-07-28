@@ -3,16 +3,16 @@ import type { PageServerLoad } from './$types';
 
 import { join } from 'node:path';
 import { getValidationSchema } from '$lib/utils';
-import { PUBLIC_SIM_DIR } from '$env/static/public';
+import { parametersFormFields } from '$lib/config';
 import { createFile, isFile } from '$lib/server/utils';
-import { defaultZonesFilename, parametersFormFields } from '$lib/config';
+import { PUBLIC_SIM_DIR, PUBLIC_ZONES_FILENAME } from '$env/static/public';
 
 export const prerender = false;
 
 export const load = (async () => {
 	const path: string = join(PUBLIC_SIM_DIR, 'input/');
 
-	if (isFile(join(path, defaultZonesFilename))) return;
+	if (isFile(join(path, PUBLIC_ZONES_FILENAME))) return;
 
 	const defaultData: string = JSON.stringify(
 		{
@@ -23,7 +23,7 @@ export const load = (async () => {
 		'\t'
 	);
 
-	createFile(path, defaultZonesFilename, defaultData);
+	createFile(path, PUBLIC_ZONES_FILENAME, defaultData);
 }) satisfies PageServerLoad;
 
 // TODO: Remove duplicates, better handling on client-side code

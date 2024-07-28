@@ -10,7 +10,7 @@ import { clsx } from 'clsx';
 import { on } from 'svelte/events';
 import { twMerge } from 'tailwind-merge';
 import { browser } from '$app/environment';
-import { defaultZonesFilename } from './config';
+import { PUBLIC_ZONES_FILENAME } from '$env/static/public';
 
 // GeoJSON related
 import { rewind } from '@turf/rewind';
@@ -260,7 +260,7 @@ export function preprocessParametersData(parameters: ParametersSchema) {
 	// Set default values if they doesnt exist
 	parameters.input.directory ??= 'input/';
 	parameters.output.directory ??= 'output/';
-	parameters.input.zones ??= defaultZonesFilename;
+	parameters.input.zones ??= PUBLIC_ZONES_FILENAME;
 
 	// Add prefixes to input and output directories
 	if (parameters.input.directory.split('/').at(0) !== 'input') {

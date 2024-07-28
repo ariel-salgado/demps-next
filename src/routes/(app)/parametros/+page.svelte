@@ -7,10 +7,10 @@
 	import { toast } from 'svelte-sonner';
 	import { parameters } from '$lib/states';
 	import { onDestroy, onMount } from 'svelte';
-	import { PUBLIC_BASE_DIR } from '$env/static/public';
+	import { parametersFormFields } from '$lib/config';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
-	import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
+	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
 	import {
 		FormGroup,
 		Label,
@@ -132,7 +132,7 @@
 
 				const a = document.createElement('a');
 				a.href = url;
-				a.download = defaultParametersConfigFilename;
+				a.download = PUBLIC_PARAMETERS_FILENAME;
 
 				document.body.appendChild(a);
 				a.click();
@@ -141,7 +141,7 @@
 				URL.revokeObjectURL(url);
 
 				toast.success('Configuración válida', {
-					description: `El archivo ${defaultParametersConfigFilename} se ha descargado con exito.`
+					description: `El archivo ${PUBLIC_PARAMETERS_FILENAME} se ha descargado con exito.`
 				});
 
 				return;

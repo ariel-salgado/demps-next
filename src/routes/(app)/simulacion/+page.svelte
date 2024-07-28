@@ -5,12 +5,11 @@
 	import { joinPath } from '$lib/utils';
 	import { source } from 'sveltekit-sse';
 	import { parameters } from '$lib/states';
-	import { PUBLIC_BASE_DIR } from '$env/static/public';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
-	import { defaultParametersConfigFilename } from '$lib/config';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
+	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
 
 	const parametersOptions = $state([
 		{ value: 'default', label: 'Usar por defecto' },
@@ -122,7 +121,7 @@
 	}
 
 	async function handleExistingConfigFile() {
-		const path = joinPath(parameters.value.baseDirSim!, defaultParametersConfigFilename);
+		const path = joinPath(parameters.value.baseDirSim!, PUBLIC_PARAMETERS_FILENAME);
 
 		const fileExistsResponse = await fetch('/api/file/get', {
 			method: 'POST',

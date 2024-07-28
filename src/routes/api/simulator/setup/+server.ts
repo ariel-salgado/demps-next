@@ -3,8 +3,9 @@ import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
+import { parametersFormFields } from '$lib/config';
+import { PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
 import { basePath, createFile, isFile, readFile } from '$lib/server/utils';
-import { defaultParametersConfigFilename, parametersFormFields } from '$lib/config';
 import {
 	deflattenJSON,
 	getValidationSchema,
@@ -97,7 +98,7 @@ export const POST = (async ({ request }) => {
 	const enableFloodWatcher = floodModelEnable && stateEnable;
 	const floodDir = addTrailingSlash(join(fullOutputDirectory, stateDir));
 	const agentsDir = addTrailingSlash(join(fullOutputDirectory, agentsPath));
-	const configFile = type === 'local' ? defaultParametersConfigFilename : config.split('/').at(-1);
+	const configFile = type === 'local' ? PUBLIC_PARAMETERS_FILENAME : config.split('/').at(-1);
 
 	const simulatorDirectives: SimulatorDirectives = {
 		configFile,
