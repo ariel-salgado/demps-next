@@ -32,7 +32,10 @@
 </script>
 
 {#if show}
-	<div class="fixed inset-0 z-[9999] size-full content-center bg-slate-700/80" transition:fade>
+	<div
+		class="fixed inset-0 -top-2 z-[9999] h-lvh w-screen content-center bg-slate-700/80"
+		transition:fade
+	>
 		<div
 			class={cn(
 				'relative mx-auto size-[80%] overflow-scroll rounded-lg bg-white p-4 shadow-lg',
