@@ -56,7 +56,7 @@
 		tabindex="-1"
 		aria-label="Resize"
 		onmousedown={mouseDownHandler}
-		class={`z-[999] self-center rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
+		class={`isolate self-center rounded-sm py-2 transition-colors focus-within:bg-slate-500 hover:bg-slate-500 ${isDragging ? 'cursor-col-resize' : 'cursor-ew-resize'}`}
 	>
 		<EllipsisVertical class="stroke-slate-300" />
 	</div>
