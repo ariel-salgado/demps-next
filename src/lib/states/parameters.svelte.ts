@@ -1,8 +1,8 @@
-import type { ParametersSchema } from '$lib/types';
+import type { DeepPartial, ParametersSchema } from '$lib/types';
 
 import { loadLocalStorage, saveLocalStorage } from '$lib/utils';
 
-type PartialParameters = Partial<ParametersSchema>;
+type PartialParameters = DeepPartial<ParametersSchema>;
 
 export function createParameters(parameters?: PartialParameters) {
 	let _parameters: PartialParameters | null = $state({});
