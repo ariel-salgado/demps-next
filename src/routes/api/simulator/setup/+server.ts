@@ -4,14 +4,9 @@ import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
 import { parametersFormFields } from '$lib/config';
-import { PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
+import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
 import { basePath, createFile, isFile, readFile } from '$lib/server/utils';
-import {
-	deflattenJSON,
-	getValidationSchema,
-	stringifyZodFieldErrors,
-	preprocessParametersData
-} from '$lib/utils';
+import { deflattenJSON, getValidationSchema, stringifyZodFieldErrors } from '$lib/utils';
 
 export const POST = (async ({ request }) => {
 	const { type, config } = await request.json();
@@ -39,7 +34,7 @@ export const POST = (async ({ request }) => {
 			});
 		}
 
-		parameters = preprocessParametersData(deflattenJSON(config) as ParametersSchema);
+		parameters = deflattenJSON(config) as ParametersSchema;
 	} else if (type === 'server') {
 		if (!isFile(config)) {
 			return json({
@@ -81,36 +76,24 @@ export const POST = (async ({ request }) => {
 	}
 
 	const {
-		baseDirSim,
 		floodModelEnable,
-		input: { directory: inputDirectory, zones },
-		output: {
-			directory: outputDirectory,
-			'agents-out': agentsOut,
-			'agents-path': agentsPath,
-			'agents-sufix': agentsSufix
-		},
+		input: { zones },
+		output: { directory: outputDirectory, 'agents-path': agentsPath },
 		floodParams: { stateEnable, stateDir }
 	} = parameters;
 
-	const fullInputDirectory = addTrailingSlash(join(baseDirSim, inputDirectory));
-	const fullOutputDirectory = addTrailingSlash(join(baseDirSim, outputDirectory));
-	const enableFloodWatcher = floodModelEnable && stateEnable;
-	const floodDir = addTrailingSlash(join(fullOutputDirectory, stateDir));
-	const agentsDir = addTrailingSlash(join(fullOutputDirectory, agentsPath));
-	const configFile = type === 'local' ? PUBLIC_PARAMETERS_FILENAME : config.split('/').at(-1);
+	const agentsDir: string = join(outputDirectory, agentsPath);
+	const floodDir: string = join(outputDirectory, stateDir);
+	const floodEnabled = floodModelEnable && stateEnable;
+	const configFile =
+		type === 'local' ? PUBLIC_PARAMETERS_FILENAME : config.split('/').filter(Boolean).at(-1);
 
 	const simulatorDirectives: SimulatorDirectives = {
-		configFile,
-		baseDirSim: addTrailingSlash(baseDirSim),
-		zones,
-		floodEnabled: enableFloodWatcher,
-		inputDirectory: fullInputDirectory,
-		outputDirectory: fullOutputDirectory,
-		agentsOut,
 		agentsDir,
-		agentsSufix,
-		floodDir
+		configFile,
+		floodDir,
+		floodEnabled,
+		zones
 	};
 
 	// Create simulator ini file
@@ -128,7 +111,7 @@ export const POST = (async ({ request }) => {
 	// Create simulator config file
 	if (type === 'local') {
 		const configFileCreated = createFile(
-			baseDirSim,
+			PUBLIC_BASE_DIR,
 			configFile,
 			JSON.stringify(parameters, null, '\t'),
 			true
@@ -152,12 +135,6 @@ function verifyIntegrity(config: Record<string, unknown>) {
 	const { success, error } = schema.safeParse(config);
 	const errors = error?.flatten().fieldErrors;
 	return { success, errors };
-}
-
-function addTrailingSlash(path: string) {
-	if (path.endsWith('/')) return path;
-
-	return path + '/';
 }
 
 /**

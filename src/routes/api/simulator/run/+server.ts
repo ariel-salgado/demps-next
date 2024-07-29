@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { produce } from 'sveltekit-sse';
 import { basePath, isFile, readFile } from '$lib/server/utils';
 import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/server';
+import { PUBLIC_BASE_DIR } from '$env/static/public';
 
 const fileWatchers: Watcher[] = [];
 const childProcesses: DempsProcess[] = [];
@@ -27,9 +28,9 @@ export const POST = (async () => {
 				return;
 			}
 
-			const { baseDirSim, configFile, agentsDir, floodEnabled, floodDir } = directives;
+			const { configFile, agentsDir, floodEnabled, floodDir } = directives;
 
-			const dempsProcess = createDempsProcess(baseDirSim, configFile);
+			const dempsProcess = createDempsProcess(PUBLIC_BASE_DIR, configFile);
 			childProcesses.push(dempsProcess);
 
 			const agentWatcher = createWatcher('agentWatcher', agentsDir);

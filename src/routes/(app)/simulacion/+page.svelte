@@ -9,7 +9,7 @@
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
-	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
+	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 
 	const parametersOptions = $state([
 		{ value: 'default', label: 'Usar por defecto' },
@@ -121,7 +121,7 @@
 	}
 
 	async function handleExistingConfigFile() {
-		const path = joinPath(parameters.value.baseDirSim!, PUBLIC_PARAMETERS_FILENAME);
+		const path = joinPath(PUBLIC_SIM_DIR, PUBLIC_PARAMETERS_FILENAME);
 
 		const fileExistsResponse = await fetch('/api/file/get', {
 			method: 'POST',

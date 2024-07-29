@@ -2,7 +2,7 @@ import type { ZodType } from 'zod';
 import type { ClassValue } from 'clsx';
 import type { Action } from 'svelte/action';
 import type { Feature, FeatureCollection } from 'geojson';
-import type { FormField, FormSchema, G, ParametersSchema, SelectOptions } from '$lib/types';
+import type { FormField, FormSchema, G, SelectOptions } from '$lib/types';
 
 // Others
 import { z } from 'zod';
@@ -10,7 +10,6 @@ import { clsx } from 'clsx';
 import { on } from 'svelte/events';
 import { twMerge } from 'tailwind-merge';
 import { browser } from '$app/environment';
-import { PUBLIC_ZONES_FILENAME } from '$env/static/public';
 
 // GeoJSON related
 import { rewind } from '@turf/rewind';
@@ -254,30 +253,6 @@ export const nonEmpty = (message?: string) =>
 	z.any().refine((val) => val !== undefined && val !== null && val !== '', {
 		message: message ?? 'El campo es requerido.'
 	});
-
-// TODO: Fix all relative paths
-export function preprocessParametersData(parameters: ParametersSchema) {
-	// Set default values if they doesnt exist
-	parameters.input.directory ??= 'input/';
-	parameters.output.directory ??= 'output/';
-	parameters.input.zones ??= PUBLIC_ZONES_FILENAME;
-
-	// Add prefixes to input and output directories
-	if (parameters.input.directory.split('/').at(0) !== 'input') {
-		parameters.input.directory = joinPath('input/', parameters.input.directory || '');
-	}
-
-	if (parameters.output.directory.split('/').at(0) !== 'output') {
-		parameters.output.directory = joinPath('output/', parameters.output.directory || '');
-	}
-
-	// Add .geojson extension to zones field if it doesn't have it
-	parameters.input.zones = parameters.input.zones.endsWith('.geojson')
-		? parameters.input.zones
-		: `${parameters.input.zones}.geojson`;
-
-	return parameters;
-}
 
 export function stringifyZodFieldErrors(fieldErrors: { [x: string]: string[] | undefined }) {
 	const entries = Object.entries(fieldErrors);

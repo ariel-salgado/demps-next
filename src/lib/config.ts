@@ -60,7 +60,6 @@ export const popupFields = {
 	}
 } satisfies PopupFields;
 
-// TODO: Some path refinements
 export const parametersFormFields = {
 	general: [
 		{
@@ -291,38 +290,9 @@ export const parametersFormFields = {
 				placeholder: 'Ingrese el intervalo de muestreo'
 			},
 			validation: nonEmpty()
-		},
-		{
-			label: 'Base Dir Sim',
-			description: 'Directorio base de la simulación',
-			type: 'explorer',
-			attributes: {
-				name: 'baseDirSim',
-				value: PUBLIC_SIM_DIR
-			},
-			props: {
-				isFile: false,
-				includeFiles: false,
-				basePath: PUBLIC_BASE_DIR
-			},
-			validation: nonEmpty()
 		}
 	],
 	input: [
-		{
-			label: 'Directory',
-			description: 'Directorio',
-			type: 'explorer',
-			attributes: {
-				name: 'input.directory',
-				value: joinPath(PUBLIC_SIM_DIR, 'input/')
-			},
-			props: {
-				isFile: false,
-				includeFiles: false
-			},
-			validation: nonEmpty()
-		},
 		{
 			label: 'Map',
 			description: 'Mapa',
@@ -344,8 +314,10 @@ export const parametersFormFields = {
 			description: 'Zonas',
 			type: 'explorer',
 			attributes: {
+				type: 'text',
 				name: 'input.zones',
-				value: joinPath(PUBLIC_SIM_DIR, `input/${PUBLIC_ZONES_FILENAME}`)
+				value: joinPath(PUBLIC_SIM_DIR, PUBLIC_ZONES_FILENAME),
+				placeholder: 'Ingrese nombre del archivo de zonas.'
 			},
 			props: {
 				isFile: true,
@@ -425,14 +397,13 @@ export const parametersFormFields = {
 		{
 			label: 'Agents Path',
 			description: 'Directorio de agentes',
-			type: 'explorer',
+			type: 'input',
 			attributes: {
+				type: 'text',
 				name: 'output.agents-path',
-				value: joinPath(PUBLIC_SIM_DIR, 'output/agents/')
-			},
-			props: {
-				isFile: false,
-				includeFiles: false
+				value: 'agents/',
+				placeholder: 'Ingrese directorio de salida de los agentes.',
+				readonly: true
 			},
 			validation: nonEmpty()
 		},
@@ -495,28 +466,25 @@ export const parametersFormFields = {
 		{
 			label: 'Stats Path',
 			description: 'Directorio de estadísticas',
-			type: 'explorer',
+			type: 'input',
 			attributes: {
+				type: 'text',
 				name: 'output.stats-path',
-				value: joinPath(PUBLIC_SIM_DIR, 'output/stats/')
-			},
-			props: {
-				isFile: false,
-				includeFiles: false
+				value: 'stats/',
+				placeholder: 'Ingrese directorio de salida de estadísticas.',
+				readonly: true
 			},
 			validation: nonEmpty()
 		},
 		{
 			label: 'Anim Config',
 			description: 'Nombre de archivo de configuración de animación',
-			type: 'explorer',
+			type: 'input',
 			attributes: {
+				type: 'text',
 				name: 'output.anim-config',
-				value: joinPath(PUBLIC_SIM_DIR, 'output/animacion.config.json')
-			},
-			props: {
-				isFile: true,
-				includeFolders: false
+				value: 'animacion.config.json',
+				placeholder: 'Ingrese nombre de archivo de animación.'
 			},
 			validation: nonEmpty()
 		},
@@ -567,14 +535,13 @@ export const parametersFormFields = {
 		{
 			label: 'Heat Map Path',
 			description: 'Directorio del mapa de calor',
-			type: 'explorer',
+			type: 'input',
 			attributes: {
+				type: 'text',
 				name: 'output.heatMap-path',
-				value: joinPath(PUBLIC_SIM_DIR, 'output/heatMaps/')
-			},
-			props: {
-				isFile: false,
-				includeFiles: false
+				value: 'heatMaps/',
+				placeholder: 'Ingrese directorio de salida del mapa de calor.',
+				readonly: true
 			},
 			validation: nonEmpty()
 		}
@@ -687,14 +654,13 @@ export const parametersFormFields = {
 		{
 			label: 'Images Dir',
 			description: 'Directorio de imágenes',
-			type: 'explorer',
+			type: 'input',
 			attributes: {
+				type: 'text',
 				name: 'floodParams.imagesDir',
-				value: joinPath(PUBLIC_SIM_DIR, 'output/floodImgs/')
-			},
-			props: {
-				isFile: false,
-				includeFiles: false
+				value: 'floodImgs/',
+				placeholder: 'Ingrese directorio de salida de las imágenes.',
+				readonly: true
 			},
 			validation: nonEmpty()
 		},
@@ -721,14 +687,13 @@ export const parametersFormFields = {
 		{
 			label: 'State Dir',
 			description: 'Directorio de estado',
-			type: 'explorer',
+			type: 'input',
 			attributes: {
+				type: 'text',
 				name: 'floodParams.stateDir',
-				value: joinPath(PUBLIC_SIM_DIR, 'output/floodState/')
-			},
-			props: {
-				isFile: false,
-				includeFiles: false
+				value: 'floodState/',
+				placeholder: 'Ingrese directorio de salida de estado de inundación.',
+				readonly: true
 			},
 			validation: nonEmpty()
 		}

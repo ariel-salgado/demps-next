@@ -10,9 +10,9 @@ import { PUBLIC_SIM_DIR, PUBLIC_ZONES_FILENAME } from '$env/static/public';
 export const prerender = false;
 
 export const load = (async () => {
-	const path: string = join(PUBLIC_SIM_DIR, 'input/');
+	const path: string = join(PUBLIC_SIM_DIR, PUBLIC_ZONES_FILENAME);
 
-	if (isFile(join(path, PUBLIC_ZONES_FILENAME))) return;
+	if (isFile(path)) return;
 
 	const defaultData: string = JSON.stringify(
 		{

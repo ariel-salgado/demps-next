@@ -10,7 +10,8 @@
 	import { parametersFormFields } from '$lib/config';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { CloudUpload, Database, Download, Save } from 'lucide-svelte';
-	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
+	import { deflattenJSON, flattenJSON, splitCamelCase } from '$lib/utils';
+	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 	import {
 		FormGroup,
 		Label,
@@ -21,14 +22,6 @@
 		Dialog,
 		PathPicker
 	} from '$lib/components/ui';
-	import { deflattenJSON, flattenJSON, preprocessParametersData, splitCamelCase } from '$lib/utils';
-
-	const baseDirInitValue = (
-		PUBLIC_BASE_DIR !== parameters.value.baseDirSim ? parameters.value.baseDirSim : PUBLIC_BASE_DIR
-	) as string;
-
-	// baseDirSim related
-	let dirSimDirectory: string = $state(baseDirInitValue);
 
 	// Config file related
 	let configFileName: string | null = $state(null);
@@ -130,7 +123,7 @@
 			}
 
 			const parsedData = deflattenJSON(result.data) as ParametersSchema;
-			const data = JSON.stringify(preprocessParametersData(parsedData), null, '\t');
+			const data = JSON.stringify(parsedData, null, '\t');
 
 			// Download the file
 			if (action.search.includes('download')) {
@@ -154,7 +147,7 @@
 				return;
 			}
 
-			// Verify integrity
+			// Upload th file
 			if (action.search.includes('verify')) {
 				if (!configFileName) {
 					toast.error('Error al guardar configuración', {
@@ -168,7 +161,7 @@
 					body: JSON.stringify({
 						data,
 						fileName: `${configFileName}.config`,
-						path: parameters.value['baseDirSim']
+						path: PUBLIC_SIM_DIR
 					}),
 					headers: {
 						'Content-Type': 'application/json'
@@ -239,7 +232,7 @@
 
 <Dialog bind:show={showConfigDialog}>
 	<Explorer
-		bind:directory={dirSimDirectory}
+		directory={PUBLIC_BASE_DIR}
 		bind:selected={selectedConfigFile}
 		onSelected={onConfigSelected}
 		extensions={['.config']}

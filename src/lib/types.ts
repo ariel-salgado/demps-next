@@ -13,16 +13,11 @@ export type FetchDirectoryOptions = Partial<{
 }>;
 
 export type SimulatorDirectives = {
-	configFile: any;
-	baseDirSim: string;
-	zones: string;
-	floodEnabled: boolean;
-	inputDirectory: string;
-	outputDirectory: string;
-	agentsOut: boolean;
 	agentsDir: string;
-	agentsSufix: string;
+	configFile: string;
 	floodDir: string;
+	floodEnabled: boolean;
+	zones: string;
 };
 
 export type G = Exclude<Geometry, GeometryCollection>;
@@ -92,9 +87,7 @@ export type ParametersSchema = {
 	city: string;
 	description: string;
 	samplingInterval: number;
-	baseDirSim: string;
 	input: {
-		directory: string;
 		map: string;
 		zones: string;
 	};
