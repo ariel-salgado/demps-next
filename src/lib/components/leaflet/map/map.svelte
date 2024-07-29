@@ -162,7 +162,7 @@
 		if (bounds.isValid()) {
 			map.fitBounds(bounds, {
 				animate: true,
-				padding: [150, 150]
+				padding: [100, 100]
 			});
 		}
 	}
@@ -178,7 +178,7 @@
 </svelte:head>
 
 <div
-	class={cn('grid size-full place-content-center items-center outline-none', className)}
+	class={cn('isolate grid size-full place-content-center items-center outline-none', className)}
 	{...rest}
 	use:initMap={environment}
 >
