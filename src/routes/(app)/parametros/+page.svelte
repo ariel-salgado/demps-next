@@ -93,7 +93,6 @@
 		}
 	}
 
-	// TODO: Handle relative paths
 	const handleFormVerification: SubmitFunction = async () => {
 		return async ({ result, action }) => {
 			if (result.type !== 'success' || !result.data) {
