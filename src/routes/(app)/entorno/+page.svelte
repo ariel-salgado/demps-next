@@ -4,6 +4,7 @@
 	import { Map, ToggleLayers, Geoman, Geosearch } from '$lib/components/leaflet';
 	import {
 		Editor,
+		LoadData,
 		ClearData,
 		UploadFile,
 		DownloadFile,
@@ -36,6 +37,7 @@
 			<Editor {environment} onChanges={triggerFullReload}>
 				<DownloadFile />
 				<CopyToClipboard />
+				<LoadData onLoad={triggerFullReload} />
 				<ClearData onClear={triggerFullReload} />
 				<UploadFile accept=".geojson" {files} onUpload={triggerFullReload} />
 			</Editor>
