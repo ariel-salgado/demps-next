@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { isDirectory } from './utils';
 import { execFile } from 'child_process';
 import { uniquePool } from '$lib/states';
+import { PUBLIC_EXEC_CMD } from '$env/static/public';
 
 import treeKill from 'tree-kill';
 
@@ -21,9 +22,9 @@ export function createDempsProcess(path: string, filename: string) {
 			}
 
 			try {
-				dempsProcess = execFile('./run.sh', ['--config', filename], { cwd: path }, (error) => {
+				dempsProcess = execFile(PUBLIC_EXEC_CMD, ['--config', filename], { cwd: path }, (error) => {
 					if (error && error.code === 'ENOENT') {
-						console.error(`File not found: ${join(path, './run.sh')}.`);
+						console.error(`File not found: ${join(path, filename)}.`);
 						reject(error);
 					}
 				});
