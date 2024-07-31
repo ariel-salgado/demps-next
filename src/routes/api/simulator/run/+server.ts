@@ -4,9 +4,9 @@ import type { DempsProcess, Watcher } from '$lib/server';
 
 import { join } from 'node:path';
 import { produce } from 'sveltekit-sse';
+import { PUBLIC_SIM_DIR } from '$env/static/public';
 import { basePath, isFile, readFile } from '$lib/server/utils';
 import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/server';
-import { PUBLIC_BASE_DIR } from '$env/static/public';
 
 const fileWatchers: Watcher[] = [];
 const childProcesses: DempsProcess[] = [];
@@ -30,7 +30,7 @@ export const POST = (async () => {
 
 			const { configFile, agentsDir, floodEnabled, floodDir } = directives;
 
-			const dempsProcess = createDempsProcess(PUBLIC_BASE_DIR, configFile);
+			const dempsProcess = createDempsProcess(PUBLIC_SIM_DIR, configFile);
 			childProcesses.push(dempsProcess);
 
 			const agentWatcher = createWatcher('agentWatcher', agentsDir);
@@ -42,8 +42,9 @@ export const POST = (async () => {
 				try {
 					await dempsProcess.run();
 					emit('status', 'finished');
-				} catch {
-					console.log('There was an error, closing the connection.');
+				} catch (error) {
+					console.error(error);
+					console.log('Closing the connection.');
 					emit('status', 'error');
 				} finally {
 					// eslint-disable-next-line no-unsafe-finally
@@ -59,7 +60,7 @@ export const POST = (async () => {
 				agentProcessor.push(path);
 			});
 
-			if (floodEnabled) {
+			/* if (floodEnabled) {
 				const floodWatcher = createWatcher('floodWatcher', floodDir);
 				fileWatchers.push(floodWatcher);
 
@@ -71,7 +72,7 @@ export const POST = (async () => {
 				floodWatcher.on('add', (path) => {
 					floodProcessor.push(path);
 				});
-			}
+			} */
 		},
 		{
 			ping: 10000,
