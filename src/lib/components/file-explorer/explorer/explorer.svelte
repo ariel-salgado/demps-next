@@ -63,8 +63,8 @@
 				action: {
 					label: 'Crear directorio',
 					onClick: () => {
-						// TODO: Create directory from the last existing path
-						// createDirectory(directory)
+						createDirectory('/');
+						directory = '/' + directory.split('/').filter(Boolean).slice(0, -1).join('/') + '/';
 					}
 				}
 			});
@@ -76,7 +76,7 @@
 	}
 
 	async function createDirectory(pathToCreate: string | null) {
-		if (!directoryToCreate) {
+		if (directoryToCreate === undefined || directory === null || typeof pathToCreate !== 'string') {
 			toast.error('Error', {
 				description: 'Por favor, ingrese un nombre para el directorio a crear'
 			});
@@ -102,7 +102,9 @@
 			return;
 		}
 
-		folders.push(pathToCreate!);
+		if (pathToCreate !== '/') {
+			folders.push(pathToCreate!);
+		}
 
 		toast.success('Creado', {
 			description: `El directorio ${created} ha sido creado`
