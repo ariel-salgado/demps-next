@@ -87,10 +87,6 @@
 	}
 
 	async function setupSimulation() {
-		toast.loading('Preparando simulación', {
-			description: 'Verificando configuración de los parámetros.'
-		});
-
 		const type = selectedParameterConfig === 'default' ? 'local' : 'server';
 		const config = type === 'local' ? $state.snapshot(parameters.value) : selectedParameterConfig;
 
@@ -171,9 +167,6 @@
 
 	function createConnection() {
 		return source('/api/simulator/run', {
-			close: () => {
-				onProgress = false;
-			},
 			error: ({ error }) => {
 				toast.error('Error en la conexión.', {
 					description: error?.message
@@ -189,6 +182,7 @@
 
 	function stopSimulation() {
 		connection?.close();
+		onProgress = false;
 	}
 </script>
 
