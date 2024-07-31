@@ -52,9 +52,10 @@ export const POST = (async () => {
 				}
 			});
 
-			const agentProcessor = createFileProcessor((data) => {
-				emit('agents', data);
-			});
+			const agentProcessor = createFileProcessor(
+				(line, isFirstLine) => processAgentData(line, isFirstLine),
+				(data) => emit('agents', data)
+			);
 
 			agentWatcher.on('add', (path) => {
 				agentProcessor.push(path);
@@ -89,6 +90,19 @@ export const POST = (async () => {
 		}
 	);
 }) satisfies RequestHandler;
+
+function processAgentData(line: string, isFirstLine: boolean) {
+	if (!isFirstLine) {
+		const splitted = line.split(' ');
+
+		const lat = splitted.at(1);
+		const lng = splitted.at(2);
+
+		if (lat && lng) {
+			return lat + ',' + lng + '$';
+		}
+	}
+}
 
 function getSimulationDirectives() {
 	const iniFilePath = join(basePath, 'sim.ini');

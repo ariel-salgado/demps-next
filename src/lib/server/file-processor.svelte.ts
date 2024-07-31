@@ -1,7 +1,10 @@
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 
-export function createFileProcessor(emitter: (data: string) => void) {
+export function createFileProcessor(
+	refine: (line: string, isFirstLine: boolean) => string | void,
+	emitter: (data: string) => void
+) {
 	const fileQueue: string[] = $state([]);
 
 	let isProcessing: boolean = $state(false);
@@ -32,21 +35,17 @@ export function createFileProcessor(emitter: (data: string) => void) {
 				terminal: false
 			});
 
-			let firstLineSkipped = false;
+			let isFirstLine = true;
 
 			for await (const line of readInterface) {
-				if (!firstLineSkipped) {
-					firstLineSkipped = true;
-					continue;
+				const refinedData = refine(line, isFirstLine);
+
+				if (isFirstLine) {
+					isFirstLine = false;
 				}
 
-				const splitted = line.split(' ');
-
-				const lat = splitted.at(1);
-				const lng = splitted.at(2);
-
-				if (lat && lng) {
-					data.push(lat + ',' + lng + '$');
+				if (refinedData) {
+					data.push(refinedData);
 				}
 			}
 
