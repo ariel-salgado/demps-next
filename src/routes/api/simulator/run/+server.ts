@@ -61,19 +61,19 @@ export const POST = (async () => {
 				agentProcessor.push(path);
 			});
 
-			/* if (floodEnabled) {
+			if (floodEnabled) {
 				const floodWatcher = createWatcher('floodWatcher', floodDir);
 				fileWatchers.push(floodWatcher);
 
-				// TODO: Make data process generic passing a callback function
-				const floodProcessor = createFileProcessor((data) => {
-					emit('agents', data);
-				});
+				const floodProcessor = createFileProcessor(
+					(line) => processFloodData(line),
+					(data) => emit('flood', data)
+				);
 
 				floodWatcher.on('add', (path) => {
 					floodProcessor.push(path);
 				});
-			} */
+			}
 		},
 		{
 			ping: 10000,
@@ -104,6 +104,20 @@ function processAgentData(line: string, isFirstLine: boolean) {
 	}
 }
 
+function processFloodData(line: string) {
+	if (line) {
+		const splitted = line.split(' ');
+
+		const lat = splitted.at(1);
+		const lng = splitted.at(2);
+		const depth = splitted.at(4);
+
+		if (lat && lng && depth) {
+			return lng + ',' + lat + ',' + depth + '$';
+		}
+	}
+}
+
 function getSimulationDirectives() {
 	const iniFilePath = join(basePath, 'sim.ini');
 
@@ -127,6 +141,8 @@ function getSimulationDirectives() {
 				}
 			}
 		}
+
+		directives.floodEnabled = Boolean(directives.floodEnabled);
 
 		return directives;
 	} catch {

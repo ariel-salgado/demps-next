@@ -1,14 +1,17 @@
 <script lang="ts">
 	import type { Readable } from 'svelte/store';
+	import type { Feature, FeatureCollection, Position } from 'geojson';
 
 	import { toast } from 'svelte-sonner';
-	import { joinPath } from '$lib/utils';
+	import { rewind } from '@turf/rewind';
 	import { source } from 'sveltekit-sse';
+	import { feature } from '@turf/helpers';
 	import { parameters } from '$lib/states';
+	import { joinPath, randomID } from '$lib/utils';
 	import { Explorer } from '$lib/components/file-explorer';
-	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
+	import { Map as LeafletMap, MaskCanvas } from '$lib/components/leaflet';
 	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 
 	const parametersOptions = $state([
@@ -27,7 +30,8 @@
 
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
-	let coordinates: Readable<[number, number][]> | undefined = $state();
+	let agents: Readable<[number, number][]> | undefined = $state();
+	let flood: Readable<FeatureCollection> | undefined = $state();
 
 	$effect(() => {
 		if (selectedParameterConfig === 'custom') {
@@ -40,7 +44,7 @@
 		if ($status === 'ready') {
 			onProgress = true;
 			toast.loading('Iniciando simulación...', {
-				duration: 30000,
+				duration: 45000,
 				description: 'Esperando datos de los agentes. Por favor, espere...'
 			});
 		}
@@ -66,9 +70,40 @@
 	// When the coordinates are received
 	$effect(() => {
 		if (onProgress) {
-			coordinates = connection?.select('agents').transform((data) => {
-				const coordinates = data.split('$').map((coord) => coord.split(',').map(Number));
-				return coordinates;
+			agents = connection?.select('agents').transform((data) => {
+				return data
+					.split('$')
+					.filter(Boolean)
+					.map((coord) => coord.split(',').map(Number));
+			});
+
+			// TODO: This can be improved a lot
+			flood = connection?.select('flood').transform((data) => {
+				if (data) {
+					const floodData = data
+						.split('$')
+						.filter(Boolean)
+						.map((f) => f.split(',').map(Number));
+
+					const floodLayers = Map.groupBy(floodData, (coords) => {
+						return coords.pop();
+					});
+
+					const features: Feature[] = [];
+
+					floodLayers.forEach((coords) => {
+						const coordinates = [[...coords, coords.at(0)]] as unknown as Position[][];
+						const newFeature = rewind(
+							feature({ type: 'Polygon', coordinates: coordinates })
+						) as Feature;
+						features.push({ id: randomID(), ...newFeature });
+					});
+
+					return {
+						type: 'FeatureCollection',
+						features: features
+					} as FeatureCollection;
+				}
 			});
 		}
 	});
@@ -203,11 +238,11 @@
 
 <section class="flex size-full divide-x divide-slate-300">
 	<div class="size-full">
-		<Map>
-			{#if $coordinates}
-				<MaskCanvas coordinates={$coordinates} color={'#7E4BB9'} lineColor={'#6A3D9E'} />
+		<LeafletMap floodGeoJSON={$flood}>
+			{#if $agents}
+				<MaskCanvas coordinates={$agents} color={'#7E4BB9'} lineColor={'#6A3D9E'} />
 			{/if}
-		</Map>
+		</LeafletMap>
 	</div>
 	<aside class="flex w-[24rem] flex-col gap-y-6 py-8 px-10">
 		<div class="space-y-4">

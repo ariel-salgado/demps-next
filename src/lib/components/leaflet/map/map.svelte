@@ -16,16 +16,13 @@
 		getStylesFromFeature
 	} from '$lib/components/leaflet/helpers';
 
-	type Parameters = Environment | undefined;
-
-	type MapAction = Action<HTMLElement, Parameters>;
-
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		zoom?: number;
 		center?: [number, number];
 		environment?: Environment;
 		reload?: boolean;
 		isLayerEditable?: boolean;
+		floodGeoJSON?: FeatureCollection;
 	}
 
 	let {
@@ -35,6 +32,7 @@
 		environment,
 		reload = $bindable(),
 		isLayerEditable,
+		floodGeoJSON,
 		class: className,
 		...rest
 	}: Props = $props();
@@ -47,6 +45,13 @@
 		if (reload) {
 			reloadLayers();
 			reload = false;
+		}
+	});
+
+	$effect(() => {
+		if (floodGeoJSON) {
+			floodGeoJSON;
+			loadFlood(floodGeoJSON);
 		}
 	});
 
@@ -69,7 +74,10 @@
 	});
 
 	// @ts-expect-error - Svelte action can't be async by type definition
-	const initMap: MapAction = async (mapContainer, environment) => {
+	const initMap: Action<HTMLDivElement, Environment | undefined> = async (
+		mapContainer,
+		environment
+	) => {
 		if (!window.L) {
 			await import('leaflet');
 			await import('leaflet/dist/leaflet.css');
@@ -99,8 +107,9 @@
 		map.whenReady(() => {
 			map?.invalidateSize();
 
+			map?.addLayer(featureGroup!);
+
 			if (environment) {
-				map?.addLayer(featureGroup!);
 				map?.addControl(overlayLayer!);
 				loadFeatures(environment?.getFeatures());
 				fitBounds();
@@ -114,6 +123,18 @@
 			}
 		};
 	};
+
+	// TODO: Set different colors based on depth
+	function loadFlood(features: FeatureCollection) {
+		featureGroup?.clearLayers();
+		window.L.geoJSON(features, {
+			onEachFeature(_, layer) {
+				// @ts-expect-error - smoothFactor is a valid prop
+				(layer as Path).setStyle({ opacity: 0.3, fillOpacity: 0.4, smoothFactor: 0 });
+				featureGroup?.addLayer(layer);
+			}
+		});
+	}
 
 	function loadFeatures(features: Feature<G> | Feature<G>[] | FeatureCollection<G>) {
 		window.L.geoJSON(features, {
@@ -180,7 +201,7 @@
 <div
 	class={cn('isolate grid size-full place-content-center items-center outline-none', className)}
 	{...rest}
-	use:initMap={environment}
+	use:initMap={environment || undefined}
 >
 	{#if map}
 		{#if children}
