@@ -115,6 +115,8 @@ export function updateFeatureProperties(form: HTMLFormElement, featureGroup: Fea
 
 	environment?.updateFeatureProperties(id, props);
 	updateLayerStyle(id, featureGroup);
+
+	return environment.getFeature(id);
 }
 
 function updateLayerStyle(id: string, featureGroup: FeatureGroup) {
@@ -135,7 +137,10 @@ export function addPopupToLayer(layer: Layer, feature: Feature, featureGroup: Fe
 	const popup = createPopup(feature);
 
 	attachPopupEvents(popup, (popupForm) => {
-		updateFeatureProperties(popupForm, featureGroup!);
+		const updatedFeature = updateFeatureProperties(popupForm, featureGroup!);
+		layer.unbindPopup();
+
+		addPopupToLayer(layer, updatedFeature!, featureGroup);
 	});
 
 	layer.bindPopup(popup);
