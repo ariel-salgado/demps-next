@@ -46,7 +46,7 @@ export function layerToGeometry(layer: Layer) {
 		return new window.L.Polygon(coordinates);
 	} else if (layer instanceof window.L.Circle) {
 		const coordinates = layer.getLatLng();
-		const radius = Number(layer.getRadius().toFixed(6));
+		const radius = Number(layer.getRadius());
 		return new window.L.Circle(coordinates, radius);
 	}
 	return;
@@ -56,15 +56,15 @@ export function geometryToGeoJSON<T extends Layer | Polygon | Circle>(feature: T
 	let featureGeoJSON: Feature<G> | undefined;
 
 	if (feature instanceof window.L.Circle) {
-		featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature, 18).toGeoJSON(6);
+		featureGeoJSON = window.L.PM.Utils.circleToPolygon(feature, 18).toGeoJSON(10);
 
-		featureGeoJSON.properties!.radius = Number(feature.getRadius().toFixed(6));
+		featureGeoJSON.properties!.radius = Number(feature.getRadius());
 		featureGeoJSON.properties!.center = [
-			Number(feature.getLatLng().lat.toFixed(6)),
-			Number(feature.getLatLng().lng.toFixed(6))
+			Number(feature.getLatLng().lat),
+			Number(feature.getLatLng().lng)
 		];
 	} else if (feature instanceof window.L.Polygon) {
-		featureGeoJSON = feature.toGeoJSON(6);
+		featureGeoJSON = feature.toGeoJSON(10);
 	} else {
 		return;
 	}
