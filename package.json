@@ -36,7 +36,6 @@
 		"@turf/helpers": "^7.0.0",
 		"@turf/random": "7.0.0",
 		"@turf/rewind": "7.0.0",
-		"@turf/truncate": "^7.0.0",
 		"@types/eslint": "^9.6.0",
 		"@types/geojson": "^7946.0.14",
 		"@types/html-minifier-terser": "^7.0.2",

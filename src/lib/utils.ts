@@ -13,7 +13,6 @@ import { browser } from '$app/environment';
 
 // GeoJSON related
 import { rewind } from '@turf/rewind';
-import { truncate } from '@turf/truncate';
 import { randomPolygon } from '@turf/random';
 import { HintError, check } from '@placemarkio/check-geojson';
 
@@ -86,8 +85,7 @@ export function preprocessGeoJSON(geojson: FeatureCollection | string) {
 
 		for (const feature of geojson.features) {
 			const id = feature.id ? String(feature.id) : randomID();
-			const truncated = truncate(feature, { precision: 6, coordinates: 2, mutate: true });
-			const rewinded = rewind(truncated, { mutate: true }) as Feature<G>;
+			const rewinded = rewind(feature, { mutate: true }) as Feature<G>;
 
 			features.push({ id, ...rewinded });
 		}
