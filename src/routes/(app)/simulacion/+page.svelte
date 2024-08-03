@@ -30,7 +30,8 @@
 
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
-	let agents: Readable<[number, number][]> | undefined = $state();
+	let agents: Readable<{ alive: [number, number][]; dead: [number, number][] }> | undefined =
+		$state();
 	let flood: Readable<FeatureCollection> | undefined = $state();
 
 	$effect(() => {
@@ -71,10 +72,19 @@
 	$effect(() => {
 		if (onProgress) {
 			agents = connection?.select('agents').transform((data) => {
-				return data
+				const agents = data
 					.split('$')
 					.filter(Boolean)
 					.map((coord) => coord.split(',').map(Number));
+
+				return agents.reduce(
+					(acc, [x, y, status]) => {
+						const key = status === 1 ? 'alive' : 'dead';
+						acc[key].push([x, y]);
+						return acc;
+					},
+					{ alive: [] as [number, number][], dead: [] as [number, number][] }
+				);
 			});
 
 			// TODO: This can be improved a lot
@@ -239,8 +249,11 @@
 <section class="flex size-full divide-x divide-slate-300">
 	<div class="size-full">
 		<LeafletMap floodGeoJSON={$flood}>
-			{#if $agents}
-				<MaskCanvas coordinates={$agents} color={'#7E4BB9'} lineColor={'#6A3D9E'} />
+			{#if $agents?.alive}
+				<MaskCanvas coordinates={$agents.alive} color={'#4B70B9'} lineColor={'#3D569E'} />
+			{/if}
+			{#if $agents?.dead}
+				<MaskCanvas coordinates={$agents.dead} color={'#B94B4B'} lineColor={'#9E3D3D'} />
 			{/if}
 		</LeafletMap>
 	</div>
