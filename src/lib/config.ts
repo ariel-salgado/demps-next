@@ -316,7 +316,8 @@ export const parametersFormFields = {
 			attributes: {
 				type: 'text',
 				name: 'input.zones',
-				placeholder: 'Ingrese nombre del archivo de zonas.'
+				placeholder: 'Ingrese nombre del archivo de zonas.',
+				readonly: true
 			},
 			props: {
 				isFile: true,
