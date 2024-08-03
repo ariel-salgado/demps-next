@@ -84,7 +84,7 @@
 	};
 </script>
 
-<div class="contents" use:initEditor={environment}>
+<div class="isolate contents" use:initEditor={environment}>
 	{#if editor && children}
 		<div class="sticky top-7 z-50 float-right mr-14 size-0 space-y-3">
 			{@render children()}
