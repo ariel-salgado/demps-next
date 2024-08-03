@@ -1,6 +1,7 @@
 import { createUniquePool } from './pool.svelte';
 import { extractDefaultValues } from '$lib/utils';
 import { parametersFormFields } from '$lib/config';
+import { createPersisted } from './persisted.svelte';
 import { createParameters } from './parameters.svelte';
 import { createEnvironment } from './environment.svelte';
 
@@ -11,3 +12,5 @@ export type Environment = ReturnType<typeof createEnvironment>;
 export const uniquePool = createUniquePool();
 export const environment = createEnvironment();
 export const parameters = createParameters(extractDefaultValues(parametersFormFields));
+
+export { createPersisted };
