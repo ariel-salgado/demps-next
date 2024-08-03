@@ -13,7 +13,7 @@
 	import { Explorer } from '$lib/components/file-explorer';
 
 	interface Props extends HTMLButtonAttributes {
-		onLoad?: () => void;
+		onLoad?: (selectedFile: string) => void;
 	}
 
 	const { onLoad, ...rest }: Props = $props();
@@ -52,11 +52,8 @@
 
 			environment.value = loadedData;
 
-			// TODO: This doesnt change the value on the parameters page
-			// parameters.value.input = { ...parameters.value.input, zones: selectedFile! };
-
 			if (onLoad) {
-				onLoad();
+				onLoad(selectedFile as string);
 			}
 
 			toast.success('Configuración válida', {
