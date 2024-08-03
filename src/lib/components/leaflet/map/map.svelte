@@ -130,7 +130,7 @@
 		window.L.geoJSON(features, {
 			onEachFeature(_, layer) {
 				// @ts-expect-error - smoothFactor is a valid prop
-				(layer as Path).setStyle({ opacity: 0.3, fillOpacity: 0.4, smoothFactor: 0 });
+				(layer as Path).setStyle({ opacity: 0.2, fillOpacity: 0.2, smoothFactor: 0 });
 				featureGroup?.addLayer(layer);
 			}
 		});
