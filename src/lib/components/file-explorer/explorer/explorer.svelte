@@ -3,7 +3,7 @@
 
 	import { toast } from 'svelte-sonner';
 	import { joinPath } from '$lib/utils';
-	import { FolderPlus } from 'lucide-svelte';
+	import { FilePlus, FolderPlus } from 'lucide-svelte';
 	import { Button, Input } from '$lib/components/ui';
 	import { Breadcrumb, Item } from '$lib/components/file-explorer';
 
@@ -11,10 +11,11 @@
 		basePath?: string;
 		directory: string;
 		isRelativeTo?: string;
-		selected: string | null;
+		selected?: string | null;
 		isFile?: boolean | null;
 		onSelected?: () => void;
 		disableBacktracking?: boolean;
+		saveFileExtension?: string;
 	} & FetchDirectoryOptions;
 
 	let {
@@ -27,12 +28,14 @@
 		includeFolders = true,
 		extensions = null,
 		disableBacktracking = false,
-		isRelativeTo
+		isRelativeTo,
+		saveFileExtension
 	}: Props = $props();
 
 	let files: string[] = $state([]);
 	let folders: string[] = $state([]);
 
+	let fileToCreate: string | null = $state(null);
 	let directoryToCreate: string | null = $state(null);
 
 	$effect(() => {
@@ -75,10 +78,50 @@
 		folders = contents.folders;
 	}
 
-	async function createDirectory(pathToCreate: string | null) {
-		if (directoryToCreate === undefined || directory === null || typeof pathToCreate !== 'string') {
+	async function createFile(pathToCreate: string | null) {
+		if (!pathToCreate) {
 			toast.error('Error', {
-				description: 'Por favor, ingrese un nombre para el directorio a crear'
+				description: 'Debe ingresar un nombre para el archivo a crear'
+			});
+			return;
+		}
+
+		const fileToCreate = !saveFileExtension
+			? pathToCreate
+			: pathToCreate.endsWith(saveFileExtension)
+				? pathToCreate
+				: `${pathToCreate}${saveFileExtension}`;
+
+		const response = await fetch('/api/file/create', {
+			method: 'POST',
+			body: JSON.stringify({ data: '', fileName: fileToCreate, path: directory }),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		const { error, path, fileName } = await response.json();
+
+		if (error) {
+			toast.error('Error', {
+				description: error.message
+			});
+			return;
+		}
+
+		if (fileName) {
+			files.push(fileName);
+		}
+
+		toast.success('Creado', {
+			description: `El archivo ${fileName} ha sido creado en ${path}.`
+		});
+	}
+
+	async function createDirectory(pathToCreate: string | null) {
+		if (!pathToCreate) {
+			toast.error('Error', {
+				description: 'Debe ingresar un nombre para el directorio a crear'
 			});
 			return;
 		}
@@ -117,17 +160,33 @@
 
 	<div class="flex w-full items-center justify-between">
 		<Breadcrumb bind:directory {basePath} {disableBacktracking} />
-		<div class="flex gap-x-1.5">
-			<Input class="h-8" placeholder="Crear directorio" bind:value={directoryToCreate} />
-			<Button
-				size="icon"
-				onclick={() => {
-					createDirectory(directoryToCreate);
-					directoryToCreate = null;
-				}}
-			>
-				<FolderPlus />
-			</Button>
+
+		<!-- Actions -->
+		<div class="flex gap-x-6">
+			<div class="flex gap-x-1.5">
+				<Input class="h-8" placeholder="Crear archivo" bind:value={fileToCreate} />
+				<Button
+					size="icon"
+					onclick={() => {
+						createFile(fileToCreate);
+						fileToCreate = null;
+					}}
+				>
+					<FilePlus />
+				</Button>
+			</div>
+			<div class="flex gap-x-1.5">
+				<Input class="h-8" placeholder="Crear directorio" bind:value={directoryToCreate} />
+				<Button
+					size="icon"
+					onclick={() => {
+						createDirectory(directoryToCreate);
+						directoryToCreate = null;
+					}}
+				>
+					<FolderPlus />
+				</Button>
+			</div>
 		</div>
 	</div>
 

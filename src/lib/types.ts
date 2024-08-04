@@ -40,6 +40,7 @@ export type PathPickerProps = {
 	isRelativeTo?: string;
 	onSelected?: () => void;
 	disableBacktracking?: boolean;
+	saveFileExtension?: string;
 } & FetchDirectoryOptions;
 
 export type FormFieldProps =
