@@ -48,6 +48,8 @@
 			return;
 		}
 
+		showDialog = false;
+
 		toast.success('Creado', {
 			description: `Se guardado la configuración en ${fileName}.`
 		});
