@@ -4,7 +4,7 @@ import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
 import { parametersFormFields } from '$lib/config';
-import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME } from '$env/static/public';
+import { PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 import { basePath, createFile, isFile, readFile } from '$lib/server/utils';
 import { deflattenJSON, getValidationSchema, stringifyZodFieldErrors } from '$lib/utils';
 
@@ -111,7 +111,7 @@ export const POST = (async ({ request }) => {
 	// Create simulator config file
 	if (type === 'local') {
 		const configFileCreated = createFile(
-			PUBLIC_BASE_DIR,
+			PUBLIC_SIM_DIR,
 			configFile,
 			JSON.stringify(parameters, null, '\t'),
 			true
