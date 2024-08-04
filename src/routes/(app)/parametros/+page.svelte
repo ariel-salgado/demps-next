@@ -33,6 +33,9 @@
 	let selected: string | null = $state($page.url.hash.slice(1) || 'general');
 
 	onMount(() => {
+		const zonesInput = document.getElementById('input.zones') as HTMLInputElement;
+		zonesInput.value = parameters.value.input?.zones || '';
+
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const entry of entries) {

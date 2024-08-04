@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { createPersisted, environment, parameters } from '$lib/states';
 	import { SplitView } from '$lib/components/ui';
+	import { createPersisted, environment, parameters } from '$lib/states';
 	import { Map, ToggleLayers, Geoman, Geosearch } from '$lib/components/leaflet';
 	import {
 		Editor,
@@ -26,9 +26,21 @@
 		triggerFullReload();
 	}
 
+	function handleOnSavedFile(selectedFile: string) {
+		zoneFile.value = selectedFile;
+		parameters.value = {
+			...parameters.value,
+			input: { ...parameters.value.input, zones: zoneFile.value }
+		};
+	}
+
 	function handleOnLoadedFile(selectedFile: string) {
 		zoneFile.value = selectedFile;
 		triggerFullReload();
+		parameters.value = {
+			...parameters.value,
+			input: { ...parameters.value.input, zones: zoneFile.value }
+		};
 	}
 </script>
 
@@ -52,7 +64,7 @@
 					<UploadFile accept=".geojson" {files} onUpload={triggerFullReload} />
 					<LoadData onLoad={(selectedFile) => handleOnLoadedFile(selectedFile)} />
 					<SaveData
-						onSave={(selectedFile) => (zoneFile.value = selectedFile)}
+						onSave={(selectedFile) => handleOnSavedFile(selectedFile)}
 						extension=".geojson"
 					/>
 				</div>
