@@ -15,10 +15,15 @@
 	let reload: boolean = $state(false);
 	let files: FileList | null = $state(null);
 
-	let zoneFile = createPersisted('zone', parameters.value.input?.zones);
+	let zoneFile = createPersisted<string | null>('zone', parameters.value.input?.zones);
 
 	function triggerFullReload() {
 		reload = true;
+	}
+
+	function handleOnClearData() {
+		zoneFile.value = null;
+		triggerFullReload();
 	}
 
 	function handleOnLoadedFile(selectedFile: string) {
@@ -45,9 +50,9 @@
 			<Editor {environment} onChanges={triggerFullReload}>
 				<DownloadFile />
 				<CopyToClipboard />
-				<SaveData extension=".geojson" />
+				<SaveData onSave={(selectedFile) => (zoneFile.value = selectedFile)} extension=".geojson" />
 				<LoadData onLoad={(selectedFile) => handleOnLoadedFile(selectedFile)} />
-				<ClearData onClear={triggerFullReload} />
+				<ClearData onClear={handleOnClearData} />
 				<UploadFile accept=".geojson" {files} onUpload={triggerFullReload} />
 			</Editor>
 		{/snippet}
