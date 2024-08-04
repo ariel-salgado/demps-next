@@ -3,8 +3,8 @@
 
 	import { toast } from 'svelte-sonner';
 	import { joinPath } from '$lib/utils';
-	import { FilePlus, FolderPlus } from 'lucide-svelte';
 	import { Button, Input } from '$lib/components/ui';
+	import { FilePlus, FolderPlus } from 'lucide-svelte';
 	import { Breadcrumb, Item } from '$lib/components/file-explorer';
 
 	type Props = {
@@ -16,6 +16,7 @@
 		onSelected?: () => void;
 		disableBacktracking?: boolean;
 		saveFileExtension?: string;
+		enableCreateFile?: boolean;
 	} & FetchDirectoryOptions;
 
 	let {
@@ -29,7 +30,8 @@
 		extensions = null,
 		disableBacktracking = false,
 		isRelativeTo,
-		saveFileExtension
+		saveFileExtension,
+		enableCreateFile = false
 	}: Props = $props();
 
 	let files: string[] = $state([]);
@@ -163,18 +165,20 @@
 
 		<!-- Actions -->
 		<div class="flex gap-x-6">
-			<div class="flex gap-x-1.5">
-				<Input class="h-8" placeholder="Crear archivo" bind:value={fileToCreate} />
-				<Button
-					size="icon"
-					onclick={() => {
-						createFile(fileToCreate);
-						fileToCreate = null;
-					}}
-				>
-					<FilePlus />
-				</Button>
-			</div>
+			{#if enableCreateFile}
+				<div class="flex gap-x-1.5">
+					<Input class="h-8" placeholder="Crear archivo" bind:value={fileToCreate} />
+					<Button
+						size="icon"
+						onclick={() => {
+							createFile(fileToCreate);
+							fileToCreate = null;
+						}}
+					>
+						<FilePlus />
+					</Button>
+				</div>
+			{/if}
 			<div class="flex gap-x-1.5">
 				<Input class="h-8" placeholder="Crear directorio" bind:value={directoryToCreate} />
 				<Button

@@ -67,6 +67,7 @@
 		includeFolders={false}
 		onSelected={saveData}
 		saveFileExtension={'.geojson'}
+		enableCreateFile={true}
 	/>
 </Dialog>
 
