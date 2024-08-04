@@ -7,7 +7,7 @@ import { createFile, deleteFile, isDirectory, isFile } from '$lib/server/utils';
 export const POST = (async ({ request }) => {
 	const { data, fileName, path } = await request.json();
 
-	if (!data || !fileName || !path) {
+	if (data === undefined || data === null || !fileName || !path) {
 		return json({
 			error: {
 				code: 400,
