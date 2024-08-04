@@ -48,12 +48,21 @@
 		{/snippet}
 		{#snippet right()}
 			<Editor {environment} onChanges={triggerFullReload}>
-				<DownloadFile />
-				<CopyToClipboard />
-				<SaveData onSave={(selectedFile) => (zoneFile.value = selectedFile)} extension=".geojson" />
-				<LoadData onLoad={(selectedFile) => handleOnLoadedFile(selectedFile)} />
-				<ClearData onClear={handleOnClearData} />
-				<UploadFile accept=".geojson" {files} onUpload={triggerFullReload} />
+				<div>
+					<UploadFile accept=".geojson" {files} onUpload={triggerFullReload} />
+					<LoadData onLoad={(selectedFile) => handleOnLoadedFile(selectedFile)} />
+					<SaveData
+						onSave={(selectedFile) => (zoneFile.value = selectedFile)}
+						extension=".geojson"
+					/>
+				</div>
+				<div>
+					<DownloadFile />
+					<CopyToClipboard />
+				</div>
+				<div>
+					<ClearData onClear={handleOnClearData} />
+				</div>
 			</Editor>
 		{/snippet}
 	</SplitView>

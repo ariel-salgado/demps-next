@@ -86,8 +86,12 @@
 
 <div class="isolate contents" use:initEditor={environment}>
 	{#if editor && children}
-		<div class="sticky top-7 z-50 float-right mr-14 size-0 space-y-3">
-			{@render children()}
+		<div class="sticky top-7 z-50 float-right mr-14 size-0">
+			<div
+				class="flex flex-col gap-y-4 *:w-8 *:rounded-md *:leading-none *:outline *:outline-slate-700/80"
+			>
+				{@render children()}
+			</div>
 		</div>
 	{/if}
 </div>
