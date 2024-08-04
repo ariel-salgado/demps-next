@@ -1,5 +1,6 @@
 import type { EditorContext } from './editor';
 
+import { SaveData } from './save-data';
 import { LoadData } from './load-data';
 import { ClearData } from './clear-data';
 import { UploadFile } from './upload-file';
@@ -11,6 +12,7 @@ export type { EditorContext };
 
 export {
 	Editor,
+	SaveData,
 	LoadData,
 	ClearData,
 	UploadFile,
