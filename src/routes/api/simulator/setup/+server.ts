@@ -127,6 +127,8 @@ export const POST = (async ({ request }) => {
 		}
 	}
 
+	//TODO: Maybe delete contents of agents and flood
+
 	return json({ directives: simulatorDirectives });
 }) satisfies RequestHandler;
 
