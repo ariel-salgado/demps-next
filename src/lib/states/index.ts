@@ -13,4 +13,4 @@ export const uniquePool = createUniquePool();
 export const environment = createEnvironment();
 export const parameters = createParameters(extractDefaultValues(parametersFormFields));
 
-export { createPersisted };
+export { createEnvironment, createParameters, createPersisted };
