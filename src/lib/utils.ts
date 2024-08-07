@@ -109,7 +109,7 @@ export function debounce<T extends (...args: Parameters<T>) => void>(
 }
 
 export function splitCamelCase(word: string) {
-	return word.replace(/([a-z])([A-Z])/g, '$1 $2');
+	return word.replace(/-/g, ' ');
 }
 
 export function flattenJSON(obj: object, prefix: string = '') {
