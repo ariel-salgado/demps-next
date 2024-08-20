@@ -22,7 +22,6 @@
 		environment?: Environment;
 		reload?: boolean;
 		isLayerEditable?: boolean;
-		floodGeoJSON?: FeatureCollection;
 	}
 
 	let {
@@ -32,7 +31,6 @@
 		environment,
 		reload = $bindable(),
 		isLayerEditable,
-		floodGeoJSON,
 		class: className,
 		...rest
 	}: Props = $props();
@@ -45,13 +43,6 @@
 		if (reload) {
 			reloadLayers();
 			reload = false;
-		}
-	});
-
-	$effect(() => {
-		if (floodGeoJSON) {
-			floodGeoJSON;
-			loadFlood(floodGeoJSON);
 		}
 	});
 
@@ -123,18 +114,6 @@
 			}
 		};
 	};
-
-	// TODO: Set different colors based on depth
-	function loadFlood(features: FeatureCollection) {
-		featureGroup?.clearLayers();
-		window.L.geoJSON(features, {
-			onEachFeature(_, layer) {
-				// @ts-expect-error - smoothFactor is a valid prop
-				(layer as Path).setStyle({ opacity: 0.2, fillOpacity: 0.2, smoothFactor: 0 });
-				featureGroup?.addLayer(layer);
-			}
-		});
-	}
 
 	function loadFeatures(features: Feature<G> | Feature<G>[] | FeatureCollection<G>) {
 		window.L.geoJSON(features, {
