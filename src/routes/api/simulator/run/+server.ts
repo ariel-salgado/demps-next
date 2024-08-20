@@ -97,10 +97,11 @@ function processAgentData(line: string, isFirstLine: boolean) {
 
 		const lat = splitted.at(1);
 		const lng = splitted.at(2);
+		const isVisitant = splitted.at(3);
 		const isAlive = splitted.at(5);
 
 		if (lat && lng && (isAlive === '0' || isAlive === '1')) {
-			return lat + ',' + lng + ',' + isAlive + '$';
+			return lat + ',' + lng + ',' + isVisitant + ',' + isAlive + '$';
 		}
 	}
 }
