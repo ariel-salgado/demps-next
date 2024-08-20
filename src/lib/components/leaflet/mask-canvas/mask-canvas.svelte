@@ -16,11 +16,10 @@
 	const { map } = getContext<MapContext>(contextKey);
 
 	let mounted: boolean = $state(false);
-	let layerGroup: LayerGroup<TileLayer> = $state(window.L.layerGroup());
+	let layerGroup: LayerGroup<TileLayer> | undefined = $state();
 
 	$effect(() => {
-		if (mounted) {
-			coordinates;
+		if (mounted && coordinates) {
 			untrack(() => createMaskLayer(coordinates));
 		}
 	});
@@ -29,8 +28,8 @@
 		// @ts-expect-error - maskCanvas is not typed
 		await import('leaflet-maskcanvas');
 
+		layerGroup = window.L.layerGroup();
 		map.addLayer(layerGroup);
-
 		createMaskLayer(coordinates, 1);
 
 		mounted = true;
@@ -38,8 +37,8 @@
 
 	onDestroy(() => {
 		mounted = false;
-		map.removeLayer(layerGroup);
-		layerGroup.clearLayers();
+		map.removeLayer(layerGroup!);
+		layerGroup!.clearLayers();
 	});
 
 	function createMaskLayer(coordinates: [number, number][], initialOpacity: number = 0) {
@@ -55,13 +54,13 @@
 
 		maskLayer.setData(coordinates);
 
-		layerGroup.addLayer(maskLayer);
+		layerGroup!.addLayer(maskLayer);
 
 		toggleLayers();
 	}
 
 	function toggleLayers() {
-		const layers = layerGroup.getLayers();
+		const layers = layerGroup!.getLayers();
 
 		if (layers.length <= 1) return;
 
@@ -72,7 +71,7 @@
 			oldLayer.setOpacity(0);
 			newLayer.setOpacity(1);
 
-			layerGroup.removeLayer(oldLayer);
+			layerGroup!.removeLayer(oldLayer);
 		}, 160);
 	}
 </script>
