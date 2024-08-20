@@ -45,7 +45,7 @@
 
 	// TODO: Found the correct equation to minimize the flood flickering
 	function flickeringDelay(dotsOnScreen: number) {
-		return dotsOnScreen * 0.0035 + 20;
+		return dotsOnScreen * 0.0025 + 60;
 	}
 
 	function createMaskLayer(coordinates: [number, number][], initialOpacity: number = 0) {
@@ -60,9 +60,7 @@
 		});
 
 		maskLayer.setData(coordinates);
-
 		layerGroup!.addLayer(maskLayer);
-
 		toggleLayers(flickeringDelay(coordinates.length));
 	}
 
