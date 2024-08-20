@@ -77,7 +77,7 @@
 	$effect(() => {
 		if (onProgress) {
 			agents = connection?.select('agents').transform((data) => {
-				let transformData: ((data: string[]) => typeof $agents) | null = (data: string[]) => {
+				const transformData = (data: string[]) => {
 					const deadAgents: Coordinates = [];
 					const residentAgents: Coordinates = [];
 					const visitantAgents: Coordinates = [];
@@ -277,7 +277,7 @@
 					<MaskCanvas coordinates={residents} color={'#4B70B9'} lineColor={'#3D569E'} />
 				{/if}
 				{#if visitants}
-					<MaskCanvas coordinates={residents} color={'#B97B4B'} lineColor={'#9E663D'} />
+					<MaskCanvas coordinates={visitants} color={'#B97B4B'} lineColor={'#9E663D'} />
 				{/if}
 				{#if dead}
 					<MaskCanvas coordinates={dead} color={'#B94B4B'} lineColor={'#9E3D3D'} />
