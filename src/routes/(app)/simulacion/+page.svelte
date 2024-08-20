@@ -30,9 +30,21 @@
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
 	let agents:
-		| Readable<{ residents: Coordinates; visitants: Coordinates; dead: Coordinates }>
+		| Readable<{
+				residents: Coordinates;
+				visitants: Coordinates;
+				dead: Coordinates;
+		  }>
 		| undefined = $state();
-	let flood: Readable<[number, number][]> | undefined = $state();
+	let flood:
+		| Readable<{
+				flood_1m: Coordinates;
+				flood_2m: Coordinates;
+				flood_4m: Coordinates;
+				flood_6m: Coordinates;
+				flood_plus_6m: Coordinates;
+		  }>
+		| undefined = $state();
 
 	$effect(() => {
 		if (selectedParameterConfig === 'custom') {
@@ -44,6 +56,8 @@
 		// When the simulation is ready
 		if ($status === 'ready') {
 			onProgress = true;
+
+			// TODO: Turn this into a promise so it's dismiss on error or on data recieved.
 			toast.loading('Iniciando simulación...', {
 				duration: 45000,
 				description: 'Esperando datos de los agentes. Por favor, espere...'
@@ -108,17 +122,30 @@
 			flood = connection?.select('flood').transform((data) => {
 				if (!data) return;
 
-				// TODO: Split data into multiples arrays, each based on depth level.
 				const parseFloodData = (data: string[]) => {
-					const coords: [number, number][] = [];
+					const floods_1m: Coordinates = [];
+					const floods_2m: Coordinates = [];
+					const floods_4m: Coordinates = [];
+					const floods_6m: Coordinates = [];
+					const floods_plus_6m: Coordinates = [];
 
 					for (const floodData of data) {
-						// const [lat, lng, depth] = floodData.split(',');
-						const [lat, lng] = floodData.split(',');
-						coords.push([+lng, +lat]);
+						const [lat, lng, depth] = floodData.split(',');
+
+						if (+depth === 1) floods_1m.push([+lng, +lat]);
+						else if (+depth === 2) floods_2m.push([+lng, +lat]);
+						else if (+depth === 4) floods_4m.push([+lng, +lat]);
+						else if (+depth === 6) floods_6m.push([+lng, +lat]);
+						else if (+depth > 6) floods_plus_6m.push([+lng, +lat]);
 					}
 
-					return coords;
+					return {
+						flood_1m: floods_1m,
+						flood_2m: floods_2m,
+						flood_4m: floods_4m,
+						flood_6m: floods_6m,
+						flood_plus_6m: floods_plus_6m
+					} as typeof $flood;
 				};
 
 				const mappedFloodData = data.split('$').filter(Boolean);
@@ -273,13 +300,53 @@
 				{/if}
 			{/if}
 			{#if $flood}
-				<MaskCanvas
-					coordinates={$flood}
-					color={'#3388FF'}
-					lineColor={'#3388FF'}
-					radius={10}
-					opacity={0.2}
-				/>
+				{@const { flood_1m, flood_2m, flood_4m, flood_6m, flood_plus_6m } = $flood}
+
+				{#if flood_1m}
+					<MaskCanvas
+						coordinates={flood_1m}
+						color={'#C8C8FF'}
+						lineColor={'#C8C8FF'}
+						radius={10}
+						opacity={0.5}
+					/>
+				{/if}
+				{#if flood_2m}
+					<MaskCanvas
+						coordinates={flood_2m}
+						color={'#9696FF'}
+						lineColor={'#9696FF'}
+						radius={10}
+						opacity={0.5}
+					/>
+				{/if}
+				{#if flood_4m}
+					<MaskCanvas
+						coordinates={flood_4m}
+						color={'#6464FF'}
+						lineColor={'#6464FF'}
+						radius={10}
+						opacity={0.5}
+					/>
+				{/if}
+				{#if flood_6m}
+					<MaskCanvas
+						coordinates={flood_6m}
+						color={'#3232FF'}
+						lineColor={'#3232FF'}
+						radius={10}
+						opacity={0.5}
+					/>
+				{/if}
+				{#if flood_plus_6m}
+					<MaskCanvas
+						coordinates={flood_plus_6m}
+						color={'#0000FF'}
+						lineColor={'#0000FF'}
+						radius={10}
+						opacity={0.5}
+					/>
+				{/if}
 			{/if}
 		</Map>
 	</div>
