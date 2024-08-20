@@ -290,13 +290,13 @@
 				{@const { residents, visitants, dead } = $agents}
 
 				{#if residents}
-					<MaskCanvas coordinates={residents} color={'#4B70B9'} lineColor={'#3D569E'} />
+					<MaskCanvas coordinates={residents} color={'#0000FF'} lineColor={'#0000DD'} />
 				{/if}
 				{#if visitants}
-					<MaskCanvas coordinates={visitants} color={'#B97B4B'} lineColor={'#9E663D'} />
+					<MaskCanvas coordinates={visitants} color={'#FF9F00'} lineColor={'#FF8E00'} />
 				{/if}
 				{#if dead}
-					<MaskCanvas coordinates={dead} color={'#B94B4B'} lineColor={'#9E3D3D'} />
+					<MaskCanvas coordinates={dead} color={'#FF0000'} lineColor={'#DD0000'} />
 				{/if}
 			{/if}
 			{#if $flood}
