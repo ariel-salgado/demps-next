@@ -7,11 +7,13 @@
 
 	interface Props {
 		coordinates: [number, number][];
-		color: string;
-		lineColor: string;
+		radius?: number;
+		color?: string;
+		lineColor?: string;
+		opacity?: number;
 	}
 
-	let { coordinates, color, lineColor }: Props = $props();
+	let { coordinates, radius, color, lineColor, opacity }: Props = $props();
 
 	const { map } = getContext<MapContext>(contextKey);
 
@@ -41,25 +43,30 @@
 		layerGroup!.clearLayers();
 	});
 
+	// TODO: Found the correct equation to minimize the flood flickering
+	function flickeringDelay(dotsOnScreen: number) {
+		return dotsOnScreen * 0.0035 + 20;
+	}
+
 	function createMaskLayer(coordinates: [number, number][], initialOpacity: number = 0) {
 		// @ts-expect-error - maskCanvas is not typed
 		const maskLayer = window.L.TileLayer.maskCanvas({
-			radius: 1,
+			radius: radius || 1,
 			noMask: true,
 			useAbsoluteRadius: true,
 			color: color,
 			lineColor: lineColor,
-			opacity: initialOpacity
+			opacity: opacity || initialOpacity
 		});
 
 		maskLayer.setData(coordinates);
 
 		layerGroup!.addLayer(maskLayer);
 
-		toggleLayers();
+		toggleLayers(flickeringDelay(coordinates.length));
 	}
 
-	function toggleLayers() {
+	function toggleLayers(delay: number) {
 		const layers = layerGroup!.getLayers();
 
 		if (layers.length <= 1) return;
@@ -69,9 +76,9 @@
 			const [oldLayer, newLayer] = layers as [TileLayer, TileLayer];
 
 			oldLayer.setOpacity(0);
-			newLayer.setOpacity(1);
+			newLayer.setOpacity(opacity || 1);
 
 			layerGroup!.removeLayer(oldLayer);
-		}, 160);
+		}, delay);
 	}
 </script>
