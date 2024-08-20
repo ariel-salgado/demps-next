@@ -6,9 +6,9 @@
 	import { source } from 'sveltekit-sse';
 	import { parameters } from '$lib/states';
 	import { Explorer } from '$lib/components/file-explorer';
+	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
-	import { Map as LeafletMap, MaskCanvas } from '$lib/components/leaflet';
 	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 
 	type Coordinates = [number, number][];
@@ -32,12 +32,7 @@
 	let agents:
 		| Readable<{ residents: Coordinates; visitants: Coordinates; dead: Coordinates }>
 		| undefined = $state();
-	// let flood: Readable<FeatureCollection> | undefined = $state();
-
-	// Actual data
-	/* 	let deadAgents: Coordinates | undefined = $state();
-	let residentAgents: Coordinates | undefined = $state();
-	let visitantAgents: Coordinates | undefined = $state(); */
+	let flood: Readable<[number, number][]> | undefined = $state();
 
 	$effect(() => {
 		if (selectedParameterConfig === 'custom') {
@@ -77,7 +72,9 @@
 	$effect(() => {
 		if (onProgress) {
 			agents = connection?.select('agents').transform((data) => {
-				const transformData = (data: string[]) => {
+				if (!data) return;
+
+				const parseAgentData = (data: string[]) => {
 					const deadAgents: Coordinates = [];
 					const residentAgents: Coordinates = [];
 					const visitantAgents: Coordinates = [];
@@ -105,37 +102,29 @@
 
 				const mappedAgentData = data.split('$').filter(Boolean);
 
-				return transformData(mappedAgentData);
+				return parseAgentData(mappedAgentData);
 			});
 
-			// TODO: This can be improved a lot
-			/* flood = connection?.select('flood').transform((data) => {
-				if (data) {
-					const floodData = data
-						.split('$')
-						.filter(Boolean)
-						.map((f) => f.split(',').map(Number));
+			flood = connection?.select('flood').transform((data) => {
+				if (!data) return;
 
-					const floodLayers = Map.groupBy(floodData, (coords) => {
-						return coords.pop();
-					});
+				// TODO: Split data into multiples arrays, each based on depth level.
+				const parseFloodData = (data: string[]) => {
+					const coords: [number, number][] = [];
 
-					const features: Feature[] = [];
+					for (const floodData of data) {
+						// const [lat, lng, depth] = floodData.split(',');
+						const [lat, lng] = floodData.split(',');
+						coords.push([+lng, +lat]);
+					}
 
-					floodLayers.forEach((coords) => {
-						const coordinates = [[...coords, coords.at(0)]] as unknown as Position[][];
-						const newFeature = rewind(
-							feature({ type: 'Polygon', coordinates: coordinates })
-						) as Feature;
-						features.push({ id: randomID(), ...newFeature });
-					});
+					return coords;
+				};
 
-					return {
-						type: 'FeatureCollection',
-						features: features
-					} as FeatureCollection;
-				}
-			}); */
+				const mappedFloodData = data.split('$').filter(Boolean);
+
+				return parseFloodData(mappedFloodData);
+			});
 		}
 	});
 
@@ -269,7 +258,7 @@
 
 <section class="flex size-full divide-x divide-slate-300">
 	<div class="size-full">
-		<LeafletMap>
+		<Map>
 			{#if $agents}
 				{@const { residents, visitants, dead } = $agents}
 
@@ -283,7 +272,16 @@
 					<MaskCanvas coordinates={dead} color={'#B94B4B'} lineColor={'#9E3D3D'} />
 				{/if}
 			{/if}
-		</LeafletMap>
+			{#if $flood}
+				<MaskCanvas
+					coordinates={$flood}
+					color={'#3388FF'}
+					lineColor={'#3388FF'}
+					radius={10}
+					opacity={0.2}
+				/>
+			{/if}
+		</Map>
 	</div>
 	<aside class="flex w-[24rem] flex-col gap-y-6 py-8 px-10">
 		<div class="space-y-4">
