@@ -41,11 +41,13 @@
 
 		if (type === 'number') {
 			element.addEventListener('keydown', onlyAllowNumbers);
+			element.addEventListener('blur', () => {
+				value = Number(value);
+			});
 		}
 
 		return {
 			destroy() {
-				element.removeEventListener('keydown', onlyAllowNumbers);
 				element.remove();
 			}
 		};
