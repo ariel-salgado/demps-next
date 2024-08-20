@@ -1,18 +1,17 @@
 <script lang="ts">
 	import type { Readable } from 'svelte/store';
-	import type { Feature, FeatureCollection, Position } from 'geojson';
 
 	import { toast } from 'svelte-sonner';
-	import { rewind } from '@turf/rewind';
+	import { joinPath } from '$lib/utils';
 	import { source } from 'sveltekit-sse';
-	import { feature } from '@turf/helpers';
 	import { parameters } from '$lib/states';
-	import { joinPath, randomID } from '$lib/utils';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
 	import { Map as LeafletMap, MaskCanvas } from '$lib/components/leaflet';
 	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
+
+	type Coordinates = [number, number][];
 
 	const parametersOptions = $state([
 		{ value: 'default', label: 'Usar por defecto' },
@@ -30,9 +29,15 @@
 
 	// Server-Sent Events
 	let status: Readable<string> | undefined = $state();
-	let agents: Readable<{ alive: [number, number][]; dead: [number, number][] }> | undefined =
-		$state();
-	let flood: Readable<FeatureCollection> | undefined = $state();
+	let agents:
+		| Readable<{ residents: Coordinates; visitants: Coordinates; dead: Coordinates }>
+		| undefined = $state();
+	// let flood: Readable<FeatureCollection> | undefined = $state();
+
+	// Actual data
+	/* 	let deadAgents: Coordinates | undefined = $state();
+	let residentAgents: Coordinates | undefined = $state();
+	let visitantAgents: Coordinates | undefined = $state(); */
 
 	$effect(() => {
 		if (selectedParameterConfig === 'custom') {
@@ -72,23 +77,39 @@
 	$effect(() => {
 		if (onProgress) {
 			agents = connection?.select('agents').transform((data) => {
-				const agents = data
-					.split('$')
-					.filter(Boolean)
-					.map((coord) => coord.split(',').map(Number));
+				let transformData: ((data: string[]) => typeof $agents) | null = (data: string[]) => {
+					const deadAgents: Coordinates = [];
+					const residentAgents: Coordinates = [];
+					const visitantAgents: Coordinates = [];
 
-				return agents.reduce(
-					(acc, [x, y, status]) => {
-						const key = status === 1 ? 'alive' : 'dead';
-						acc[key].push([x, y]);
-						return acc;
-					},
-					{ alive: [] as [number, number][], dead: [] as [number, number][] }
-				);
+					for (const agentData of data) {
+						const [lat, lng, isVisitant, isAlive] = agentData.split(',');
+
+						if (+isAlive) {
+							if (+isVisitant) {
+								visitantAgents.push([+lat, +lng]);
+							} else {
+								residentAgents.push([+lat, +lng]);
+							}
+						} else {
+							deadAgents.push([+lat, +lng]);
+						}
+					}
+
+					return {
+						residents: residentAgents,
+						visitants: visitantAgents,
+						dead: deadAgents
+					} as typeof $agents;
+				};
+
+				const mappedAgentData = data.split('$').filter(Boolean);
+
+				return transformData(mappedAgentData);
 			});
 
 			// TODO: This can be improved a lot
-			flood = connection?.select('flood').transform((data) => {
+			/* flood = connection?.select('flood').transform((data) => {
 				if (data) {
 					const floodData = data
 						.split('$')
@@ -114,7 +135,7 @@
 						features: features
 					} as FeatureCollection;
 				}
-			});
+			}); */
 		}
 	});
 
@@ -248,12 +269,19 @@
 
 <section class="flex size-full divide-x divide-slate-300">
 	<div class="size-full">
-		<LeafletMap floodGeoJSON={$flood}>
-			{#if $agents?.alive}
-				<MaskCanvas coordinates={$agents.alive} color={'#4B70B9'} lineColor={'#3D569E'} />
-			{/if}
-			{#if $agents?.dead}
-				<MaskCanvas coordinates={$agents.dead} color={'#B94B4B'} lineColor={'#9E3D3D'} />
+		<LeafletMap>
+			{#if $agents}
+				{@const { residents, visitants, dead } = $agents}
+
+				{#if residents}
+					<MaskCanvas coordinates={residents} color={'#4B70B9'} lineColor={'#3D569E'} />
+				{/if}
+				{#if visitants}
+					<MaskCanvas coordinates={residents} color={'#B97B4B'} lineColor={'#9E663D'} />
+				{/if}
+				{#if dead}
+					<MaskCanvas coordinates={dead} color={'#B94B4B'} lineColor={'#9E3D3D'} />
+				{/if}
 			{/if}
 		</LeafletMap>
 	</div>
