@@ -303,7 +303,7 @@
 					<MaskCanvas coordinates={residents} color={'#0000FF'} lineColor={'#0000DD'} />
 				{/if}
 				{#if visitants}
-					<MaskCanvas coordinates={visitants} color={'#FF9F00'} lineColor={'#FF8E00'} />
+					<MaskCanvas coordinates={visitants} color={'#00FF00'} lineColor={'#00DD00'} />
 				{/if}
 				{#if dead}
 					<MaskCanvas coordinates={dead} color={'#FF0000'} lineColor={'#DD0000'} />
