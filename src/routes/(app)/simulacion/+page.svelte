@@ -57,19 +57,29 @@
 		if ($status === 'ready') {
 			onProgress = true;
 
-			// TODO: Turn this into a promise so it's dismiss on error or on data recieved.
-			toast.loading('Iniciando simulación...', {
-				duration: 45000,
-				description: 'Esperando datos de los agentes. Por favor, espere...'
+			const simPromise = new Promise((resolve, reject) => {
+				const interval = setInterval(() => {
+					//@ts-expect-error - Typescript infers that status will always be "start".
+					if ($status === 'error') {
+						clearInterval(interval);
+						reject('Error');
+					} else if ($agents) {
+						clearInterval(interval);
+						resolve('Success');
+					}
+				}, 1000);
+			});
+
+			toast.promise(simPromise, {
+				loading: 'Esperando datos de los agentes. Por favor, espere...',
+				success: 'Iniciando visualización de agentes.',
+				error: 'Ocurrió un error. Vuelva a intentarlo nuevamente.'
 			});
 		}
 
 		// When an error occurs
 		if ($status === 'error') {
 			stopSimulation();
-			toast.error('Error conectando con el simulador.', {
-				description: 'Conexión con el servidor finalizada.'
-			});
 		}
 
 		// When the simulation finishes successfully
@@ -240,8 +250,8 @@
 			return true;
 		}
 
-		toast.info('Sobreescribir archivo.', {
-			description: 'El archivo de configuración será modificado.'
+		toast.info('Archivo de configuración.', {
+			description: 'El archivo de configuración ha sido modificado.'
 		});
 
 		return false;
