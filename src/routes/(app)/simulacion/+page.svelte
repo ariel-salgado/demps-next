@@ -71,8 +71,8 @@
 			});
 
 			toast.promise(simPromise, {
-				loading: 'Esperando datos de los agentes. Por favor, espere...',
-				success: 'Iniciando visualización de agentes.',
+				loading: 'Iniciando simulación. Por favor, espere...',
+				success: 'Simulación iniciada.',
 				error: 'Ocurrió un error. Vuelva a intentarlo nuevamente.'
 			});
 		}
