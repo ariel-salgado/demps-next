@@ -16,8 +16,6 @@ export function createDempsProcess(path: string, filename: string) {
 	killExistingProcess();
 
 	async function run(onStart?: () => void): Promise<void> {
-		console.log('runnning');
-
 		return new Promise((resolve, reject) => {
 			if (!isDirectory(path)) {
 				reject(new Error('Simulator directory does not exist'));
