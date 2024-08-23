@@ -5,12 +5,15 @@
 	import { joinPath } from '$lib/utils';
 	import { source } from 'sveltekit-sse';
 	import { parameters } from '$lib/states';
+	import { beforeNavigate } from '$app/navigation';
 	import { Explorer } from '$lib/components/file-explorer';
 	import { Map, MaskCanvas } from '$lib/components/leaflet';
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
 	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
-	import { beforeNavigate } from '$app/navigation';
+
+	// *: The simulations only runs once, after that you have to reload the page.
+	// TODO: Fix the above
 
 	type Coordinates = [number, number][];
 
