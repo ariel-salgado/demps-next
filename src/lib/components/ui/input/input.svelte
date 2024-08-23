@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { z } from 'zod';
+	import type { Action } from 'svelte/action';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
 	import { cn } from '$lib/utils';
@@ -28,6 +29,16 @@
 		inputError = error.format()._errors.at(0);
 		return;
 	}
+
+	const initInput: Action<HTMLInputElement> = (element: HTMLInputElement) => {
+		if (element.type === 'number') {
+			const step = element.getAttribute('step');
+
+			if (!step) {
+				element.setAttribute('step', 'any');
+			}
+		}
+	};
 </script>
 
 <input
@@ -40,6 +51,7 @@
 	)}
 	onchange={validation ? validateField : undefined}
 	bind:value
+	use:initInput
 />
 
 {#if validationError}
