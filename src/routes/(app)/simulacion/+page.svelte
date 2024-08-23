@@ -10,6 +10,7 @@
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
 	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
+	import { beforeNavigate } from '$app/navigation';
 
 	type Coordinates = [number, number][];
 
@@ -45,6 +46,10 @@
 				flood_plus_6m: Coordinates;
 		  }>
 		| undefined = $state();
+
+	beforeNavigate(() => {
+		connection?.close();
+	});
 
 	$effect(() => {
 		if (selectedParameterConfig === 'custom') {
@@ -268,6 +273,9 @@
 				toast.error('Error en la conexión.', {
 					description: error?.message
 				});
+			},
+			close: () => {
+				onProgress = false;
 			}
 		});
 	}
@@ -279,7 +287,6 @@
 
 	function stopSimulation() {
 		connection?.close();
-		onProgress = false;
 	}
 </script>
 
