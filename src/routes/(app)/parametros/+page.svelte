@@ -394,6 +394,8 @@
 	{/each}
 {/snippet}
 
+<!-- *: PathPicker doesnt update its value on binding, because of internal binding with selected file -->
+<!-- TODO: Fix the above -->
 {#snippet formField(field: FormField)}
 	<FormGroup>
 		<Label for={field.attributes.name}>{field.label}</Label>
