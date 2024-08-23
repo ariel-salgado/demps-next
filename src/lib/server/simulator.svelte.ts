@@ -15,7 +15,9 @@ export function createDempsProcess(path: string, filename: string) {
 
 	killExistingProcess();
 
-	async function run(): Promise<void> {
+	async function run(onStart?: () => void): Promise<void> {
+		console.log('runnning');
+
 		return new Promise((resolve, reject) => {
 			if (!isDirectory(path)) {
 				reject(new Error('Simulator directory does not exist'));
@@ -32,6 +34,10 @@ export function createDempsProcess(path: string, filename: string) {
 				dempsProcess.on('spawn', () => {
 					isRunning = true;
 					uniquePool.add('dempsProcess', dempsProcess);
+
+					if (onStart) {
+						onStart();
+					}
 				});
 
 				dempsProcess.on('error', async (error) => {
