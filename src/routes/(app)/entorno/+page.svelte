@@ -28,19 +28,15 @@
 
 	function handleOnSavedFile(selectedFile: string) {
 		zoneFile.value = selectedFile;
-		parameters.value = {
-			...parameters.value,
-			input: { ...parameters.value.input, zones: zoneFile.value }
-		};
+		// @ts-expect-error - Using 'parameters.value.input.zones' instead, creates an object.
+		parameters.value['input.zones'] = zoneFile.value;
 	}
 
 	function handleOnLoadedFile(selectedFile: string) {
 		zoneFile.value = selectedFile;
 		triggerFullReload();
-		parameters.value = {
-			...parameters.value,
-			input: { ...parameters.value.input, zones: zoneFile.value }
-		};
+		// @ts-expect-error - Using 'parameters.value.input.zones' instead, creates an object.
+		parameters.value['input.zones'] = zoneFile.value;
 	}
 </script>
 
