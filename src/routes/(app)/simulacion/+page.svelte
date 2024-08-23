@@ -62,18 +62,23 @@
 					//@ts-expect-error - Typescript infers that status will always be "start".
 					if ($status === 'error') {
 						clearInterval(interval);
-						reject('Error');
+						reject();
+					} else if (!onProgress) {
+						clearInterval(interval);
+						reject();
 					} else if ($agents) {
 						clearInterval(interval);
-						resolve('Success');
+						resolve('Simulación iniciada.');
 					}
 				}, 1000);
 			});
 
-			toast.promise(simPromise, {
+			toast.promise(simPromise as Promise<string>, {
 				loading: 'Iniciando simulación. Por favor, espere...',
-				success: 'Simulación iniciada.',
-				error: 'Ocurrió un error. Vuelva a intentarlo nuevamente.'
+				success: (message) => {
+					return message;
+				},
+				error: 'Simulación abortada.'
 			});
 		}
 
