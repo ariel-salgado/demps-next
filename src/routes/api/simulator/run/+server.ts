@@ -37,10 +37,10 @@ export const POST = (async () => {
 			fileWatchers.push(agentWatcher);
 
 			agentWatcher.on('ready', async () => {
-				emit('status', 'ready');
-
 				try {
-					await dempsProcess.run();
+					await dempsProcess.run(() => {
+						emit('status', 'ready');
+					});
 					emit('status', 'finished');
 				} catch (error) {
 					console.error(error);
@@ -80,9 +80,7 @@ export const POST = (async () => {
 			async stop() {
 				fileWatchers.forEach((watcher) => watcher.close());
 				childProcesses.forEach(async (childProcess) => {
-					if (childProcess.isRunning) {
-						await childProcess.kill();
-					}
+					await childProcess.kill();
 				});
 
 				console.log('Connection closed');
