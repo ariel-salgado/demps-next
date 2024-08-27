@@ -24,7 +24,7 @@
 	let currentDirectory: string = $state(PUBLIC_SIM_DIR);
 
 	async function saveData() {
-		const data = JSON.stringify(environment.value);
+		const data = JSON.stringify($state.snapshot(environment.value), null, 2);
 		const fileName = selectedFile?.split('/').filter(Boolean).pop();
 
 		const response = await fetch('/api/file/create', {
@@ -50,7 +50,7 @@
 
 		showDialog = false;
 
-		toast.success('Creado', {
+		toast.success('Guardado exitoso', {
 			description: `Se guardado la configuración en ${fileName}.`
 		});
 
