@@ -1,122 +1,82 @@
 import type { RequestHandler } from './$types';
 import type { SimulatorDirectives } from '$lib/types';
-import type { DempsProcess, Watcher } from '$lib/server';
 
 import { join } from 'node:path';
-import { produce } from 'sveltekit-sse';
-import { PUBLIC_SIM_DIR } from '$env/static/public';
+import { PUBLIC_EXEC_CMD, PUBLIC_SIM_DIR } from '$env/static/public';
 import { basePath, isFile, readFile } from '$lib/server/utils';
-import { createWatcher, createDempsProcess, createFileProcessor } from '$lib/server';
 
-const fileWatchers: Watcher[] = [];
-const childProcesses: DempsProcess[] = [];
+import { Stream } from '$lib/models';
+import { FileWatcher, Process } from '$lib/server/models';
+import { create_agent_processor, create_flood_processor } from '$lib/server/helpers';
 
-export const POST = (async () => {
-	return produce(
-		async function start({ emit }) {
-			const { error } = emit('status', 'init');
+export const GET = (async () => {
+	console.log('Connection started');
 
-			if (error) {
-				console.error(error);
-				return;
-			}
+	const stream = new Stream();
 
-			const directives = getSimulationDirectives();
+	const directives = getSimulationDirectives();
 
-			if (!directives) {
-				emit('status', 'error');
-				return;
-			}
+	if (!directives) {
+		stream.send({ name: 'status', data: 'error' });
+		stream.close();
+	} else {
+		stream.send({ name: 'status', data: 'init' });
+	}
 
-			const { configFile, agentsDir, floodEnabled, floodDir } = directives;
+	const { configFile, agentsDir, floodEnabled, floodDir } = directives!;
 
-			const dempsProcess = createDempsProcess(PUBLIC_SIM_DIR, configFile);
-			childProcesses.push(dempsProcess);
+	const agent_watcher = new FileWatcher('agent_watcher');
+	const flood_watcher = new FileWatcher('flood_watcher');
 
-			const agentWatcher = createWatcher('agentWatcher', agentsDir);
-			fileWatchers.push(agentWatcher);
+	const demps_process = new Process('demps', PUBLIC_EXEC_CMD, ['--config', configFile], {
+		cwd: PUBLIC_SIM_DIR
+	});
 
-			agentWatcher.on('ready', async () => {
-				try {
-					await dempsProcess.run(() => {
-						emit('status', 'ready');
-					});
-					emit('status', 'finished');
-				} catch (error) {
-					console.error(error);
-					console.log('Closing the connection.');
-					emit('status', 'error');
-				} finally {
-					// eslint-disable-next-line no-unsafe-finally
-					return;
-				}
-			});
+	const agent_processor = create_agent_processor((data) => {
+		stream.sync_and_send({ name: 'agents', data: data });
+	});
 
-			const agentProcessor = createFileProcessor(
-				(line, isFirstLine) => processAgentData(line, isFirstLine),
-				(data) => emit('agents', data)
-			);
+	const flood_processor = create_flood_processor((data) => {
+		stream.sync_and_send({ name: 'flood', data: data });
+	});
 
-			agentWatcher.on('add', (path) => {
-				agentProcessor.push(path);
-			});
+	demps_process.on_spawn(() => {
+		agent_watcher.add(agentsDir);
+		flood_watcher.add(floodDir);
+		stream.send({ name: 'status', data: 'ready' });
+	});
 
-			if (floodEnabled) {
-				const floodWatcher = createWatcher('floodWatcher', floodDir);
-				fileWatchers.push(floodWatcher);
+	agent_watcher.on('add', (path) => {
+		agent_processor.add(path);
+	});
 
-				const floodProcessor = createFileProcessor(
-					(line) => processFloodData(line),
-					(data) => emit('flood', data)
-				);
+	if (floodEnabled) {
+		flood_watcher.on('add', (path) => {
+			flood_processor.add(path);
+		});
+	}
 
-				floodWatcher.on('add', (path) => {
-					floodProcessor.push(path);
-				});
-			}
-		},
-		{
-			ping: 10000,
-			async stop() {
-				fileWatchers.forEach((watcher) => watcher.close());
-				childProcesses.forEach(async (childProcess) => {
-					await childProcess.kill();
-				});
-
-				console.log('Connection closed');
-			}
+	demps_process.on_close((code) => {
+		if (code === 0) {
+			stream.send({ name: 'status', data: 'finished' });
+		} else {
+			stream.send({ name: 'status', data: 'error' });
 		}
-	);
+		stream.close();
+	});
+
+	stream.on_close(() => {
+		demps_process.kill();
+		agent_watcher.close();
+		agent_processor.close();
+		flood_watcher.close();
+		flood_processor.close();
+
+		console.log('Connection closed');
+	});
+
+	return stream.response();
 }) satisfies RequestHandler;
-
-function processAgentData(line: string, isFirstLine: boolean) {
-	if (!isFirstLine) {
-		const splitted = line.split(' ');
-
-		const lat = splitted.at(1);
-		const lng = splitted.at(2);
-		const isVisitant = splitted.at(3);
-		const isAlive = splitted.at(5);
-
-		if (lat && lng && isVisitant && isAlive) {
-			return lat + ',' + lng + ',' + isVisitant + ',' + isAlive + '$';
-		}
-	}
-}
-
-function processFloodData(line: string) {
-	if (line) {
-		const splitted = line.split(' ');
-
-		const lat = splitted.at(1);
-		const lng = splitted.at(2);
-		const depth = splitted.at(4);
-
-		if (lat && lng && depth) {
-			return lng + ',' + lat + ',' + depth + '$';
-		}
-	}
-}
 
 function getSimulationDirectives() {
 	const iniFilePath = join(basePath, 'sim.ini');

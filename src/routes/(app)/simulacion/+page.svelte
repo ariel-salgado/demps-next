@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Readable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 
+	import { Source } from '$lib/models';
 	import { toast } from 'svelte-sonner';
 	import { joinPath } from '$lib/utils';
-	import { source } from 'sveltekit-sse';
 	import { parameters } from '$lib/states';
 	import { beforeNavigate } from '$app/navigation';
 	import { Explorer } from '$lib/components/file-explorer';
@@ -11,9 +11,6 @@
 	import { Play, Square, LoaderCircle } from 'lucide-svelte';
 	import { Button, Label, Select, Dialog } from '$lib/components/ui';
 	import { PUBLIC_BASE_DIR, PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
-
-	// *: The simulations only runs once, after that you have to reload the page.
-	// TODO: Fix the above
 
 	type Coordinates = [number, number][];
 
@@ -29,25 +26,24 @@
 	let selectedParameterConfig: string = $state('default');
 
 	// SSE Connection
-	let connection: ReturnType<typeof source> | undefined = $state();
+	let connection: Source | undefined = $state();
 
 	// Server-Sent Events
-	let status: Readable<string> | undefined = $state();
+	let status: Writable<string> | undefined = $state();
 	let agents:
-		| Readable<{
-				residents: Coordinates;
-				visitants: Coordinates;
-				dead: Coordinates;
-		  }>
+		| Writable<{ residents: Coordinates; visitants: Coordinates; dead: Coordinates } | undefined>
 		| undefined = $state();
 	let flood:
-		| Readable<{
-				flood_1m: Coordinates;
-				flood_2m: Coordinates;
-				flood_4m: Coordinates;
-				flood_6m: Coordinates;
-				flood_plus_6m: Coordinates;
-		  }>
+		| Writable<
+				| {
+						flood_1m: Coordinates;
+						flood_2m: Coordinates;
+						flood_4m: Coordinates;
+						flood_6m: Coordinates;
+						flood_plus_6m: Coordinates;
+				  }
+				| undefined
+		  >
 		| undefined = $state();
 
 	beforeNavigate(() => {
@@ -108,7 +104,7 @@
 	// When the coordinates are received
 	$effect(() => {
 		if (onProgress) {
-			agents = connection?.select('agents').transform((data) => {
+			agents = connection?.listen('agents', (data) => {
 				if (!data) return;
 
 				const parseAgentData = (data: string[]) => {
@@ -142,7 +138,7 @@
 				return parseAgentData(mappedAgentData);
 			});
 
-			flood = connection?.select('flood').transform((data) => {
+			flood = connection?.listen('flood', (data) => {
 				if (!data) return;
 
 				const parseFloodData = (data: string[]) => {
@@ -270,26 +266,19 @@
 		return false;
 	}
 
-	function createConnection() {
-		return source('/api/simulator/run', {
-			error: ({ error }) => {
-				toast.error('Error en la conexión.', {
-					description: error?.message
-				});
-			},
-			close: () => {
-				onProgress = false;
-			}
+	function startSimulation() {
+		connection = new Source('/api/simulator/run');
+		status = connection?.listen('status');
+
+		connection.error(() => {
+			toast.error('Error en la conexión.');
 		});
 	}
 
-	function startSimulation() {
-		connection = createConnection();
-		status = connection?.select('status');
-	}
-
 	function stopSimulation() {
-		connection?.close();
+		connection?.close(() => {
+			onProgress = false;
+		});
 	}
 </script>
 
