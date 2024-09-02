@@ -63,12 +63,14 @@ export class Process {
 	kill() {
 		if (!this.child_process?.killed) {
 			this.child_process?.kill();
+			this.child_process?.removeAllListeners();
 			this.child_process = null;
 		}
 	}
 
 	force_kill() {
 		this.child_process?.kill('SIGKILL');
+		this.child_process?.removeAllListeners();
 		this.child_process = null;
 	}
 }

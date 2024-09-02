@@ -1,6 +1,8 @@
 import { LinkedList } from '.';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
+const current_streams: SvelteMap<string, Stream> = new SvelteMap();
+
 declare type StreamEventData = {
 	name: string;
 	data: any;
@@ -19,10 +21,17 @@ export class Stream {
 	private sync_timeout_id: ReturnType<typeof setTimeout> | null = null;
 
 	constructor() {
+		if (current_streams.has('demps')) {
+			const stream = current_streams.get('demps');
+			stream?.close();
+		}
+
 		this.stream = new ReadableStream({
 			start: this.initialize_stream.bind(this),
-			cancel: this.handle_close.bind(this)
+			cancel: this.close.bind(this)
 		});
+
+		current_streams.set('demps', this);
 	}
 
 	private initialize_stream(controller: ReadableStreamDefaultController) {
@@ -56,8 +65,8 @@ export class Stream {
 			}
 			this.handle_backpressure();
 			this.controller.enqueue(message);
-		} catch (error) {
-			console.error('Error sending synced data:', error);
+		} catch {
+			// console.error('Error sending synced data:', error);
 		}
 	}
 
@@ -68,12 +77,14 @@ export class Stream {
 			const message = this.format_message(event);
 			this.handle_backpressure();
 			this.controller.enqueue(message);
-		} catch (error) {
-			console.error('Error sending data:', error);
+		} catch {
+			// console.error('Error sending data:', error);
 		}
 	}
 
 	sync_and_send(event: StreamEventData) {
+		if (!this.controller) return;
+
 		let buffer = this.events_buffers.get(event.name);
 		if (!buffer) {
 			buffer = new LinkedList<StreamEventData>();
@@ -136,7 +147,7 @@ export class Stream {
 		if (this.controller) {
 			const desired_size = this.controller.desiredSize;
 			if (desired_size !== null && desired_size < 1) {
-				console.warn('Backpressure detected, slowing down event flow.');
+				// console.warn('Backpressure detected, slowing down event flow.');
 			}
 		}
 	}

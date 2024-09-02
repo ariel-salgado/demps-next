@@ -1,3 +1,5 @@
+import type { Interface } from 'node:readline';
+
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 
@@ -11,12 +13,14 @@ export class FileProcessor {
 	private is_processing: boolean | null;
 	private preprocess_callback: FileProcessOptions['preprocess'] | null;
 	private on_complete_callback: FileProcessOptions['on_complete'] | null;
+	private current_file_reader: Interface | null;
 
 	constructor(options?: FileProcessOptions) {
 		this.file_queue = [];
 		this.is_processing = false;
 		this.preprocess_callback = options?.preprocess || null;
 		this.on_complete_callback = options?.on_complete || null;
+		this.current_file_reader = null;
 	}
 
 	add(path: string) {
@@ -25,10 +29,14 @@ export class FileProcessor {
 	}
 
 	close() {
+		if (this.current_file_reader) {
+			this.current_file_reader.close();
+		}
 		this.file_queue = null;
 		this.is_processing = null;
 		this.preprocess_callback = null;
 		this.on_complete_callback = null;
+		this.current_file_reader = null;
 	}
 
 	on_preprocess(callback: FileProcessOptions['preprocess']) {
@@ -52,14 +60,14 @@ export class FileProcessor {
 	private async process_file(path: string) {
 		try {
 			const lines: string[] = [];
-			const file_reader = createInterface({
+			this.current_file_reader = createInterface({
 				input: createReadStream(path),
 				terminal: false
 			});
 
 			let is_first_line = true;
 
-			for await (const line of file_reader) {
+			for await (const line of this.current_file_reader) {
 				const processed_line = this.preprocess_callback
 					? this.preprocess_callback(line, is_first_line)
 					: line;
@@ -73,11 +81,12 @@ export class FileProcessor {
 				}
 			}
 
-			file_reader.close();
 			this.on_complete_callback?.(lines.join(''));
 		} catch (error) {
 			console.error(`Error reading file ${path}:`, error);
 		} finally {
+			this.current_file_reader?.close();
+			this.current_file_reader = null;
 			this.is_processing = false;
 			this.process_next();
 		}

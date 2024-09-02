@@ -272,12 +272,17 @@
 
 		connection.error(() => {
 			toast.error('Error en la conexión.');
+			connection?.close();
 		});
 	}
 
 	function stopSimulation() {
 		connection?.close(() => {
 			onProgress = false;
+		});
+
+		fetch('/api/simulator/run', {
+			method: 'DELETE'
 		});
 	}
 </script>

@@ -6,8 +6,21 @@ import { PUBLIC_EXEC_CMD, PUBLIC_SIM_DIR } from '$env/static/public';
 import { basePath, isFile, readFile } from '$lib/server/utils';
 
 import { Stream } from '$lib/models';
+import { uniquePool } from '$lib/states';
 import { FileWatcher, Process } from '$lib/server/models';
 import { create_agent_processor, create_flood_processor } from '$lib/server/helpers';
+
+export const DELETE = (async () => {
+	if (uniquePool.has('demps')) {
+		const current = uniquePool.pop<Process>('demps');
+
+		if (current?.is_running) {
+			current.kill();
+		}
+	}
+
+	return new Response();
+}) satisfies RequestHandler;
 
 export const GET = (async () => {
 	console.log('Connection started');
@@ -31,6 +44,8 @@ export const GET = (async () => {
 	const demps_process = new Process('demps', PUBLIC_EXEC_CMD, ['--config', configFile], {
 		cwd: PUBLIC_SIM_DIR
 	});
+
+	uniquePool.add('demps', demps_process);
 
 	const agent_processor = create_agent_processor((data) => {
 		stream.sync_and_send({ name: 'agents', data: data });
@@ -66,7 +81,7 @@ export const GET = (async () => {
 	});
 
 	stream.on_close(() => {
-		demps_process.kill();
+		demps_process?.kill();
 		agent_watcher.close();
 		agent_processor.close();
 		flood_watcher.close();

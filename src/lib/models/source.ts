@@ -98,9 +98,9 @@ export class Source {
 	close(callback?: () => void) {
 		if (!this.source) return;
 
-		this.source?.close();
+		this.source.close();
 
-		if (this.source?.readyState === 2) {
+		if (this.source.readyState === 2) {
 			this.get_store('open')?.set(false);
 
 			if (callback) {

@@ -8,6 +8,7 @@ const watchers: SvelteMap<string, FSWatcher> = new SvelteMap();
 process.on('exit', () => {
 	for (const watcher of watchers.values()) {
 		watcher.close();
+		watcher.removeAllListeners();
 	}
 	watchers.clear();
 });
@@ -34,6 +35,7 @@ export class FileWatcher extends FSWatcher {
 		if (watchers.has(id)) {
 			let stored_watcher: FSWatcher | null = watchers.get(id)!;
 			stored_watcher?.close();
+			this.removeAllListeners();
 			stored_watcher = null;
 			watchers.delete(id);
 		}
