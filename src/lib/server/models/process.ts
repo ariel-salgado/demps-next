@@ -1,4 +1,4 @@
-import type { ChildProcess } from 'node:child_process';
+import type { ChildProcess, ExecFileException } from 'node:child_process';
 
 import { execFile } from 'node:child_process';
 import { SvelteMap } from 'svelte/reactivity';
@@ -16,7 +16,9 @@ export class Process {
 	private child_process: ChildProcess | null;
 
 	constructor(id: string, path: string, args: string[], options?: Parameters<typeof execFile>[2]) {
-		this.child_process = execFile(path, args, options);
+		this.child_process = execFile(path, args, options, (error) => {
+			console.error(error);
+		});
 		this.kill_existing_process(id);
 		child_processes.set(id, this);
 
@@ -44,7 +46,7 @@ export class Process {
 		this.child_process?.on('spawn', callback);
 	}
 
-	on_error(callback: (error: Error) => void) {
+	on_error(callback: (error: Error | ExecFileException) => void) {
 		this.child_process?.on('error', callback);
 	}
 
