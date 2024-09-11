@@ -27,7 +27,7 @@ export const POST = (async ({ request }) => {
 
 	const fullPath = join(path, fileName);
 
-	// Overwrite by default
+	// By default, it overwrites the file.
 	if (isFile(fullPath)) {
 		deleteFile(fullPath);
 	}

@@ -4,8 +4,8 @@ import type { ParametersSchema, SimulatorDirectives } from '$lib/types';
 import { join } from 'node:path';
 import { json } from '@sveltejs/kit';
 import { parametersFormFields } from '$lib/config';
-import { PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 import { basePath, createFile, isFile, readFile } from '$lib/server/utils';
+import { PUBLIC_PARAMETERS_FILENAME, PUBLIC_SIM_DIR } from '$env/static/public';
 import { deflattenJSON, getValidationSchema, stringifyZodFieldErrors } from '$lib/utils';
 
 export const POST = (async ({ request }) => {
@@ -22,6 +22,7 @@ export const POST = (async ({ request }) => {
 
 	let parameters: ParametersSchema;
 
+	// Verify the configuration file stored in the form
 	if (type === 'local') {
 		const { success: validConfig, errors: configErrors } = verifyIntegrity(config);
 
@@ -35,6 +36,8 @@ export const POST = (async ({ request }) => {
 		}
 
 		parameters = deflattenJSON(config) as ParametersSchema;
+
+		// Verify the configuration file stored in the server
 	} else if (type === 'server') {
 		if (!isFile(config)) {
 			return json({
@@ -96,7 +99,7 @@ export const POST = (async ({ request }) => {
 		zones
 	};
 
-	// Create simulator ini file
+	// Create simulator .ini file
 	const iniFileCreated = createSimulatorLaunchFile(simulatorDirectives);
 
 	if (!iniFileCreated) {
@@ -127,8 +130,6 @@ export const POST = (async ({ request }) => {
 		}
 	}
 
-	//TODO: Maybe delete contents of agents and flood
-
 	return json({ directives: simulatorDirectives });
 }) satisfies RequestHandler;
 
@@ -141,7 +142,7 @@ function verifyIntegrity(config: Record<string, unknown>) {
 
 /**
  * *: This function is used to create a .ini file in the root directory of the app.
- * *: It sets the required values to launch correctle the simulator as children process.
+ * *: It sets the required values to launch correctly the simulator as children process.
  */
 function createSimulatorLaunchFile(data: Record<string, unknown>) {
 	const iniFilename = 'sim.ini';
