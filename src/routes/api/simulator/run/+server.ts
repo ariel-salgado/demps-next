@@ -75,8 +75,6 @@ export const GET = (async () => {
 	}
 
 	demps_process.on_close((code) => {
-		console.log('DEMPS closed');
-
 		if (code === 0) {
 			stream.send({ name: 'status', data: 'finished' });
 		} else {
