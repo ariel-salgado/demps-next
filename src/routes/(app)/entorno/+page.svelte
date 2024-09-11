@@ -21,6 +21,9 @@
 		reload = true;
 	}
 
+	// * All the logic below handles syncing with the form input zones value.
+	// * When the user select other file to work with, keeps in sync with the input zones form field.
+
 	function handleOnClearData() {
 		zoneFile.value = null;
 		triggerFullReload();
