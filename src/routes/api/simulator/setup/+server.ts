@@ -99,7 +99,7 @@ export const POST = (async ({ request }) => {
 		zones
 	};
 
-	// Create simulator .ini file
+	// Create .ini file
 	const iniFileCreated = createSimulatorLaunchFile(simulatorDirectives);
 
 	if (!iniFileCreated) {
@@ -111,7 +111,7 @@ export const POST = (async ({ request }) => {
 		});
 	}
 
-	// Create simulator config file
+	// Create parameters.config file
 	if (type === 'local') {
 		const configFileCreated = createFile(
 			PUBLIC_SIM_DIR,
