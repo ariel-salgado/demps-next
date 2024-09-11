@@ -59,9 +59,14 @@ export const GET = (async () => {
 	});
 
 	demps_process.on_spawn(() => {
-		agent_watcher.add(agentsDir);
-		flood_watcher.add(floodDir);
 		stream.send({ name: 'status', data: 'ready' });
+	});
+
+	demps_process.on_message((data) => {
+		if (data.includes('Creando agentes')) {
+			agent_watcher.add(agentsDir);
+			flood_watcher.add(floodDir);
+		}
 	});
 
 	agent_watcher.on('add', (path) => {
