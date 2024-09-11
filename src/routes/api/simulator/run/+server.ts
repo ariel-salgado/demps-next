@@ -2,20 +2,25 @@ import type { RequestHandler } from './$types';
 import type { SimulatorDirectives } from '$lib/types';
 
 import { join } from 'node:path';
-import { PUBLIC_EXEC_CMD, PUBLIC_SIM_DIR } from '$env/static/public';
 import { basePath, isFile, readFile } from '$lib/server/utils';
+import { PUBLIC_EXEC_CMD, PUBLIC_SIM_DIR } from '$env/static/public';
 
 import { Stream } from '$lib/models';
-import { uniquePool } from '$lib/states';
 import { FileWatcher, Process } from '$lib/server/models';
 import { create_agent_processor, create_flood_processor } from '$lib/server/helpers';
 
-export const DELETE = (async () => {
-	if (uniquePool.has('demps')) {
-		const current = uniquePool.pop<Process>('demps');
+let stream: Stream;
+let demps_process: Process;
 
-		if (current?.is_running) {
-			current.kill();
+export const DELETE = (async () => {
+	stream.close();
+	if (demps_process && demps_process.is_running) {
+		console.log('Stopping current simulation');
+		demps_process.kill();
+
+		if (demps_process.is_running) {
+			console.log('Force killing simulation');
+			demps_process.force_kill();
 		}
 	}
 
@@ -25,7 +30,7 @@ export const DELETE = (async () => {
 export const GET = (async () => {
 	console.log('Connection started');
 
-	const stream = new Stream();
+	stream = new Stream();
 
 	const directives = getSimulationDirectives();
 
@@ -41,11 +46,9 @@ export const GET = (async () => {
 	const agent_watcher = new FileWatcher('agent_watcher');
 	const flood_watcher = new FileWatcher('flood_watcher');
 
-	const demps_process = new Process('demps', PUBLIC_EXEC_CMD, ['--config', configFile], {
+	demps_process = new Process('demps', PUBLIC_EXEC_CMD, ['--config', configFile], {
 		cwd: PUBLIC_SIM_DIR
 	});
-
-	uniquePool.add('demps', demps_process);
 
 	const agent_processor = create_agent_processor((data) => {
 		stream.sync_and_send({ name: 'agents', data: data });
@@ -72,6 +75,8 @@ export const GET = (async () => {
 	}
 
 	demps_process.on_close((code) => {
+		console.log('DEMPS closed');
+
 		if (code === 0) {
 			stream.send({ name: 'status', data: 'finished' });
 		} else {

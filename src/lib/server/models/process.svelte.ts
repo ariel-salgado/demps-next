@@ -16,10 +16,10 @@ export class Process {
 	private child_process: ChildProcess | null;
 
 	constructor(id: string, path: string, args: string[], options?: Parameters<typeof execFile>[2]) {
-		this.child_process = execFile(path, args, options, (error) => {
-			console.error(error);
-		});
 		this.kill_existing_process(id);
+
+		this.child_process = execFile(path, args, options);
+
 		child_processes.set(id, this);
 
 		this.child_process.on('close', () => {
@@ -34,6 +34,11 @@ export class Process {
 		if (child_processes.has(id)) {
 			const existing_process = child_processes.get(id);
 			existing_process!.kill();
+
+			if (existing_process?.is_running) {
+				existing_process.force_kill();
+			}
+
 			child_processes.delete(id);
 		}
 	}
@@ -62,17 +67,15 @@ export class Process {
 		this.child_process?.on('exit', callback);
 	}
 
-	kill() {
+	kill(signal?: NodeJS.Signals) {
 		if (!this.child_process?.killed) {
-			this.child_process?.kill();
+			this.child_process?.kill(signal || 'SIGTERM');
 			this.child_process?.removeAllListeners();
 			this.child_process = null;
 		}
 	}
 
 	force_kill() {
-		this.child_process?.kill('SIGKILL');
-		this.child_process?.removeAllListeners();
-		this.child_process = null;
+		this.kill('SIGKILL');
 	}
 }

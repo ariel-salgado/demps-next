@@ -1,5 +1,5 @@
-import { Process } from './process';
-import { FileWatcher } from './file-watcher';
-import { FileProcessor } from './file-processor';
+import { Process } from './process.svelte';
+import { FileWatcher } from './file-watcher.svelte';
+import { FileProcessor } from './file-processor.svelte';
 
 export { Process, FileWatcher, FileProcessor };

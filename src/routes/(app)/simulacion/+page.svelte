@@ -277,9 +277,10 @@
 	}
 
 	function stopSimulation() {
-		connection?.close(() => {
-			onProgress = false;
-		});
+		connection?.close();
+		onProgress = false;
+
+		toast.info('Simulación detenida');
 
 		fetch('/api/simulator/run', {
 			method: 'DELETE'

@@ -1,8 +1,6 @@
 import { LinkedList } from '.';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
-const current_streams: SvelteMap<string, Stream> = new SvelteMap();
-
 declare type StreamEventData = {
 	name: string;
 	data: any;
@@ -21,17 +19,10 @@ export class Stream {
 	private sync_timeout_id: ReturnType<typeof setTimeout> | null = null;
 
 	constructor() {
-		if (current_streams.has('demps')) {
-			const stream = current_streams.get('demps');
-			stream?.close();
-		}
-
 		this.stream = new ReadableStream({
 			start: this.initialize_stream.bind(this),
 			cancel: this.close.bind(this)
 		});
-
-		current_streams.set('demps', this);
 	}
 
 	private initialize_stream(controller: ReadableStreamDefaultController) {
@@ -115,9 +106,17 @@ export class Stream {
 	}
 
 	close() {
-		if (this.controller) {
-			this.controller.close();
-			this.handle_close();
+		try {
+			if (this.on_close_callback) {
+				this.on_close_callback();
+			}
+			this.controller?.close();
+		} catch {
+			console.log('Stream closed');
+		} finally {
+			if (this.controller) {
+				this.cleanup();
+			}
 		}
 	}
 
@@ -152,22 +151,17 @@ export class Stream {
 		}
 	}
 
-	private handle_close() {
-		if (this.on_close_callback) {
-			this.on_close_callback();
-		}
-		this.cleanup();
-	}
-
 	private cleanup() {
-		this.controller = null;
-		this.on_close_callback = null;
-		this.events_buffers.clear();
-		this.pending_events.clear();
-		this.is_synced = false;
-		if (this.sync_timeout_id !== null) {
-			clearTimeout(this.sync_timeout_id);
-			this.sync_timeout_id = null;
+		if (this.controller) {
+			this.controller = null;
+			this.on_close_callback = null;
+			this.events_buffers.clear();
+			this.pending_events.clear();
+			this.is_synced = false;
+			if (this.sync_timeout_id !== null) {
+				clearTimeout(this.sync_timeout_id);
+				this.sync_timeout_id = null;
+			}
 		}
 	}
 }
