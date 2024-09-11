@@ -59,6 +59,8 @@ export class FileProcessor {
 
 	private async process_file(path: string) {
 		try {
+			if (!path) return;
+
 			const lines: string[] = [];
 			this.current_file_reader = createInterface({
 				input: createReadStream(path),
@@ -82,8 +84,8 @@ export class FileProcessor {
 			}
 
 			this.on_complete_callback?.(lines.join(''));
-		} catch (error) {
-			console.error(`Error reading file ${path}:`, error);
+		} catch {
+			// console.error(`Error reading file ${path}:`, error);
 		} finally {
 			this.current_file_reader?.close();
 			this.current_file_reader = null;
