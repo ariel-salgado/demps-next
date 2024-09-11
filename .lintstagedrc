@@ -1,9 +1,0 @@
-{
-	"*.{ts,svelte}": [
-		"eslint --fix",
-		"eslint"
-	],
-	"*.{html,css,ts,svelte}": [
-		"prettier --write --ignore-unknown"
-	]
-}

@@ -17,6 +17,15 @@
 		"prepare": "husky",
 		"preinstall": "npx only-allow pnpm"
 	},
+	"lint-staged": {
+		"*.{js,ts,svelte}": [
+			"eslint --fix",
+			"eslint"
+		],
+		"*.{html,css,js,ts,svelte}": [
+			"prettier --write --ignore-unknown"
+		]
+	},
 	"devDependencies": {
 		"@codemirror/autocomplete": "^6.18.0",
 		"@codemirror/commands": "^6.6.1",
