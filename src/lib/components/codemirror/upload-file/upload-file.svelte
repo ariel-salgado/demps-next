@@ -19,7 +19,7 @@
 
 	const { environment } = getContext<EditorContext>(contextKey);
 
-	function handleUpload(e: Event) {
+	function handleUpload() {
 		if (!files || files.length === 0) return;
 
 		const reader = new FileReader();
@@ -41,7 +41,7 @@
 
 				toast.success('Archivo GeoJSON cargado correctamente.');
 
-				(e.target as HTMLInputElement).value = '';
+				files = new DataTransfer().files;
 
 				if (onUpload) onUpload();
 			} catch {
