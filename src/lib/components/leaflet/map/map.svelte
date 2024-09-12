@@ -39,6 +39,9 @@
 	let featureGroup: FeatureGroup | undefined = $state();
 	let overlayLayer: Control.Layers | undefined = $state();
 
+	/**
+	 * Used to force reload the map in certain scenarios.
+	 */
 	$effect(() => {
 		if (reload) {
 			reloadLayers();
@@ -66,8 +69,8 @@
 
 	// @ts-expect-error - Svelte action can't be async by type definition
 	const initMap: Action<HTMLDivElement, Environment | undefined> = async (
-		mapContainer,
-		environment
+		mapContainer: HTMLDivElement,
+		environment: Environment
 	) => {
 		if (!window.L) {
 			await import('leaflet');
@@ -115,6 +118,9 @@
 		};
 	};
 
+	/**
+	 * Loads features into the map
+	 */
 	function loadFeatures(features: Feature<G> | Feature<G>[] | FeatureCollection<G>) {
 		window.L.geoJSON(features, {
 			onEachFeature(feature, layer) {
@@ -123,6 +129,12 @@
 		});
 	}
 
+	/**
+	 * Every time a layer is added to the map:
+	 * - Set the style for that later
+	 * - Give an internal id
+	 * - Adds a popup if layer is editable
+	 */
 	function addFeatureToMap(feature: Feature, layer: Layer) {
 		// @ts-expect-error - This are custom properties
 		const { nameID } = feature.properties;
@@ -154,6 +166,9 @@
 		fitBounds();
 	}
 
+	/**
+	 * Fits the map zoom, so all the layers on the map can be seen.
+	 */
 	function fitBounds() {
 		if (!map || !featureGroup) return;
 

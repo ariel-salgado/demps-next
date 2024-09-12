@@ -31,6 +31,10 @@
 		}
 	});
 
+	/**
+	 * If the value is a valid GeoJSON and is different from the actual value
+	 * updates the environment value to the content in the editor.
+	 */
 	const updateEnvironment = debounce((value: string) => {
 		if (!isValidGeoJSON(value) || strEqualsObj(value, environment.value)) return;
 
@@ -43,13 +47,19 @@
 		}
 	}, 1000);
 
+	/**
+	 * Listens for changes in the editor.
+	 */
 	const handleChanges = EditorView.updateListener.of(({ state, docChanged }) => {
 		if (!docChanged) return;
 
 		updateEnvironment(state.doc.toString());
 	});
 
-	// ?: Just update the affected code
+	/**
+	 * If the environment value changes updates the editor content only if
+	 * the environment value is a valid GeoJSON and it's different from the current editor contents.
+	 */
 	function updateEditor(value: FeatureCollection) {
 		const { doc } = editor!.state;
 
@@ -64,7 +74,13 @@
 		});
 	}
 
-	const initEditor: Action<HTMLElement, Environment> = (editorContainer, environment) => {
+	/**
+	 * Initializes the editor.
+	 */
+	const initEditor: Action<HTMLElement, Environment> = (
+		editorContainer: HTMLElement,
+		environment: Environment
+	) => {
 		editor = new EditorView({
 			parent: editorContainer,
 			state: EditorState.create({

@@ -43,12 +43,19 @@
 			drawCircleMarker: false
 		});
 
-		// Add aria-label to the draw buttons
+		/**
+		 * Add aria-label to the draw buttons for accessibilty
+		 */
 		window.document.querySelectorAll('a.leaflet-buttons-control-button').forEach((button) => {
 			button.setAttribute('aria-label', button.parentElement!.getAttribute('title')!);
 		});
 	});
 
+	/**
+	 * When a new layer is created it gets removed from the featureGroup as it needs to be updated.
+	 * An internal id is given to the created layer and a popup is attached.
+	 * Then is added to the map and the environment.
+	 */
 	map.on('pm:create', ({ layer }) => {
 		featureGroup.removeLayer(layer);
 
@@ -71,6 +78,11 @@
 		environment.addFeature(createdFeature, id);
 	});
 
+	/**
+	 * When a layer is edited it is removed from the map to work with it first.
+	 * Updates the coordinates and properties of the layer feature.
+	 * Reassigns the internal id and attach the popup.
+	 */
 	featureGroup.on('pm:edit', ({ layer }) => {
 		const feature = geometryToGeoJSON(layer) as Feature<G>;
 		const { id, geometry } = feature;
@@ -108,6 +120,11 @@
 		environment.removeFeature(layer.id);
 	});
 
+	/**
+	 * When the layer has a popup attached and is dragged it displays the popup. That is bad.
+	 * So when the layer is about to be dragged the click event is removed and then added again
+	 * after the user ends the dragging.
+	 */
 	featureGroup.on('pm:dragstart', ({ layer }) => {
 		layer.removeEventListener('click');
 	});

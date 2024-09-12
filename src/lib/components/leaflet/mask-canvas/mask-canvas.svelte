@@ -20,12 +20,19 @@
 	let mounted: boolean = $state(false);
 	let layerGroup: LayerGroup<TileLayer> | undefined = $state();
 
+	/**
+	 * After the component being mounted and the value of coordinates is truthy or changes
+	 * calls the function createMaskLayer with initial opacity 0.
+	 */
 	$effect(() => {
 		if (mounted && coordinates) {
 			untrack(() => createMaskLayer(coordinates));
 		}
 	});
 
+	/**
+	 * The first time the layer is rendered it is rendered with opacity 1.
+	 */
 	onMount(async () => {
 		// @ts-expect-error - maskCanvas is not typed
 		await import('leaflet-maskcanvas');
@@ -43,7 +50,7 @@
 		layerGroup!.clearLayers();
 	});
 
-	// TODO: Found the correct equation to minimize the flood flickering
+	// TODO: Found the correct equation to minimize the layer flickering
 	function flickeringDelay(dotsOnScreen: number) {
 		return dotsOnScreen * 0.0025 + 60;
 	}
@@ -64,6 +71,12 @@
 		toggleLayers(flickeringDelay(coordinates.length));
 	}
 
+	/**
+	 * Mounting a layer with a lot of coordinates takes time, so when the layer are toggled looks bad.
+	 * The trick here is to wait the new layer to be mounted but with opacity 0, so it invisible
+	 * and then swap the opacity between the layers and remove the old one.
+	 * This minimizes the flickering.
+	 */
 	function toggleLayers(delay: number) {
 		const layers = layerGroup!.getLayers();
 
