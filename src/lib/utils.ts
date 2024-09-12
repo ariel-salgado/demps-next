@@ -197,7 +197,10 @@ export function joinPath(path1: string, path2: string) {
 	return path;
 }
 
-export const clickOutside: Action<HTMLElement, () => void> = (node, callback) => {
+export const clickOutside: Action<HTMLElement, () => void> = (
+	node: HTMLElement,
+	callback: () => void
+) => {
 	const onClick = on(node.parentElement as HTMLElement, 'click', ({ target }) => {
 		if (!node.contains(target as Node)) {
 			callback();
